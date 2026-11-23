@@ -1,0 +1,556 @@
+{
+  "built_at_utc": "2026-11-23 11:52:20 UTC",
+  "duckdb_path": "data\\observatory.duckdb",
+  "duplicate_primary_keys_lfs": 0,
+  "mart_panel_causal_lfs": {
+    "total_rows": 11933,
+    "rows_sex_total": 3987,
+    "eligible_countries_count": 49,
+    "min_year": 2015,
+    "max_year": 2025
+  },
+  "mart_panel_causal_modeled": {
+    "total_rows": 28350,
+    "rows_sex_total": 9450,
+    "total_countries_count": 124,
+    "rows_sex_total_matched_lfs": 3598
+  },
+  "eligible_lfs_countries": [
+    {
+      "iso3": "MLI",
+      "country_name": "Mali",
+      "income_level": "LIC",
+      "pre_2022_years": 6,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2024
+    },
+    {
+      "iso3": "RWA",
+      "country_name": "Rwanda",
+      "income_level": "LIC",
+      "pre_2022_years": 6,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2017,
+      "max_year": 2025
+    },
+    {
+      "iso3": "AGO",
+      "country_name": "Angola",
+      "income_level": "LMC",
+      "pre_2022_years": 4,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2019,
+      "max_year": 2025
+    },
+    {
+      "iso3": "BGD",
+      "country_name": "Bangladesh",
+      "income_level": "LMC",
+      "pre_2022_years": 3,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2016,
+      "max_year": 2024
+    },
+    {
+      "iso3": "BOL",
+      "country_name": "Bolivia",
+      "income_level": "LMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "BTN",
+      "country_name": "Bhutan",
+      "income_level": "LMC",
+      "pre_2022_years": 5,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2018,
+      "max_year": 2024
+    },
+    {
+      "iso3": "EGY",
+      "country_name": "Egypt, Arab Rep.",
+      "income_level": "LMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2024
+    },
+    {
+      "iso3": "GHA",
+      "country_name": "Ghana",
+      "income_level": "LMC",
+      "pre_2022_years": 4,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "HND",
+      "country_name": "Honduras",
+      "income_level": "LMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "KGZ",
+      "country_name": "Kyrgyz Republic",
+      "income_level": "LMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 1,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2023
+    },
+    {
+      "iso3": "KHM",
+      "country_name": "Cambodia",
+      "income_level": "LMC",
+      "pre_2022_years": 6,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "KIR",
+      "country_name": "Kiribati",
+      "income_level": "LMC",
+      "pre_2022_years": 3,
+      "post_2022_years": 1,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2023
+    },
+    {
+      "iso3": "PAK",
+      "country_name": "Pakistan",
+      "income_level": "LMC",
+      "pre_2022_years": 6,
+      "post_2022_years": 1,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "PSE",
+      "country_name": "West Bank and Gaza",
+      "income_level": "LMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "SEN",
+      "country_name": "Senegal",
+      "income_level": "LMC",
+      "pre_2022_years": 4,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "ZMB",
+      "country_name": "Zambia",
+      "income_level": "LMC",
+      "pre_2022_years": 7,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2024
+    },
+    {
+      "iso3": "ZWE",
+      "country_name": "Zimbabwe",
+      "income_level": "LMC",
+      "pre_2022_years": 3,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2019,
+      "max_year": 2025
+    },
+    {
+      "iso3": "ALB",
+      "country_name": "Albania",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2024
+    },
+    {
+      "iso3": "ARG",
+      "country_name": "Argentina",
+      "income_level": "UMC",
+      "pre_2022_years": 6,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2017,
+      "max_year": 2025
+    },
+    {
+      "iso3": "BIH",
+      "country_name": "Bosnia and Herzegovina",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "BLR",
+      "country_name": "Belarus",
+      "income_level": "UMC",
+      "pre_2022_years": 7,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2016,
+      "max_year": 2025
+    },
+    {
+      "iso3": "BLZ",
+      "country_name": "Belize",
+      "income_level": "UMC",
+      "pre_2022_years": 5,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "BRA",
+      "country_name": "Brazil",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "BWA",
+      "country_name": "Botswana",
+      "income_level": "UMC",
+      "pre_2022_years": 4,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2019,
+      "max_year": 2024
+    },
+    {
+      "iso3": "COL",
+      "country_name": "Colombia",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "DOM",
+      "country_name": "Dominican Republic",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "ECU",
+      "country_name": "Ecuador",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "GEO",
+      "country_name": "Georgia",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "GRD",
+      "country_name": "Grenada",
+      "income_level": "UMC",
+      "pre_2022_years": 4,
+      "post_2022_years": 1,
+      "isco1_groups_count": 9,
+      "min_year": 2018,
+      "max_year": 2023
+    },
+    {
+      "iso3": "GTM",
+      "country_name": "Guatemala",
+      "income_level": "UMC",
+      "pre_2022_years": 7,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "IDN",
+      "country_name": "Indonesia",
+      "income_level": "UMC",
+      "pre_2022_years": 5,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2017,
+      "max_year": 2024
+    },
+    {
+      "iso3": "IRN",
+      "country_name": "Iran, Islamic Rep.",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2024
+    },
+    {
+      "iso3": "JOR",
+      "country_name": "Jordan",
+      "income_level": "UMC",
+      "pre_2022_years": 6,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2017,
+      "max_year": 2024
+    },
+    {
+      "iso3": "LCA",
+      "country_name": "St. Lucia",
+      "income_level": "UMC",
+      "pre_2022_years": 6,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2017,
+      "max_year": 2025
+    },
+    {
+      "iso3": "LKA",
+      "country_name": "Sri Lanka",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2024
+    },
+    {
+      "iso3": "MDA",
+      "country_name": "Moldova",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "MEX",
+      "country_name": "Mexico",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "MKD",
+      "country_name": "North Macedonia",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "MNE",
+      "country_name": "Montenegro",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2024
+    },
+    {
+      "iso3": "MNG",
+      "country_name": "Mongolia",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "MUS",
+      "country_name": "Mauritius",
+      "income_level": "UMC",
+      "pre_2022_years": 7,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2024
+    },
+    {
+      "iso3": "PHL",
+      "country_name": "Philippines",
+      "income_level": "UMC",
+      "pre_2022_years": 6,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2017,
+      "max_year": 2024
+    },
+    {
+      "iso3": "PRY",
+      "country_name": "Paraguay",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "SLV",
+      "country_name": "El Salvador",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "SRB",
+      "country_name": "Serbia",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "THA",
+      "country_name": "Thailand",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "TON",
+      "country_name": "Tonga",
+      "income_level": "UMC",
+      "pre_2022_years": 3,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2016,
+      "max_year": 2025
+    },
+    {
+      "iso3": "TUR",
+      "country_name": "Turkiye",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2025
+    },
+    {
+      "iso3": "VNM",
+      "country_name": "Viet Nam",
+      "income_level": "UMC",
+      "pre_2022_years": 8,
+      "post_2022_years": 2,
+      "isco1_groups_count": 9,
+      "min_year": 2015,
+      "max_year": 2024
+    }
+  ],
+  "vietnam_gender_exposure": {
+    "iso3": "VNM",
+    "country_name": "Viet Nam",
+    "income_level": "UMC",
+    "region": "East Asia & Pacific",
+    "ref_year": 2024,
+    "female_exposure_2025": 0.22447153060871564,
+    "male_exposure_2025": 0.2070693874619673,
+    "gender_exposure_gap": 0.017402143146748345,
+    "female_grad34_share": 0.047921398364832155,
+    "male_grad34_share": 0.03419513447861345,
+    "female_clerical_share": 0.027120846472799054,
+    "male_clerical_share": 0.021533784692122707,
+    "female_emp_thousands": 25474.463,
+    "male_emp_thousands": 27961.643
+  },
+  "vietnam_theory_vs_adoption": {
+    "iso3": "VNM",
+    "country_name": "Viet Nam",
+    "income_level": "UMC",
+    "emp_ref_year": 2024,
+    "theoretical_exposure_2025": 0.21536546231328826,
+    "theoretical_grad34_share": 0.040738820203186026,
+    "white_collar_share": 0.13481213001606554,
+    "total_emp_thousands": 53436.104,
+    "gh_developers": 2760619,
+    "gh_git_pushes": 16183637.0,
+    "gh_dev_growth_since_2022": 1.2307058924297445,
+    "devs_per_10k_wap": 401.65650815102777,
+    "high_tech_readiness": 1,
+    "aei_usage_count": 10651.0,
+    "aei_usage_pct": 1.1043096172708176,
+    "aei_automation_pct": 51.84489719275186,
+    "aei_augmentation_pct": 45.620129565299024,
+    "aui_proxy": 0.7128650719708691,
+    "in_causal_panel": 1
+  },
+  "app_snapshots_rows": {
+    "ilo_exposure_isco1.csv": 9,
+    "mart_vietnam_workforce_isco1.csv": 270,
+    "mart_gender_exposure_gap.csv": 98,
+    "mart_theory_vs_adoption.csv": 103,
+    "mart_lfs_country_eligibility.csv": 103,
+    "github_vietnam_quarterly.csv": 26,
+    "aei_vietnam_profile.csv": 1
+  }
+}

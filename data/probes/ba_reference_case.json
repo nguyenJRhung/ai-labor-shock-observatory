@@ -1,0 +1,753 @@
+{
+  "reference_profile": {
+    "total_headcount": 1000,
+    "scenario": "base",
+    "locked_hitl_isco1": [
+      "1"
+    ],
+    "targeted_reskill_isco1": [
+      "2",
+      "3",
+      "4"
+    ],
+    "note": "Reference parameters configurable via Human-in-the-Loop controls."
+  },
+  "diagnostics": {
+    "total_headcount": 1000,
+    "total_monthly_payroll_vnd": 16555000000.0,
+    "high_exposure_payroll_vnd": 11770000000.0,
+    "high_exposure_payroll_pct": 71.09634551495017,
+    "headcount_weighted_exposure": 0.3348061215185233,
+    "payroll_weighted_exposure": 0.3540677272637143,
+    "total_realizable_hours_per_month": 16874.22852453357,
+    "total_monthly_value_gain_vnd": 1758477367.4552372
+  },
+  "group_table": [
+    {
+      "isco1": "1",
+      "occupation_group": "Managers",
+      "headcount": 40,
+      "monthly_salary_vnd": 45000000.0,
+      "monthly_payroll_vnd": 1800000000.0,
+      "exposure_2025": 0.361,
+      "share_exposed_grad34": 0.0,
+      "share_automation_23": 0.0,
+      "share_augmentation_23": 0.09897610921501707,
+      "auto_aug_ratio": 0.0,
+      "is_high_exposure": true,
+      "is_locked_hitl": true,
+      "effective_time_saved_share": 0.1083,
+      "realizable_hours_per_month": 727.776,
+      "monthly_value_gain_vnd": 194940000.0,
+      "annual_net_gain_per_person_vnd": 51882000.0,
+      "payback_months_est": 3.1918584480166525,
+      "quadrant": "Q2: Strategic Copilot (HITL Locked)"
+    },
+    {
+      "isco1": "2",
+      "occupation_group": "Professionals",
+      "headcount": 160,
+      "monthly_salary_vnd": 28000000.0,
+      "monthly_payroll_vnd": 4480000000.0,
+      "exposure_2025": 0.386304347826087,
+      "share_exposed_grad34": 0.19896640826873385,
+      "share_automation_23": 0.025839793281653745,
+      "share_augmentation_23": 0.20801033591731266,
+      "auto_aug_ratio": 0.1242,
+      "is_high_exposure": true,
+      "is_locked_hitl": false,
+      "effective_time_saved_share": 0.1158913043478261,
+      "realizable_hours_per_month": 3115.1582608695658,
+      "monthly_value_gain_vnd": 519193043.47826093,
+      "annual_net_gain_per_person_vnd": 32339478.26086957,
+      "payback_months_est": 5.120676303562208,
+      "quadrant": "Q1: Quick Wins (Reskill First)"
+    },
+    {
+      "isco1": "3",
+      "occupation_group": "Technicians and associate professionals",
+      "headcount": 140,
+      "monthly_salary_vnd": 18000000.0,
+      "monthly_payroll_vnd": 2520000000.0,
+      "exposure_2025": 0.3459756097560976,
+      "share_exposed_grad34": 0.11262798634812286,
+      "share_automation_23": 0.017064846416382253,
+      "share_augmentation_23": 0.26621160409556316,
+      "auto_aug_ratio": 0.0641,
+      "is_high_exposure": true,
+      "is_locked_hitl": false,
+      "effective_time_saved_share": 0.10379268292682928,
+      "realizable_hours_per_month": 2441.2039024390247,
+      "monthly_value_gain_vnd": 261557560.97560978,
+      "annual_net_gain_per_person_vnd": 15819219.512195125,
+      "payback_months_est": 10.468278784066307,
+      "quadrant": "Q1: Quick Wins (Reskill First)"
+    },
+    {
+      "isco1": "4",
+      "occupation_group": "Clerical support workers",
+      "headcount": 220,
+      "monthly_salary_vnd": 13500000.0,
+      "monthly_payroll_vnd": 2970000000.0,
+      "exposure_2025": 0.5355172413793103,
+      "share_exposed_grad34": 0.7177914110429447,
+      "share_automation_23": 0.50920245398773,
+      "share_augmentation_23": 0.03067484662576687,
+      "auto_aug_ratio": 16.6,
+      "is_high_exposure": true,
+      "is_locked_hitl": false,
+      "effective_time_saved_share": 0.1606551724137931,
+      "realizable_hours_per_month": 5937.815172413792,
+      "monthly_value_gain_vnd": 477145862.0689655,
+      "annual_net_gain_per_person_vnd": 19426137.93103448,
+      "payback_months_est": 8.524597147817197,
+      "quadrant": "Q1: Quick Wins (Reskill First)"
+    },
+    {
+      "isco1": "5",
+      "occupation_group": "Service and sales workers",
+      "headcount": 200,
+      "monthly_salary_vnd": 11500000.0,
+      "monthly_payroll_vnd": 2300000000.0,
+      "exposure_2025": 0.25564102564102564,
+      "share_exposed_grad34": 0.029304029304029304,
+      "share_automation_23": 0.029304029304029304,
+      "share_augmentation_23": 0.26373626373626374,
+      "auto_aug_ratio": 0.1111,
+      "is_high_exposure": false,
+      "is_locked_hitl": false,
+      "effective_time_saved_share": 0.07669230769230768,
+      "realizable_hours_per_month": 2576.861538461538,
+      "monthly_value_gain_vnd": 176392307.69230768,
+      "annual_net_gain_per_person_vnd": 3983538.46153846,
+      "payback_months_est": 41.57108098713939,
+      "quadrant": "Q3: Selective Task Pilot"
+    },
+    {
+      "isco1": "6",
+      "occupation_group": "Skilled agricultural, forestry and fishery workers",
+      "headcount": 10,
+      "monthly_salary_vnd": 8500000.0,
+      "monthly_payroll_vnd": 85000000.0,
+      "exposure_2025": 0.1638888888888889,
+      "share_exposed_grad34": 0.0,
+      "share_automation_23": 0.0,
+      "share_augmentation_23": 0.03977272727272727,
+      "auto_aug_ratio": 0.0,
+      "is_high_exposure": false,
+      "is_locked_hitl": false,
+      "effective_time_saved_share": 0.049166666666666664,
+      "realizable_hours_per_month": 82.6,
+      "monthly_value_gain_vnd": 4179166.6666666665,
+      "annual_net_gain_per_person_vnd": -1585000.0,
+      "payback_months_est": null,
+      "quadrant": "Q4: Shielded / Low AI Priority"
+    },
+    {
+      "isco1": "7",
+      "occupation_group": "Craft and related trades workers",
+      "headcount": 80,
+      "monthly_salary_vnd": 12000000.0,
+      "monthly_payroll_vnd": 960000000.0,
+      "exposure_2025": 0.16584615384615387,
+      "share_exposed_grad34": 0.0,
+      "share_automation_23": 0.0,
+      "share_augmentation_23": 0.0,
+      "auto_aug_ratio": 0.0,
+      "is_high_exposure": false,
+      "is_locked_hitl": false,
+      "effective_time_saved_share": 0.049753846153846155,
+      "realizable_hours_per_month": 668.6916923076923,
+      "monthly_value_gain_vnd": 47763692.30769231,
+      "annual_net_gain_per_person_vnd": 564553.846153846,
+      "payback_months_est": 293.3289731850881,
+      "quadrant": "Q4: Shielded / Low AI Priority"
+    },
+    {
+      "isco1": "8",
+      "occupation_group": "Plant and machine operators, and assemblers",
+      "headcount": 80,
+      "monthly_salary_vnd": 11000000.0,
+      "monthly_payroll_vnd": 880000000.0,
+      "exposure_2025": 0.19794871794871793,
+      "share_exposed_grad34": 0.0,
+      "share_automation_23": 0.0,
+      "share_augmentation_23": 0.14385964912280702,
+      "auto_aug_ratio": 0.0,
+      "is_high_exposure": false,
+      "is_locked_hitl": false,
+      "effective_time_saved_share": 0.059384615384615376,
+      "realizable_hours_per_month": 798.1292307692306,
+      "monthly_value_gain_vnd": 52258461.53846153,
+      "annual_net_gain_per_person_vnd": 1238769.23076923,
+      "payback_months_est": 133.68107302533542,
+      "quadrant": "Q4: Shielded / Low AI Priority"
+    },
+    {
+      "isco1": "9",
+      "occupation_group": "Elementary occupations",
+      "headcount": 70,
+      "monthly_salary_vnd": 8000000.0,
+      "monthly_payroll_vnd": 560000000.0,
+      "exposure_2025": 0.14909090909090908,
+      "share_exposed_grad34": 0.0,
+      "share_automation_23": 0.0,
+      "share_augmentation_23": 0.13679245283018868,
+      "auto_aug_ratio": 0.0,
+      "is_high_exposure": false,
+      "is_locked_hitl": false,
+      "effective_time_saved_share": 0.04472727272727272,
+      "realizable_hours_per_month": 525.9927272727272,
+      "monthly_value_gain_vnd": 25047272.727272723,
+      "annual_net_gain_per_person_vnd": -2306181.8181818184,
+      "payback_months_est": null,
+      "quadrant": "Q4: Shielded / Low AI Priority"
+    }
+  ],
+  "reskilling": {
+    "targeted_isco1": [
+      "2",
+      "3",
+      "4"
+    ],
+    "n_trained": 520,
+    "targeted_monthly_payroll_vnd": 9970000000.0,
+    "upfront_investment_vnd": 7175999999.999999,
+    "pv_operating_net_vnd": 29065354441.87053,
+    "npv_reskill_vnd": 21889354441.87053,
+    "roi_pct": 305.035597016033,
+    "payback_months": 10,
+    "breakeven_productivity_lift_pct": 5.346148974451188,
+    "expected_effective_lift_pct": 12.616815110560042,
+    "monthly_schedule": [
+      {
+        "month": 1,
+        "ramp_factor": 0.3333,
+        "gross_benefit_vnd": 419298822.17,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 133298822.17,
+        "discounted_cashflow_vnd": 132244287.65,
+        "cumulative_discounted_cf_vnd": -7043755712.35
+      },
+      {
+        "month": 2,
+        "ramp_factor": 0.6667,
+        "gross_benefit_vnd": 838597644.35,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 552597644.35,
+        "discounted_cashflow_vnd": 543888966.14,
+        "cumulative_discounted_cf_vnd": -6499866746.21
+      },
+      {
+        "month": 3,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 949012279.48,
+        "cumulative_discounted_cf_vnd": -5550854466.73
+      },
+      {
+        "month": 4,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 941504589.67,
+        "cumulative_discounted_cf_vnd": -4609349877.06
+      },
+      {
+        "month": 5,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 934056293.61,
+        "cumulative_discounted_cf_vnd": -3675293583.45
+      },
+      {
+        "month": 6,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 926666921.45,
+        "cumulative_discounted_cf_vnd": -2748626662.0
+      },
+      {
+        "month": 7,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 919336007.03,
+        "cumulative_discounted_cf_vnd": -1829290654.97
+      },
+      {
+        "month": 8,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 912063087.89,
+        "cumulative_discounted_cf_vnd": -917227567.09
+      },
+      {
+        "month": 9,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 904847705.22,
+        "cumulative_discounted_cf_vnd": -12379861.87
+      },
+      {
+        "month": 10,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 897689403.85,
+        "cumulative_discounted_cf_vnd": 885309541.98
+      },
+      {
+        "month": 11,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 890587732.21,
+        "cumulative_discounted_cf_vnd": 1775897274.19
+      },
+      {
+        "month": 12,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 883542242.29,
+        "cumulative_discounted_cf_vnd": 2659439516.48
+      },
+      {
+        "month": 13,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 876552489.65,
+        "cumulative_discounted_cf_vnd": 3535992006.13
+      },
+      {
+        "month": 14,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 869618033.33,
+        "cumulative_discounted_cf_vnd": 4405610039.46
+      },
+      {
+        "month": 15,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 862738435.89,
+        "cumulative_discounted_cf_vnd": 5268348475.35
+      },
+      {
+        "month": 16,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 855913263.33,
+        "cumulative_discounted_cf_vnd": 6124261738.68
+      },
+      {
+        "month": 17,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 849142085.1,
+        "cumulative_discounted_cf_vnd": 6973403823.78
+      },
+      {
+        "month": 18,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 842424474.05,
+        "cumulative_discounted_cf_vnd": 7815828297.83
+      },
+      {
+        "month": 19,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 835760006.39,
+        "cumulative_discounted_cf_vnd": 8651588304.22
+      },
+      {
+        "month": 20,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 829148261.71,
+        "cumulative_discounted_cf_vnd": 9480736565.93
+      },
+      {
+        "month": 21,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 822588822.92,
+        "cumulative_discounted_cf_vnd": 10303325388.85
+      },
+      {
+        "month": 22,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 816081276.23,
+        "cumulative_discounted_cf_vnd": 11119406665.08
+      },
+      {
+        "month": 23,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 809625211.1,
+        "cumulative_discounted_cf_vnd": 11929031876.18
+      },
+      {
+        "month": 24,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 803220220.27,
+        "cumulative_discounted_cf_vnd": 12732252096.45
+      },
+      {
+        "month": 25,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 796865899.68,
+        "cumulative_discounted_cf_vnd": 13529117996.13
+      },
+      {
+        "month": 26,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 790561848.48,
+        "cumulative_discounted_cf_vnd": 14319679844.61
+      },
+      {
+        "month": 27,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 784307668.99,
+        "cumulative_discounted_cf_vnd": 15103987513.6
+      },
+      {
+        "month": 28,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 778102966.67,
+        "cumulative_discounted_cf_vnd": 15882090480.26
+      },
+      {
+        "month": 29,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 771947350.09,
+        "cumulative_discounted_cf_vnd": 16654037830.36
+      },
+      {
+        "month": 30,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 765840430.95,
+        "cumulative_discounted_cf_vnd": 17419878261.31
+      },
+      {
+        "month": 31,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 759781823.99,
+        "cumulative_discounted_cf_vnd": 18179660085.3
+      },
+      {
+        "month": 32,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 753771147.01,
+        "cumulative_discounted_cf_vnd": 18933431232.31
+      },
+      {
+        "month": 33,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 747808020.84,
+        "cumulative_discounted_cf_vnd": 19681239253.15
+      },
+      {
+        "month": 34,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 741892069.3,
+        "cumulative_discounted_cf_vnd": 20423131322.45
+      },
+      {
+        "month": 35,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 736022919.18,
+        "cumulative_discounted_cf_vnd": 21159154241.63
+      },
+      {
+        "month": 36,
+        "ramp_factor": 1.0,
+        "gross_benefit_vnd": 1257896466.52,
+        "ai_license_cost_vnd": 286000000.0,
+        "net_cashflow_vnd": 971896466.52,
+        "discounted_cashflow_vnd": 730200200.24,
+        "cumulative_discounted_cf_vnd": 21889354441.87
+      }
+    ]
+  },
+  "cut_and_replace": {
+    "cut_headcount": 34,
+    "upfront_severance_friction_vnd": 1894000000.0,
+    "monthly_payroll_saved_vnd": 473500000.0,
+    "npv_vnd": 4049891572.824888,
+    "roi_pct": 213.82743256731197,
+    "payback_months": 22,
+    "cumulative_discounted_cf": [
+      -2348128713.86,
+      -2798664789.79,
+      -3245636649.34,
+      -3689072489.23,
+      -4129000283.11,
+      -4565447783.34,
+      -4243976975.75,
+      -3925049341.89,
+      -3608644762.59,
+      -3294743277.81,
+      -2983325085.42,
+      -2674370539.97,
+      -2367860151.39,
+      -2063774583.84,
+      -1762094654.4,
+      -1462801331.95,
+      -1165875735.9,
+      -871299135.03,
+      -579052946.31,
+      -289118733.72,
+      -1478207.08,
+      283886779.09,
+      566994226.71,
+      847861995.31,
+      1126507803.1,
+      1402949228.15,
+      1677203709.45,
+      1949288548.04,
+      2219220908.09,
+      2487017817.97,
+      2752696171.35,
+      3016272728.25,
+      3277764116.11,
+      3537186830.81,
+      3794557237.74,
+      4049891572.82
+    ],
+    "cut_by_isco1": [
+      {
+        "isco1": "1",
+        "is_locked_hitl": true,
+        "original_headcount": 40,
+        "cut_headcount": 0,
+        "severance_friction_vnd": 0.0
+      },
+      {
+        "isco1": "2",
+        "is_locked_hitl": false,
+        "original_headcount": 160,
+        "cut_headcount": 1,
+        "severance_friction_vnd": 112000000.0
+      },
+      {
+        "isco1": "3",
+        "is_locked_hitl": false,
+        "original_headcount": 140,
+        "cut_headcount": 0,
+        "severance_friction_vnd": 0.0
+      },
+      {
+        "isco1": "4",
+        "is_locked_hitl": false,
+        "original_headcount": 220,
+        "cut_headcount": 33,
+        "severance_friction_vnd": 1782000000.0
+      },
+      {
+        "isco1": "5",
+        "is_locked_hitl": false,
+        "original_headcount": 200,
+        "cut_headcount": 0,
+        "severance_friction_vnd": 0.0
+      },
+      {
+        "isco1": "6",
+        "is_locked_hitl": false,
+        "original_headcount": 10,
+        "cut_headcount": 0,
+        "severance_friction_vnd": 0.0
+      },
+      {
+        "isco1": "7",
+        "is_locked_hitl": false,
+        "original_headcount": 80,
+        "cut_headcount": 0,
+        "severance_friction_vnd": 0.0
+      },
+      {
+        "isco1": "8",
+        "is_locked_hitl": false,
+        "original_headcount": 80,
+        "cut_headcount": 0,
+        "severance_friction_vnd": 0.0
+      },
+      {
+        "isco1": "9",
+        "is_locked_hitl": false,
+        "original_headcount": 70,
+        "cut_headcount": 0,
+        "severance_friction_vnd": 0.0
+      }
+    ]
+  },
+  "status_quo_curve": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "strategies_comparison": [
+    {
+      "strategy": "A. Status Quo (Giữ nguyên hiện trạng)",
+      "upfront_cost_vnd": 0.0,
+      "npv_36m_vnd": 0.0,
+      "opportunity_cost_vnd": -21889354441.87053,
+      "roi_pct": 0.0,
+      "payback_months": null,
+      "headcount_impact": "0 nhân sự cắt giảm; rủi ro tụt năng suất"
+    },
+    {
+      "strategy": "B. Cut & Replace (Cắt giảm theo tự động hóa)",
+      "upfront_cost_vnd": 1894000000.0,
+      "npv_36m_vnd": 4049891572.824888,
+      "opportunity_cost_vnd": 0.0,
+      "roi_pct": 213.82743256731197,
+      "payback_months": 22,
+      "headcount_impact": "-34 nhân sự (khóa HITL được bảo vệ)"
+    },
+    {
+      "strategy": "C. Targeted Reskilling + AI (Khuyến nghị BA)",
+      "upfront_cost_vnd": 7175999999.999999,
+      "npv_36m_vnd": 21889354441.87053,
+      "opportunity_cost_vnd": 0.0,
+      "roi_pct": 305.035597016033,
+      "payback_months": 10,
+      "headcount_impact": "Đào tạo lại 520 nhân sự; giữ tri thức vận hành"
+    }
+  ],
+  "scenario_sensitivity": {
+    "conservative": {
+      "adoption_multiplier": 0.35,
+      "npv_reskill_vnd": 6062403793.393418,
+      "roi_pct": 84.48165821339771,
+      "payback_months": 20,
+      "breakeven_lift_pct": 5.346148974451188,
+      "npv_cut_vnd": -457230007.67385364
+    },
+    "base": {
+      "adoption_multiplier": 0.6,
+      "npv_reskill_vnd": 21889354441.87053,
+      "roi_pct": 305.035597016033,
+      "payback_months": 10,
+      "breakeven_lift_pct": 5.346148974451188,
+      "npv_cut_vnd": 4049891572.824888
+    },
+    "accelerated": {
+      "adoption_multiplier": 0.85,
+      "npv_reskill_vnd": 37716305090.347626,
+      "roi_pct": 525.5895358186682,
+      "payback_months": 7,
+      "breakeven_lift_pct": 5.346148974451188,
+      "npv_cut_vnd": 4547824100.856435
+    }
+  }
+}

@@ -1,0 +1,2 @@
+iso3,iso2,country_name,income_level,usage_count,usage_pct,directive_pct,feedback_loop_pct,learning_pct,none_pct,not_classified,task_iteration_pct,validation_pct,automation_pct,augmentation_pct
+VNM,VN,Viet Nam,UMC,10651.0,1.1043096172708176,40.334240916345884,11.510656276405971,18.862078678058396,2.534973241949113,,22.2889869495822,4.469063937658436,51.84489719275186,45.620129565299024

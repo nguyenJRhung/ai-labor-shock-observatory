@@ -1,0 +1,105 @@
+{
+  "verified_at_utc": "2026-11-23 11:52:46 UTC",
+  "r_version": "R version 4.5.2 (2025-10-31 ucrt)",
+  "fixest_version": "0.14.2",
+  "n_obs": 3987,
+  "event_study": [
+    {
+      "year": 2015,
+      "term": "year::2015:exposure",
+      "estimate": -0.055011286192,
+      "se_unit": 0.12733083506,
+      "pvalue_unit": 0.66592813361,
+      "se_iso": 0.086840816564
+    },
+    {
+      "year": 2016,
+      "term": "year::2016:exposure",
+      "estimate": -0.086529260191,
+      "se_unit": 0.1179715363,
+      "pvalue_unit": 0.46365893286,
+      "se_iso": 0.094189646644
+    },
+    {
+      "year": 2017,
+      "term": "year::2017:exposure",
+      "estimate": -0.11488598576,
+      "se_unit": 0.098862365603,
+      "pvalue_unit": 0.24583288458,
+      "se_iso": 0.080733415531
+    },
+    {
+      "year": 2018,
+      "term": "year::2018:exposure",
+      "estimate": -0.058880942289,
+      "se_unit": 0.092327316623,
+      "pvalue_unit": 0.52397383139,
+      "se_iso": 0.071317261947
+    },
+    {
+      "year": 2019,
+      "term": "year::2019:exposure",
+      "estimate": -0.054394195649,
+      "se_unit": 0.087725365648,
+      "pvalue_unit": 0.53554522925,
+      "se_iso": 0.073864150862
+    },
+    {
+      "year": 2020,
+      "term": "year::2020:exposure",
+      "estimate": 0.072125305856,
+      "se_unit": 0.075999678389,
+      "pvalue_unit": 0.34313077792,
+      "se_iso": 0.060811954159
+    },
+    {
+      "year": 2021,
+      "term": "year::2021:exposure",
+      "estimate": -0.044809140852,
+      "se_unit": 0.054044746925,
+      "pvalue_unit": 0.40749066178,
+      "se_iso": 0.051734786327
+    },
+    {
+      "year": 2023,
+      "term": "year::2023:exposure",
+      "estimate": 0.067044645405,
+      "se_unit": 0.05889264816,
+      "pvalue_unit": 0.25556406539,
+      "se_iso": 0.06738827151
+    },
+    {
+      "year": 2024,
+      "term": "year::2024:exposure",
+      "estimate": 0.16331377723,
+      "se_unit": 0.06475966004,
+      "pvalue_unit": 0.012026128524,
+      "se_iso": 0.057697998445
+    },
+    {
+      "year": 2025,
+      "term": "year::2025:exposure",
+      "estimate": 0.09579823473,
+      "se_unit": 0.089200567926,
+      "pvalue_unit": 0.2834272449,
+      "se_iso": 0.077303459986
+    }
+  ],
+  "pooled_did": {
+    "estimate": 0.15024090289,
+    "se_unit_cluster": 0.071517892471,
+    "pvalue_unit_cluster": 0.036231728027,
+    "se_country_cluster": 0.067496550456,
+    "pvalue_country_cluster": 0.030750826746
+  },
+  "python_vs_r_comparison": {
+    "available": true,
+    "n_obs_r": 3987,
+    "n_obs_python": 3987,
+    "max_abs_coef_diff": 1.8457457784e-15,
+    "max_abs_se_diff": 3.4972025276e-15,
+    "did_coef_diff": 8.3266726847e-17,
+    "did_se_diff": 1.3877787808e-17,
+    "exact_match_pass": true
+  }
+}

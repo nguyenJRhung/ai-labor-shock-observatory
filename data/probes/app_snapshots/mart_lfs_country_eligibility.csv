@@ -1,0 +1,104 @@
+iso3,country_name,income_level,region,pre_2022_years,post_2022_years,isco1_groups_count,min_year,max_year,rows_total_sex,is_eligible
+ALB,Albania,UMC,Europe & Central Asia,8,2,9,2015,2024,90,1
+BIH,Bosnia and Herzegovina,UMC,Europe & Central Asia,8,3,9,2015,2025,99,1
+BOL,Bolivia,LMC,Latin America & Caribbean,8,3,9,2015,2025,99,1
+BRA,Brazil,UMC,Latin America & Caribbean,8,3,9,2015,2025,99,1
+COL,Colombia,UMC,Latin America & Caribbean,8,3,9,2015,2025,99,1
+DOM,Dominican Republic,UMC,Latin America & Caribbean,8,3,9,2015,2025,99,1
+ECU,Ecuador,UMC,Latin America & Caribbean,8,3,9,2015,2025,99,1
+EGY,"Egypt, Arab Rep.",LMC,"Middle East, North Africa, Afghanistan & Pakistan",8,2,9,2015,2024,90,1
+GEO,Georgia,UMC,Europe & Central Asia,8,3,9,2015,2025,99,1
+HND,Honduras,LMC,Latin America & Caribbean,8,3,9,2015,2025,99,1
+IRN,"Iran, Islamic Rep.",UMC,"Middle East, North Africa, Afghanistan & Pakistan",8,2,9,2015,2024,90,1
+KGZ,Kyrgyz Republic,LMC,Europe & Central Asia,8,1,9,2015,2023,81,1
+LKA,Sri Lanka,UMC,South Asia,8,2,9,2015,2024,90,1
+MDA,Moldova,UMC,Europe & Central Asia,8,3,9,2015,2025,99,1
+MEX,Mexico,UMC,Latin America & Caribbean,8,3,9,2015,2025,99,1
+MKD,North Macedonia,UMC,Europe & Central Asia,8,3,9,2015,2025,99,1
+MNE,Montenegro,UMC,Europe & Central Asia,8,2,9,2015,2024,90,1
+MNG,Mongolia,UMC,East Asia & Pacific,8,3,9,2015,2025,99,1
+PRY,Paraguay,UMC,Latin America & Caribbean,8,3,9,2015,2025,99,1
+PSE,West Bank and Gaza,LMC,"Middle East, North Africa, Afghanistan & Pakistan",8,2,9,2015,2025,90,1
+SLV,El Salvador,UMC,Latin America & Caribbean,8,3,9,2015,2025,99,1
+SRB,Serbia,UMC,Europe & Central Asia,8,3,9,2015,2025,99,1
+THA,Thailand,UMC,East Asia & Pacific,8,3,9,2015,2025,99,1
+TUR,Turkiye,UMC,Europe & Central Asia,8,3,9,2015,2025,99,1
+VNM,Viet Nam,UMC,East Asia & Pacific,8,2,9,2015,2024,90,1
+BLR,Belarus,UMC,Europe & Central Asia,7,3,9,2016,2025,90,1
+GTM,Guatemala,UMC,Latin America & Caribbean,7,3,9,2015,2025,90,1
+MUS,Mauritius,UMC,Sub-Saharan Africa,7,2,9,2015,2024,81,1
+ZMB,Zambia,LMC,Sub-Saharan Africa,7,2,9,2015,2024,81,1
+ARG,Argentina,UMC,Latin America & Caribbean,6,3,9,2017,2025,81,1
+JOR,Jordan,UMC,"Middle East, North Africa, Afghanistan & Pakistan",6,2,9,2017,2024,72,1
+KHM,Cambodia,LMC,East Asia & Pacific,6,2,9,2015,2025,72,1
+LCA,St. Lucia,UMC,Latin America & Caribbean,6,3,9,2017,2025,81,1
+MLI,Mali,LIC,Sub-Saharan Africa,6,2,9,2015,2024,72,1
+PAK,Pakistan,LMC,"Middle East, North Africa, Afghanistan & Pakistan",6,1,9,2015,2025,63,1
+PHL,Philippines,UMC,East Asia & Pacific,6,2,9,2017,2024,72,1
+RWA,Rwanda,LIC,Sub-Saharan Africa,6,3,9,2017,2025,81,1
+BLZ,Belize,UMC,Latin America & Caribbean,5,2,9,2015,2025,63,1
+BTN,Bhutan,LMC,South Asia,5,2,9,2018,2024,63,1
+IDN,Indonesia,UMC,East Asia & Pacific,5,2,9,2017,2024,63,1
+AGO,Angola,LMC,Sub-Saharan Africa,4,3,9,2019,2025,63,1
+BWA,Botswana,UMC,Sub-Saharan Africa,4,2,9,2019,2024,54,1
+GHA,Ghana,LMC,Sub-Saharan Africa,4,3,9,2015,2025,63,1
+GRD,Grenada,UMC,Latin America & Caribbean,4,1,9,2018,2023,45,1
+SEN,Senegal,LMC,Sub-Saharan Africa,4,3,9,2015,2025,63,1
+BGD,Bangladesh,LMC,South Asia,3,2,9,2016,2024,45,1
+KIR,Kiribati,LMC,East Asia & Pacific,3,1,9,2015,2023,36,1
+TON,Tonga,UMC,East Asia & Pacific,3,2,9,2016,2025,45,1
+ZWE,Zimbabwe,LMC,Sub-Saharan Africa,3,3,9,2019,2025,54,1
+MMR,Myanmar,LMC,East Asia & Pacific,5,0,9,2015,2020,45,0
+CIV,Cote d'Ivoire,LMC,Sub-Saharan Africa,4,0,9,2016,2022,36,0
+CPV,Cabo Verde,UMC,Sub-Saharan Africa,4,0,9,2015,2019,36,0
+TLS,Timor-Leste,LMC,East Asia & Pacific,4,0,9,2015,2022,36,0
+AFG,Afghanistan,LIC,"Middle East, North Africa, Afghanistan & Pakistan",3,0,9,2017,2021,27,0
+ARM,Armenia,UMC,Europe & Central Asia,3,0,9,2015,2017,27,0
+NER,Niger,LIC,Sub-Saharan Africa,3,0,9,2017,2022,26,0
+TGO,Togo,LMC,Sub-Saharan Africa,3,0,9,2015,2022,27,0
+TUV,Tuvalu,UMC,East Asia & Pacific,3,0,9,2016,2022,27,0
+UGA,Uganda,LIC,Sub-Saharan Africa,3,0,9,2017,2021,27,0
+WSM,Samoa,UMC,East Asia & Pacific,3,0,9,2017,2022,27,0
+BDI,Burundi,LIC,Sub-Saharan Africa,2,0,9,2017,2020,18,0
+BFA,Burkina Faso,LIC,Sub-Saharan Africa,2,3,9,2018,2025,45,0
+COD,"Congo, Dem. Rep.",LIC,Sub-Saharan Africa,2,0,9,2016,2020,18,0
+GNB,Guinea-Bissau,LIC,Sub-Saharan Africa,2,0,9,2018,2022,18,0
+JAM,Jamaica,UMC,Latin America & Caribbean,2,1,9,2021,2024,27,0
+KEN,Kenya,LMC,Sub-Saharan Africa,2,0,9,2019,2021,18,0
+LAO,Lao PDR,LMC,East Asia & Pacific,2,0,9,2017,2022,18,0
+MDG,Madagascar,LIC,Sub-Saharan Africa,2,0,9,2015,2022,18,0
+MDV,Maldives,UMC,South Asia,2,1,9,2016,2025,27,0
+MHL,Marshall Islands,UMC,East Asia & Pacific,2,0,9,2019,2021,18,0
+MOZ,Mozambique,LIC,Sub-Saharan Africa,2,0,9,2015,2022,18,0
+NPL,Nepal,LMC,South Asia,2,0,9,2017,2022,18,0
+SUR,Suriname,UMC,Latin America & Caribbean,2,0,9,2016,2022,18,0
+SWZ,Eswatini,LMC,Sub-Saharan Africa,2,2,9,2016,2025,36,0
+TCD,Chad,LIC,Sub-Saharan Africa,2,0,9,2018,2022,18,0
+TUN,Tunisia,LMC,"Middle East, North Africa, Afghanistan & Pakistan",2,0,9,2019,2021,18,0
+VUT,Vanuatu,LMC,East Asia & Pacific,2,1,9,2019,2025,27,0
+BEN,Benin,LMC,Sub-Saharan Africa,1,0,9,2022,2022,9,0
+CMR,Cameroon,LMC,Sub-Saharan Africa,1,0,9,2021,2021,9,0
+COM,Comoros,LMC,Sub-Saharan Africa,1,0,9,2021,2021,9,0
+DJI,Djibouti,LMC,"Middle East, North Africa, Afghanistan & Pakistan",1,0,9,2017,2017,9,0
+ETH,Ethiopia,LIC,Sub-Saharan Africa,1,0,9,2021,2021,9,0
+FJI,Fiji,UMC,East Asia & Pacific,1,1,9,2016,2024,18,0
+GIN,Guinea,LMC,Sub-Saharan Africa,1,0,9,2019,2019,9,0
+GMB,"Gambia, The",LIC,Sub-Saharan Africa,1,2,9,2018,2025,27,0
+IND,India,LMC,South Asia,1,3,9,2022,2025,36,0
+IRQ,Iraq,UMC,"Middle East, North Africa, Afghanistan & Pakistan",1,0,9,2021,2021,9,0
+LBN,Lebanon,LMC,"Middle East, North Africa, Afghanistan & Pakistan",1,0,9,2019,2019,9,0
+LBR,Liberia,LIC,Sub-Saharan Africa,1,0,9,2017,2017,9,0
+LSO,Lesotho,LMC,Sub-Saharan Africa,1,1,9,2019,2024,18,0
+PER,Peru,UMC,Latin America & Caribbean,1,3,9,2022,2025,36,0
+PNG,Papua New Guinea,LMC,East Asia & Pacific,1,0,9,2022,2022,9,0
+SDN,Sudan,LIC,Sub-Saharan Africa,1,0,9,2022,2022,9,0
+SLE,Sierra Leone,LIC,Sub-Saharan Africa,1,0,9,2018,2018,9,0
+SOM,"Somalia, Fed. Rep.",LIC,Sub-Saharan Africa,1,0,9,2019,2019,9,0
+STP,Sao Tome and Principe,LMC,Sub-Saharan Africa,1,0,9,2017,2017,9,0
+TJK,Tajikistan,LMC,Europe & Central Asia,1,0,9,2016,2016,9,0
+TZA,Tanzania,LMC,Sub-Saharan Africa,1,2,9,2020,2025,27,0
+GAB,Gabon,UMC,Sub-Saharan Africa,0,1,9,2024,2024,9,0
+GNQ,Equatorial Guinea,UMC,Sub-Saharan Africa,0,1,9,2023,2023,9,0
+MWI,Malawi,LIC,Sub-Saharan Africa,0,1,9,2024,2024,9,0
+NAM,Namibia,LMC,Sub-Saharan Africa,0,1,9,2023,2023,9,0
+NGA,Nigeria,LMC,Sub-Saharan Africa,0,2,9,2024,2025,18,0
