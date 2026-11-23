@@ -67,8 +67,9 @@ def render_tab_macro(bundle: dict) -> None:
         )
     with col_ctrl3:
         cmp_info = r_ver.get("python_vs_r_comparison", {})
+        n_mod_r = cmp_info.get("models_verified_count", 2)
         st.metric(
-            "Đối chiếu chéo Python vs. R (`fixest`)",
+            f"Đối chiếu chéo Python vs. R ({n_mod_r}/{n_mod_r} mô hình)",
             "KHỚP CHUẨN" if cmp_info.get("exact_match_pass") else "CẦN KIỂM TRA",
             f"Max |Δβ| = {cmp_info.get('max_abs_coef_diff', 0.0):.2e}",
         )
@@ -132,32 +133,67 @@ def render_tab_macro(bundle: dict) -> None:
 
     c_left, c_right = st.columns(2)
     with c_left:
-        st.markdown("#### Bộ 4 Kiểm định Phản bác (Robustness & Refutation)")
+        st.markdown("#### Kiểm định Phản bác & Chứng minh Kinh tế lượng (9 Checks)")
         rob = causal["robustness_checks"]
         rob_rows = [
             {
-                "Kiểm định": "Baseline (Actual LFS, ILO 2025)",
+                "Kiểm định": "1. Baseline (Actual LFS, ILO 2025)",
                 "Hệ số": rob["4_lfs_vs_modeled_and_no_covid"]["actual_lfs"]["estimate"],
                 "SE": rob["4_lfs_vs_modeled_and_no_covid"]["actual_lfs"]["se"],
                 "p-value": rob["4_lfs_vs_modeled_and_no_covid"]["actual_lfs"]["pvalue"],
                 "N": rob["4_lfs_vs_modeled_and_no_covid"]["actual_lfs"]["n_obs"],
             },
             {
-                "Kiểm định": "Placebo Date (Giả lập cú sốc 2019, mẫu 2015–2021)",
-                "Hệ số": rob["1_placebo_2019"]["estimate"],
-                "SE": rob["1_placebo_2019"]["se"],
-                "p-value": rob["1_placebo_2019"]["pvalue"],
-                "N": rob["1_placebo_2019"]["n_obs"],
+                "Kiểm định": "2. Balanced Panel 2017–2024 (30 LMICs)",
+                "Hệ số": rob["7_balanced_panel_2017_2024"]["estimate"],
+                "SE": rob["7_balanced_panel_2017_2024"]["se"],
+                "p-value": rob["7_balanced_panel_2017_2024"]["pvalue"],
+                "N": rob["7_balanced_panel_2017_2024"]["n_obs"],
             },
             {
-                "Kiểm định": "Loại trừ năm COVID (2020–2021)",
+                "Kiểm định": "3. WLS Trọng số Tỷ trọng Nghề 2022",
+                "Hệ số": rob["6_alternative_outcomes_and_wls"]["wls_within_country_share2022"]["estimate"],
+                "SE": rob["6_alternative_outcomes_and_wls"]["wls_within_country_share2022"]["se"],
+                "p-value": rob["6_alternative_outcomes_and_wls"]["wls_within_country_share2022"]["pvalue"],
+                "N": rob["6_alternative_outcomes_and_wls"]["wls_within_country_share2022"]["n_obs"],
+            },
+            {
+                "Kiểm định": "4. WLS Phi Nông nghiệp (Loại ISCO-6)",
+                "Hệ số": rob["6_alternative_outcomes_and_wls"]["non_agri_wls_share2022"]["estimate"],
+                "SE": rob["6_alternative_outcomes_and_wls"]["non_agri_wls_share2022"]["se"],
+                "p-value": rob["6_alternative_outcomes_and_wls"]["non_agri_wls_share2022"]["pvalue"],
+                "N": rob["6_alternative_outcomes_and_wls"]["non_agri_wls_share2022"]["n_obs"],
+            },
+            {
+                "Kiểm định": "5. Kiểm soát Xu hướng Tuyến tính theo Nghề",
+                "Hệ số": rob["5_occupation_linear_trends"]["ln_emp_unit_cluster"]["estimate"],
+                "SE": rob["5_occupation_linear_trends"]["ln_emp_unit_cluster"]["se"],
+                "p-value": rob["5_occupation_linear_trends"]["ln_emp_unit_cluster"]["pvalue"],
+                "N": rob["5_occupation_linear_trends"]["ln_emp_unit_cluster"]["n_obs"],
+            },
+            {
+                "Kiểm định": "6. Binary DiD: Văn phòng (ISCO-4) vs Tay chân (7-9)",
+                "Hệ số": rob["8_binary_clerical_vs_manual"]["baseline"]["estimate"],
+                "SE": rob["8_binary_clerical_vs_manual"]["baseline"]["se"],
+                "p-value": rob["8_binary_clerical_vs_manual"]["baseline"]["pvalue"],
+                "N": rob["8_binary_clerical_vs_manual"]["baseline"]["n_obs"],
+            },
+            {
+                "Kiểm định": "7. Loại trừ năm COVID (2020–2021)",
                 "Hệ số": rob["4_lfs_vs_modeled_and_no_covid"]["actual_lfs_excluding_covid_2020_2021"]["estimate"],
                 "SE": rob["4_lfs_vs_modeled_and_no_covid"]["actual_lfs_excluding_covid_2020_2021"]["se"],
                 "p-value": rob["4_lfs_vs_modeled_and_no_covid"]["actual_lfs_excluding_covid_2020_2021"]["pvalue"],
                 "N": rob["4_lfs_vs_modeled_and_no_covid"]["actual_lfs_excluding_covid_2020_2021"]["n_obs"],
             },
             {
-                "Kiểm định": "ILO Modeled (Cùng tập nước LFS)",
+                "Kiểm định": "8. Placebo Date (Giả lập 2019, mẫu 2015–2021)",
+                "Hệ số": rob["1_placebo_2019"]["estimate"],
+                "SE": rob["1_placebo_2019"]["se"],
+                "p-value": rob["1_placebo_2019"]["pvalue"],
+                "N": rob["1_placebo_2019"]["n_obs"],
+            },
+            {
+                "Kiểm định": "9. ILO Modeled (Cùng tập nước LFS)",
                 "Hệ số": rob["4_lfs_vs_modeled_and_no_covid"]["modeled_matched_sample"]["estimate"],
                 "SE": rob["4_lfs_vs_modeled_and_no_covid"]["modeled_matched_sample"]["se"],
                 "p-value": rob["4_lfs_vs_modeled_and_no_covid"]["modeled_matched_sample"]["pvalue"],
@@ -165,6 +201,12 @@ def render_tab_macro(bundle: dict) -> None:
             },
         ]
         st.dataframe(pd.DataFrame(rob_rows).style.format({"Hệ số": "{:+.4f}", "SE": "{:.4f}", "p-value": "{:.4f}"}), width="stretch")
+        ri = rob["9_randomization_inference"]["continuous_ilo2025_9_groups"]
+        st.caption(
+            f"**Randomization Inference ({ri['n_permutations']} hoán vị qua 9 nhóm nghề):** "
+            f"RI p = `{ri['ri_two_sided_pvalue']:.3f}` — xác nhận khi khử xu hướng nghề hoặc so sánh trực tiếp Văn phòng vs Tay chân, "
+            "chưa có bằng chứng sa thải ròng ngắn hạn do GenAI tại LMICs."
+        )
 
     with c_right:
         st.markdown("#### Khoảng cách Lý thuyết (ILO 2025) vs. Sẵn sàng Công nghệ (GitHub & AEI)")
@@ -177,14 +219,14 @@ def render_tab_macro(bundle: dict) -> None:
             color="income_level",
             size="aei_usage_pct",
             hover_name="country_name",
-            hover_data=["iso3", "aei_usage_pct", "aei_automation_pct"],
+            hover_data=["iso3", "aei_usage_pct", "aui_global", "aui_lmic_relative", "aei_automation_pct"],
             log_y=True,
             labels={
                 "theoretical_exposure_2025": "Phơi nhiễm Lý thuyết (ILO 2025)",
                 "devs_per_10k_wap": "Lập trình viên / 10k dân LĐ (Log)",
                 "income_level": "Nhóm thu nhập",
             },
-            height=360,
+            height=420,
         )
         st.plotly_chart(fig_ta, width="stretch")
 
@@ -372,11 +414,24 @@ def render_tab_enterprise_ba(bundle: dict) -> None:
         working_hours_per_month=float(assumptions["enterprise_profile"]["working_hours_per_month"]),
     )
 
+    gender_thresh = float(
+        assumptions.get("governance_guardrails", {}).get("gender_impact_audit_threshold_pct", 5.0)
+    )
     sim = compare_strategies(
-        hc_map, sal_map, exp_df, params, locked_isco1=locked_groups, targeted_isco1=targeted_groups
+        hc_map,
+        sal_map,
+        exp_df,
+        params,
+        locked_isco1=locked_groups,
+        targeted_isco1=targeted_groups,
+        vnm_workforce_df=bundle["vnm_wf"],
+        gender_threshold_pct=gender_thresh,
+        run_monte_carlo=True,
     )
     resk = sim["reskilling"]
     diag = sim["diagnostics"]
+    mc = sim["monte_carlo"]
+    ga = sim["gender_audit"]
 
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("NPV Tái đào tạo (36 tháng)", f"{resk['npv_reskill_vnd'] / 1e9:,.2f} Tỷ VNĐ")
@@ -390,6 +445,26 @@ def render_tab_enterprise_ba(bundle: dict) -> None:
         f"{resk['breakeven_productivity_lift_pct']:.2f}%",
         f"Kỳ vọng: {resk['expected_effective_lift_pct']:.2f}%",
     )
+
+    r_col1, r_col2 = st.columns(2)
+    with r_col1:
+        st.info(
+            f"**Mô phỏng Rủi ro Monte Carlo (1,000 kịch bản):** "
+            f"P10 = `{mc['p10_npv_vnd'] / 1e9:,.2f} Tỷ` | "
+            f"P50 = `{mc['p50_npv_vnd'] / 1e9:,.2f} Tỷ` | "
+            f"P90 = `{mc['p90_npv_vnd'] / 1e9:,.2f} Tỷ` — "
+            f"Xác suất NPV > 0: **{mc['prob_npv_positive_pct']:.1f}%** | "
+            f"Vượt Cut & Replace: **{mc['prob_reskill_beats_cut_pct']:.1f}%**."
+        )
+    with r_col2:
+        alert_text = "CẢNH BÁO VƯỢT NGƯỠNG" if ga["governance_alert"] else "Trong ngưỡng kiểm soát"
+        st.warning(
+            f"**Kiểm toán Giới tính (Ngưỡng {ga['threshold_pct']:.1f}%, LFS VN {ga['vnm_lfs_reference_year']}):** "
+            f"Tỷ lệ nữ toàn DN = `{ga['firm_female_share_pct']:.1f}%`, "
+            f"nhóm Tái đào tạo = `{ga['reskilled_female_share_pct']:.1f}%`, "
+            f"nhóm bị cắt (Cut) = `{ga['cut_displaced_female_share_pct']:.1f}%` "
+            f"(Chênh lệch `{ga['female_cut_disparity_pp']:+.2f} đ%` — {alert_text})."
+        )
 
     st.caption(
         f"Chẩn đoán cơ cấu: **{diag['high_exposure_payroll_pct']:.1f}%** quỹ lương nằm ở nhóm phơi nhiễm cao; "

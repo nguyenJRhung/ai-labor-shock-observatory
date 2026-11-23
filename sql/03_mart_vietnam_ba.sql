@@ -129,9 +129,11 @@ SELECT
     t.high_tech_readiness,
     t.aei_usage_count,
     t.aei_usage_pct,
+    t.aei_lmic_usage_share_pct,
     t.aei_automation_pct,
     t.aei_augmentation_pct,
-    t.aui_proxy,
+    t.aui_global,
+    t.aui_lmic_relative,
     COALESCE(el.is_eligible, 0) AS in_causal_panel
 FROM country_theo ct
 INNER JOIN stg_tech_readiness t ON ct.iso3 = t.iso3

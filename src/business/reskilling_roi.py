@@ -150,6 +150,45 @@ def _monthly_discount_factors(horizon_months: int, discount_rate_annual: float) 
     return 1.0 / ((1.0 + r_m) ** months)
 
 
+def _monthly_ramp_factors(horizon_months: int, ramp_months: int) -> np.ndarray:
+    denom = max(1, int(ramp_months))
+    return np.array([min(1.0, m / denom) for m in range(1, horizon_months + 1)], dtype=float)
+
+
+def discounted_cashflow_metrics(
+    upfront_cost_vnd: float,
+    monthly_gross_gain_vnd: float,
+    monthly_ai_cost_vnd: float,
+    params: FinancialParams,
+) -> dict[str, Any]:
+    """Single source of truth for discounted NPV, ROI, and discounted Payback Period (with ramp-up)."""
+    dfs = _monthly_discount_factors(params.horizon_months, params.discount_rate_annual)
+    ramps = _monthly_ramp_factors(params.horizon_months, params.productivity_ramp_months)
+    gross_m = monthly_gross_gain_vnd * ramps
+    net_m = gross_m - monthly_ai_cost_vnd
+    pv_m = net_m * dfs
+    cum_discounted = -upfront_cost_vnd + np.cumsum(pv_m)
+
+    pv_operating_net = float(np.sum(pv_m))
+    npv_vnd = float(pv_operating_net - upfront_cost_vnd)
+    roi_pct = float((npv_vnd / upfront_cost_vnd) * 100.0) if upfront_cost_vnd > 0 else 0.0
+    payback_idx = np.where(cum_discounted >= 0.0)[0]
+    payback_months = int(payback_idx[0] + 1) if len(payback_idx) > 0 else None
+
+    return {
+        "dfs": dfs,
+        "ramps": ramps,
+        "gross_m": gross_m,
+        "net_m": net_m,
+        "pv_m": pv_m,
+        "cum_discounted": cum_discounted,
+        "pv_operating_net_vnd": pv_operating_net,
+        "npv_vnd": npv_vnd,
+        "roi_pct": roi_pct,
+        "payback_months": payback_months,
+    }
+
+
 def npv_from_uniform_lift(
     targeted_payroll_vnd: float,
     n_trained: int,
@@ -160,14 +199,13 @@ def npv_from_uniform_lift(
     if n_trained <= 0 or targeted_payroll_vnd <= 0:
         return 0.0
     upfront = n_trained * params.reskilling_cost_vnd * (1.0 + params.change_management_overhead_pct)
-    dfs = _monthly_discount_factors(params.horizon_months, params.discount_rate_annual)
-    ramps = np.array(
-        [min(1.0, m / max(1, params.productivity_ramp_months)) for m in range(1, params.horizon_months + 1)],
-        dtype=float,
+    cf = discounted_cashflow_metrics(
+        upfront_cost_vnd=upfront,
+        monthly_gross_gain_vnd=targeted_payroll_vnd * productivity_lift_frac,
+        monthly_ai_cost_vnd=n_trained * params.ai_seat_cost_vnd,
+        params=params,
     )
-    gross_m = targeted_payroll_vnd * productivity_lift_frac * ramps
-    net_m = gross_m - (n_trained * params.ai_seat_cost_vnd)
-    return float(np.sum(net_m * dfs) - upfront)
+    return float(cf["npv_vnd"])
 
 
 def simulate_reskilling_roi(
@@ -203,40 +241,29 @@ def simulate_reskilling_roi(
         }
 
     upfront = n_trained * params.reskilling_cost_vnd * (1.0 + params.change_management_overhead_pct)
-    dfs = _monthly_discount_factors(params.horizon_months, params.discount_rate_annual)
-    ramps = np.array(
-        [min(1.0, m / max(1, params.productivity_ramp_months)) for m in range(1, params.horizon_months + 1)],
-        dtype=float,
+    ai_cost_m = n_trained * params.ai_seat_cost_vnd
+    cf = discounted_cashflow_metrics(
+        upfront_cost_vnd=upfront,
+        monthly_gross_gain_vnd=monthly_gross_gain,
+        monthly_ai_cost_vnd=ai_cost_m,
+        params=params,
     )
 
-    ai_cost_m = n_trained * params.ai_seat_cost_vnd
-    gross_m = monthly_gross_gain * ramps
-    net_m = gross_m - ai_cost_m
-    pv_m = net_m * dfs
-    cum_discounted = -upfront + np.cumsum(pv_m)
-
-    pv_operating_net = float(np.sum(pv_m))
-    npv_reskill = float(pv_operating_net - upfront)
-    roi_pct = float((npv_reskill / upfront) * 100.0) if upfront > 0 else 0.0
-
-    payback_idx = np.where(cum_discounted >= 0.0)[0]
-    payback_months = int(payback_idx[0] + 1) if len(payback_idx) > 0 else None
-
     # Exact closed-form break-even productivity lift (%)
-    pv_ai_costs = float(np.sum(ai_cost_m * dfs))
-    pv_ramp_payroll = float(targeted_payroll * np.sum(ramps * dfs))
+    pv_ai_costs = float(np.sum(ai_cost_m * cf["dfs"]))
+    pv_ramp_payroll = float(targeted_payroll * np.sum(cf["ramps"] * cf["dfs"]))
     breakeven_lift_frac = (upfront + pv_ai_costs) / pv_ramp_payroll if pv_ramp_payroll > 0 else 0.0
     expected_lift_frac = monthly_gross_gain / targeted_payroll
 
     schedule = [
         {
             "month": int(m),
-            "ramp_factor": round(float(ramps[m - 1]), 4),
-            "gross_benefit_vnd": round(float(gross_m[m - 1]), 2),
+            "ramp_factor": round(float(cf["ramps"][m - 1]), 4),
+            "gross_benefit_vnd": round(float(cf["gross_m"][m - 1]), 2),
             "ai_license_cost_vnd": round(float(ai_cost_m), 2),
-            "net_cashflow_vnd": round(float(net_m[m - 1]), 2),
-            "discounted_cashflow_vnd": round(float(pv_m[m - 1]), 2),
-            "cumulative_discounted_cf_vnd": round(float(cum_discounted[m - 1]), 2),
+            "net_cashflow_vnd": round(float(cf["net_m"][m - 1]), 2),
+            "discounted_cashflow_vnd": round(float(cf["pv_m"][m - 1]), 2),
+            "cumulative_discounted_cf_vnd": round(float(cf["cum_discounted"][m - 1]), 2),
         }
         for m in range(1, params.horizon_months + 1)
     ]
@@ -246,10 +273,10 @@ def simulate_reskilling_roi(
         "n_trained": n_trained,
         "targeted_monthly_payroll_vnd": targeted_payroll,
         "upfront_investment_vnd": upfront,
-        "pv_operating_net_vnd": pv_operating_net,
-        "npv_reskill_vnd": npv_reskill,
-        "roi_pct": roi_pct,
-        "payback_months": payback_months,
+        "pv_operating_net_vnd": cf["pv_operating_net_vnd"],
+        "npv_reskill_vnd": cf["npv_vnd"],
+        "roi_pct": cf["roi_pct"],
+        "payback_months": cf["payback_months"],
         "breakeven_productivity_lift_pct": breakeven_lift_frac * 100.0,
         "expected_effective_lift_pct": expected_lift_frac * 100.0,
         "monthly_schedule": schedule,

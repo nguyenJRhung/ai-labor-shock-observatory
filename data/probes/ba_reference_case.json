@@ -39,8 +39,8 @@
       "effective_time_saved_share": 0.1083,
       "realizable_hours_per_month": 727.776,
       "monthly_value_gain_vnd": 194940000.0,
-      "annual_net_gain_per_person_vnd": 51882000.0,
-      "payback_months_est": 3.1918584480166525,
+      "payback_months_est": 5.0,
+      "npv_36m_per_person_vnd": 116212457.45138057,
       "quadrant": "Q2: Strategic Copilot (HITL Locked)"
     },
     {
@@ -59,8 +59,8 @@
       "effective_time_saved_share": 0.1158913043478261,
       "realizable_hours_per_month": 3115.1582608695658,
       "monthly_value_gain_vnd": 519193043.47826093,
-      "annual_net_gain_per_person_vnd": 32339478.26086957,
-      "payback_months_est": 5.120676303562208,
+      "payback_months_est": 7.0,
+      "npv_36m_per_person_vnd": 67035353.39813639,
       "quadrant": "Q1: Quick Wins (Reskill First)"
     },
     {
@@ -79,8 +79,8 @@
       "effective_time_saved_share": 0.10379268292682928,
       "realizable_hours_per_month": 2441.2039024390247,
       "monthly_value_gain_vnd": 261557560.97560978,
-      "annual_net_gain_per_person_vnd": 15819219.512195125,
-      "payback_months_est": 10.468278784066307,
+      "payback_months_est": 13.0,
+      "npv_36m_per_person_vnd": 25463518.692518227,
       "quadrant": "Q1: Quick Wins (Reskill First)"
     },
     {
@@ -99,8 +99,8 @@
       "effective_time_saved_share": 0.1606551724137931,
       "realizable_hours_per_month": 5937.815172413792,
       "monthly_value_gain_vnd": 477145862.0689655,
-      "annual_net_gain_per_person_vnd": 19426137.93103448,
-      "payback_months_est": 8.524597147817197,
+      "payback_months_est": 11.0,
+      "npv_36m_per_person_vnd": 34540024.00552796,
       "quadrant": "Q1: Quick Wins (Reskill First)"
     },
     {
@@ -119,8 +119,8 @@
       "effective_time_saved_share": 0.07669230769230768,
       "realizable_hours_per_month": 2576.861538461538,
       "monthly_value_gain_vnd": 176392307.69230768,
-      "annual_net_gain_per_person_vnd": 3983538.46153846,
-      "payback_months_est": 41.57108098713939,
+      "payback_months_est": NaN,
+      "npv_36m_per_person_vnd": -4319972.2171381395,
       "quadrant": "Q3: Selective Task Pilot"
     },
     {
@@ -139,8 +139,8 @@
       "effective_time_saved_share": 0.049166666666666664,
       "realizable_hours_per_month": 82.6,
       "monthly_value_gain_vnd": 4179166.6666666665,
-      "annual_net_gain_per_person_vnd": -1585000.0,
-      "payback_months_est": null,
+      "payback_months_est": NaN,
+      "npv_36m_per_person_vnd": -18332728.554476317,
       "quadrant": "Q4: Shielded / Low AI Priority"
     },
     {
@@ -159,8 +159,8 @@
       "effective_time_saved_share": 0.049753846153846155,
       "realizable_hours_per_month": 668.6916923076923,
       "monthly_value_gain_vnd": 47763692.30769231,
-      "annual_net_gain_per_person_vnd": 564553.846153846,
-      "payback_months_est": 293.3289731850881,
+      "payback_months_est": NaN,
+      "npv_36m_per_person_vnd": -12923557.99954759,
       "quadrant": "Q4: Shielded / Low AI Priority"
     },
     {
@@ -179,8 +179,8 @@
       "effective_time_saved_share": 0.059384615384615376,
       "realizable_hours_per_month": 798.1292307692306,
       "monthly_value_gain_vnd": 52258461.53846153,
-      "annual_net_gain_per_person_vnd": 1238769.23076923,
-      "payback_months_est": 133.68107302533542,
+      "payback_months_est": NaN,
+      "npv_36m_per_person_vnd": -11226951.974689508,
       "quadrant": "Q4: Shielded / Low AI Priority"
     },
     {
@@ -199,8 +199,8 @@
       "effective_time_saved_share": 0.04472727272727272,
       "realizable_hours_per_month": 525.9927272727272,
       "monthly_value_gain_vnd": 25047272.727272723,
-      "annual_net_gain_per_person_vnd": -2306181.8181818184,
-      "payback_months_est": null,
+      "payback_months_est": NaN,
+      "npv_36m_per_person_vnd": -20147521.639394395,
       "quadrant": "Q4: Shielded / Low AI Priority"
     }
   ],
@@ -724,6 +724,39 @@
       "headcount_impact": "Đào tạo lại 520 nhân sự; giữ tri thức vận hành"
     }
   ],
+  "monte_carlo": {
+    "n_sims": 1000,
+    "seed": 42,
+    "p10_npv_vnd": 11059913844.76695,
+    "p50_npv_vnd": 21775302466.332615,
+    "p90_npv_vnd": 33505909166.07053,
+    "mean_npv_vnd": 21952800542.264282,
+    "prob_npv_positive_pct": 100.0,
+    "prob_reskill_beats_cut_pct": 99.0,
+    "p10_cut_npv_vnd": 3371586059.3605714,
+    "p50_cut_npv_vnd": 4217706855.028552,
+    "p90_cut_npv_vnd": 5044117005.42704
+  },
+  "gender_audit": {
+    "vnm_lfs_reference_year": 2024,
+    "threshold_pct": 5.0,
+    "firm_female_share_pct": 51.682835936737014,
+    "reskilled_female_share_pct": 55.293080715962006,
+    "cut_displaced_female_share_pct": 53.54869953563577,
+    "female_cut_disparity_pp": 1.8658635988987555,
+    "governance_alert": false,
+    "female_share_by_isco1": {
+      "1": 28.63,
+      "2": 57.38,
+      "3": 55.83,
+      "4": 53.43,
+      "5": 61.03,
+      "6": 44.15,
+      "7": 26.37,
+      "8": 45.19,
+      "9": 48.75
+    }
+  },
   "scenario_sensitivity": {
     "conservative": {
       "adoption_multiplier": 0.35,

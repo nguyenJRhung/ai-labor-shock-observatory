@@ -27,20 +27,51 @@ def test_causal_results_complete_and_finite() -> None:
     assert len(ref_rows) == 1
     assert ref_rows[0]["estimate"] == 0.0
 
-    # All 4 robustness blocks must exist and be finite
+    # All 9 robustness blocks must exist and be finite
     rob = res["robustness_checks"]
+    expected_checks = {
+        "1_placebo_2019",
+        "2_measure_agnostic_swap",
+        "3_leave_one_occupation_out",
+        "4_lfs_vs_modeled_and_no_covid",
+        "5_occupation_linear_trends",
+        "6_alternative_outcomes_and_wls",
+        "7_balanced_panel_2017_2024",
+        "8_binary_clerical_vs_manual",
+        "9_randomization_inference",
+    }
+    assert expected_checks.issubset(set(rob.keys()))
     assert math.isfinite(rob["1_placebo_2019"]["estimate"])
     assert set(rob["2_measure_agnostic_swap"].keys()) == {"ilo_2025", "ilo_2023", "ilo_2025_grad34"}
     assert len(rob["3_leave_one_occupation_out"]) == 9
     assert math.isfinite(
         rob["4_lfs_vs_modeled_and_no_covid"]["actual_lfs_excluding_covid_2020_2021"]["estimate"]
     )
+    assert math.isfinite(rob["5_occupation_linear_trends"]["ln_emp_unit_cluster"]["estimate"])
+    assert math.isfinite(rob["6_alternative_outcomes_and_wls"]["wls_within_country_share2022"]["estimate"])
+    assert math.isfinite(rob["7_balanced_panel_2017_2024"]["estimate"])
+    assert math.isfinite(rob["8_binary_clerical_vs_manual"]["baseline"]["estimate"])
+    ri = rob["9_randomization_inference"]
+    assert 0.0 <= ri["continuous_ilo2025_9_groups"]["ri_two_sided_pvalue"] <= 1.0
+    assert 0.0 <= ri["binary_clerical_vs_manual_4_groups"]["exact_ri_two_sided_pvalue"] <= 1.0
 
 
 def test_python_pyfixest_matches_r_fixest() -> None:
     r_ver = json.loads((PROBES_DIR / "r_fixest_verification.json").read_text(encoding="utf-8"))
     cmp = r_ver["python_vs_r_comparison"]
     assert cmp["available"] is True
+    assert cmp["models_verified_count"] == 5
+    expected_models = {
+        "event_study",
+        "pooled_did",
+        "occ_linear_trends",
+        "binary_clerical_vs_manual",
+        "triple_diff_gender",
+    }
+    assert set(cmp["per_model_diffs"].keys()) == expected_models
+    for m_name in expected_models:
+        assert cmp["per_model_diffs"][m_name]["max_coef_diff"] < 1e-5
+        assert cmp["per_model_diffs"][m_name]["max_se_diff"] < 1e-3
     assert cmp["n_obs_r"] == cmp["n_obs_python"]
     assert cmp["max_abs_coef_diff"] < 1e-5
     assert cmp["max_abs_se_diff"] < 1e-3

@@ -47,17 +47,35 @@ def test_vietnam_snapshot_coverage() -> None:
     assert set(df_wf["iso3"].unique()) == {"VNM"}
     assert df_wf["year"].max() >= 2024
     assert (df_wf["emp_thousands"] > 0).all()
+    share_sums = df_wf.groupby(["year", "sex"])["emp_share"].sum()
+    assert (share_sums - 1.0).abs().max() < 1e-4
 
     df_gh = pd.read_csv(SNAP_DIR / "github_vietnam_quarterly.csv")
     assert len(df_gh) >= 24
     assert (df_gh["developers"] > 0).all()
 
 
-def test_warehouse_summary_valid() -> None:
+def test_aui_matched_denominators_and_audit_notes() -> None:
+    df_tva = pd.read_csv(SNAP_DIR / "mart_theory_vs_adoption.csv")
+    vnm = df_tva[df_tva["iso3"] == "VNM"]
+    assert len(vnm) == 1
+    assert float(vnm["aui_global"].iloc[0]) > 0.0
+    assert float(vnm["aui_lmic_relative"].iloc[0]) > 0.0
+    assert df_tva["aei_lmic_usage_share_pct"].fillna(0.0).sum() <= 100.0001
+
+    df_elig = pd.read_csv(SNAP_DIR / "mart_lfs_country_eligibility.csv")
+    assert int((df_elig["is_eligible"] == 1).sum()) >= 45
+    phl_row = df_elig[df_elig["iso3"] == "PHL"]
+    assert len(phl_row) == 1 and int(phl_row["is_eligible"].iloc[0]) == 1
+
     summary = json.loads((PROBES_DIR / "warehouse_summary.json").read_text(encoding="utf-8"))
     assert summary["duplicate_primary_keys_lfs"] == 0
-    assert summary["mart_panel_causal_lfs"]["eligible_countries_count"] >= 15
+    assert summary["mart_panel_causal_lfs"]["eligible_countries_count"] >= 45
     assert summary["mart_panel_causal_lfs"]["rows_sex_total"] > 0
+    audit = summary["data_audit_notes"]
+    assert audit["ind_eligibility"]["iso3"] == "IND"
+    assert audit["ind_eligibility"]["is_eligible"] == 0
+    assert set(row["iso3"] for row in audit["lfs_countries_missing_from_modeled"]) >= {"GRD", "KIR"}
 
 
 @pytest.mark.skipif(not DUCKDB_PATH.exists(), reason="Local DuckDB file not present in CI environment.")
@@ -89,5 +107,17 @@ def test_duckdb_primary_key_uniqueness_and_constraints() -> None:
             WHERE emp_thousands <= 0 OR emp_share <= 0 OR emp_share > 1.000001
         """).fetchone()[0]
         assert bad_shares == 0
+
+        phl_2025_rows = con.execute("""
+            SELECT COUNT(*) FROM mart_panel_causal_lfs
+            WHERE iso3 = 'PHL' AND year = 2025
+        """).fetchone()[0]
+        assert phl_2025_rows == 0
+
+        ind_rows = con.execute("""
+            SELECT COUNT(*) FROM mart_panel_causal_lfs
+            WHERE iso3 = 'IND'
+        """).fetchone()[0]
+        assert ind_rows == 0
     finally:
         con.close()

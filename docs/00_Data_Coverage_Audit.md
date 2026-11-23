@@ -195,3 +195,17 @@
 1. **Xác nhận tính khả thi tổng thể:** Cả 5 nguồn dữ liệu đều truy cập công khai miễn phí (HTTP 200), không cần API key trả phí, hỗ trợ tải tự động hoàn toàn qua Python.
 2. **Cảnh báo quan trọng từ dữ liệu thật:** Kiểm tra bảng độ phủ ILOSTAT mục 3 để chốt danh sách LMICs có đủ chuỗi liên tục `ISCO-08` trước và sau 2022 (ưu tiên nhóm có `OCU_ISCO08_0..9` trong khảo sát LFS thực tế, dùng `EMP_2EMP_SEX_OCU_NB_A` làm đối chiếu độ nhạy).
 3. **Bước tiếp theo (Tuần 3–4):** Viết bộ ETL hoàn chỉnh kéo toàn bộ khối LMICs và xây `data/observatory.duckdb` cùng 3 file SQL trong `sql/`.
+
+
+---
+
+## 4. Kiểm toán Chuyên sâu Sau Tái lập Kho Dữ liệu (Forensic Audit Notes)
+
+Kiểm toán chi tiết trên kho `data/observatory.duckdb` (`49` LMICs đủ chuẩn, `N = 3,987` quan sát `SEX_T`, `0` khóa trùng lặp) xác nhận các ngoại lệ và hiệu chỉnh kỹ thuật sau:
+
+1. **Lý do `PHL 2025` vắng mặt trong `mart_panel_causal_lfs`:** Trong bảng thô `raw_ilostat_lfs` (`EMP_TEMP_SEX_OCU_NB_A`), Philippines (`PHL`) năm `2025` (`SEX_T`) chỉ công bố `OCU_ISCO08_0` (Lực lượng vũ trang) và `OCU_ISCO08_TOTAL` (`47,990.739` nghìn lao động), hoàn toàn thiếu 9 nhóm `ISCO-08` cấp 1 chữ số (`1–9`). Do đó chuỗi phân tích của `PHL` dừng tại `2024` (`10` năm, `2015–2024`).
+2. **Lý do `IND` (Ấn Độ) không nằm trong `mart_panel_causal_lfs`:** Ấn Độ chỉ có dữ liệu LFS phân rã đủ 9 nhóm `ISCO 1–9` cho giai đoạn `2022–2025` (`pre_2022_years = 1`), không đáp ứng điều kiện tối thiểu `>= 3` năm tiền xử lý (`2015–2021`). Tuy nhiên Ấn Độ vẫn được giữ đầy đủ trong các bảng EDA (`mart_gender_exposure_gap`, `mart_theory_vs_adoption`) và `mart_panel_causal_modeled`.
+3. **Sai khác `47/49` nước khi đối chiếu `mart_panel_causal_lfs` với `mart_panel_causal_modeled`:** Hai quốc đảo nhỏ **Grenada (`GRD`)** và **Kiribati (`KIR`)** có khảo sát LFS thực tế nhưng không xuất hiện trong bảng ước lượng *ILO Modeled* (`EMP_2EMP_SEX_OCU_NB_A`, `124` LMICs toàn khối). Vì vậy khi đối chiếu đồng mẫu (*Matched Sample*) trong Kiểm định 4, cỡ mẫu tương ứng là **`47` quốc gia** (`N = 3,598`).
+4. **Hiệu chỉnh khớp mẫu số Anthropic AI Usage Index (`aui_global` & `aui_lmic_relative`):** Tách riêng chỉ số cũ thành hai thước đo chuẩn hóa hoàn chỉnh nhờ bổ sung dân số trong độ tuổi lao động toàn cầu (`WLD SP.POP.1564.TO` = `wdi_world_wap.parquet`):
+   - `aui_global = (% lượt dùng Anthropic toàn cầu) / (% dân số lao động toàn cầu)` $\rightarrow$ Việt Nam đạt **`0.8605`**.
+   - `aui_lmic_relative = (% lượt dùng Anthropic trong khối LMICs) / (% dân số lao động nội khối LMICs)` (biết tổng tỷ trọng Anthropic của khối LMICs = `29.7225%` toàn cầu) $\rightarrow$ Việt Nam đạt **`2.3984`**.

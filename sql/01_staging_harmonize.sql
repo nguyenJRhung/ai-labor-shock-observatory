@@ -177,6 +177,13 @@ wap_clean AS (
     FROM latest_wap
     WHERE rn = 1
 ),
+world_wap AS (
+    SELECT working_age_pop AS world_working_age_pop
+    FROM raw_wdi_world_wap
+    WHERE working_age_pop IS NOT NULL AND working_age_pop > 0
+    ORDER BY year DESC
+    LIMIT 1
+),
 gh_latest AS (
     SELECT
         iso3,
@@ -193,6 +200,12 @@ gh_2022 AS (
     FROM raw_github_annual
     WHERE year = 2022
 ),
+aei_with_lmic_share AS (
+    SELECT
+        *,
+        COALESCE(usage_count, 0.0) * 100.0 / NULLIF(SUM(COALESCE(usage_count, 0.0)) OVER (), 0) AS aei_lmic_usage_share_pct
+    FROM raw_aei_country
+),
 combined AS (
     SELECT
         c.iso3,
@@ -201,6 +214,7 @@ combined AS (
         c.income_level,
         w.working_age_pop,
         w.lmic_wap_share_pct,
+        w.working_age_pop * 100.0 / NULLIF(ww.world_working_age_pop, 0) AS world_wap_share_pct,
         g.gh_year,
         g.developers_year_end AS gh_developers,
         g.git_pushes_annual AS gh_git_pushes,
@@ -213,18 +227,25 @@ combined AS (
         g.developers_year_end * 10000.0 / NULLIF(w.working_age_pop, 0) AS devs_per_10k_wap,
         COALESCE(a.usage_count, 0.0) AS aei_usage_count,
         COALESCE(a.usage_pct, 0.0) AS aei_usage_pct,
+        COALESCE(a.aei_lmic_usage_share_pct, 0.0) AS aei_lmic_usage_share_pct,
         a.automation_pct AS aei_automation_pct,
         a.augmentation_pct AS aei_augmentation_pct,
         CASE
-            WHEN a.usage_pct IS NOT NULL AND w.lmic_wap_share_pct > 0
-            THEN a.usage_pct / w.lmic_wap_share_pct
+            WHEN a.usage_pct IS NOT NULL AND w.working_age_pop > 0 AND ww.world_working_age_pop > 0
+            THEN a.usage_pct / (w.working_age_pop * 100.0 / ww.world_working_age_pop)
             ELSE NULL
-        END AS aui_proxy
+        END AS aui_global,
+        CASE
+            WHEN a.aei_lmic_usage_share_pct IS NOT NULL AND w.lmic_wap_share_pct > 0
+            THEN a.aei_lmic_usage_share_pct / w.lmic_wap_share_pct
+            ELSE NULL
+        END AS aui_lmic_relative
     FROM stg_countries_lmics c
+    CROSS JOIN world_wap ww
     LEFT JOIN wap_clean w ON c.iso3 = w.iso3
     LEFT JOIN gh_latest g ON c.iso3 = g.iso3 AND g.rn = 1
     LEFT JOIN gh_2022 g22 ON c.iso3 = g22.iso3
-    LEFT JOIN raw_aei_country a ON c.iso3 = a.iso3
+    LEFT JOIN aei_with_lmic_share a ON c.iso3 = a.iso3
 ),
 med AS (
     SELECT MEDIAN(devs_per_10k_wap) AS median_devs_per_10k

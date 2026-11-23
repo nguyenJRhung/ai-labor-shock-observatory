@@ -29,7 +29,9 @@ WDI_COLUMN_MAP = {
 }
 
 
-def fetch_wdi_lmics(cfg: dict[str, Any], lmics_df: pd.DataFrame) -> pd.DataFrame:
+def fetch_wdi_lmics(
+    cfg: dict[str, Any], lmics_df: pd.DataFrame
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     lmics_set = set(lmics_df["iso3"])
     indicators = list(cfg["sources"]["world_bank_wdi"]["indicators"])
     if "SP.POP.1564.TO" not in indicators:
@@ -39,6 +41,7 @@ def fetch_wdi_lmics(cfg: dict[str, Any], lmics_df: pd.DataFrame) -> pd.DataFrame
     end_fetch = int(cfg["study_window"]["end_year"])
 
     records: list[dict[str, Any]] = []
+    world_wap_records: list[dict[str, Any]] = []
     for ind in indicators:
         col_name = WDI_COLUMN_MAP.get(ind, ind.lower())
         page = 1
@@ -56,21 +59,27 @@ def fetch_wdi_lmics(cfg: dict[str, Any], lmics_df: pd.DataFrame) -> pd.DataFrame
                 iso3 = (r.get("countryiso3code") or "").strip().upper()
                 val = r.get("value")
                 yr = r.get("date")
-                if iso3 in lmics_set and val is not None and str(yr).isdigit():
-                    records.append(
-                        {
-                            "iso3": iso3,
-                            "year": int(yr),
-                            "indicator_col": col_name,
-                            "value": float(val),
-                        }
-                    )
+                if val is not None and str(yr).isdigit():
+                    if iso3 in lmics_set:
+                        records.append(
+                            {
+                                "iso3": iso3,
+                                "year": int(yr),
+                                "indicator_col": col_name,
+                                "value": float(val),
+                            }
+                        )
+                    elif iso3 == "WLD" and ind == "SP.POP.1564.TO":
+                        world_wap_records.append(
+                            {"year": int(yr), "working_age_pop": float(val)}
+                        )
             page += 1
             time.sleep(0.15)
 
+    df_world = pd.DataFrame(world_wap_records).drop_duplicates(subset=["year"]).sort_values("year").reset_index(drop=True)
     df_long = pd.DataFrame(records)
     if df_long.empty:
-        return pd.DataFrame(columns=["iso3", "year"] + list(WDI_COLUMN_MAP.values()))
+        return pd.DataFrame(columns=["iso3", "year"] + list(WDI_COLUMN_MAP.values())), df_world
 
     df_wide = (
         df_long.pivot_table(
@@ -82,7 +91,7 @@ def fetch_wdi_lmics(cfg: dict[str, Any], lmics_df: pd.DataFrame) -> pd.DataFrame
     for col in WDI_COLUMN_MAP.values():
         if col not in df_wide.columns:
             df_wide[col] = pd.NA
-    return df_wide.sort_values(["iso3", "year"]).reset_index(drop=True)
+    return df_wide.sort_values(["iso3", "year"]).reset_index(drop=True), df_world
 
 
 def fetch_github_ig(
@@ -213,10 +222,11 @@ def run(force_download: bool = False) -> None:
     out_dir = PROJECT_ROOT / cfg["paths"]["processed_dir"]
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    print("[WDI] Fetching 9 World Bank indicators for LMICs (2014–2025)...")
-    df_wdi = fetch_wdi_lmics(cfg, lmics_df)
+    print("[WDI] Fetching 9 World Bank indicators for LMICs + World WAP (2014–2025)...")
+    df_wdi, df_world_wap = fetch_wdi_lmics(cfg, lmics_df)
     df_wdi.to_parquet(out_dir / "wdi_lmics_macro.parquet", index=False)
-    print(f"[WDI] Saved {len(df_wdi):,} country-year rows.")
+    df_world_wap.to_parquet(out_dir / "wdi_world_wap.parquet", index=False)
+    print(f"[WDI] Saved {len(df_wdi):,} country-year rows and {len(df_world_wap)} World WAP rows.")
 
     print("[GitHub IG] Processing quarterly and annual series...")
     df_gh_q, df_gh_a = fetch_github_ig(cfg, lmics_df, force_download=force_download)

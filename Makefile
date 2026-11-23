@@ -1,8 +1,16 @@
 .PHONY: probe etl eda causal verify-r business test app all
 
-PYTHON := .venv/Scripts/python.exe
-PYTEST := .venv/Scripts/pytest.exe
-STREAMLIT := .venv/Scripts/streamlit.exe
+ifeq ($(OS),Windows_NT)
+	VENV_BIN := .venv/Scripts
+	EXE := .exe
+else
+	VENV_BIN := .venv/bin
+	EXE :=
+endif
+
+PYTHON := $(VENV_BIN)/python$(EXE)
+PYTEST := $(VENV_BIN)/pytest$(EXE)
+STREAMLIT := $(VENV_BIN)/streamlit$(EXE)
 
 probe:
 	$(PYTHON) src/etl/probe_data_sources.py

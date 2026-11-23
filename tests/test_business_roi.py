@@ -1,6 +1,8 @@
-"""Unit tests for Layer 3 Business Financial Model (Reskilling ROI, Break-even, HITL locks)."""
+"""Unit tests for Layer 3 Business Financial Model (Reskilling ROI, Monte Carlo, Gender Audit)."""
 
 from __future__ import annotations
+
+from pathlib import Path
 
 import pandas as pd
 import pytest
@@ -12,7 +14,14 @@ from src.business.reskilling_roi import (
     npv_from_uniform_lift,
     simulate_reskilling_roi,
 )
-from src.business.scenario_simulator import simulate_cut_and_replace
+from src.business.scenario_simulator import (
+    build_priority_matrix,
+    compute_enterprise_gender_audit,
+    run_monte_carlo_sensitivity,
+    simulate_cut_and_replace,
+)
+
+SNAP_DIR = Path(__file__).resolve().parents[1] / "data" / "probes" / "app_snapshots"
 
 
 @pytest.fixture
@@ -98,3 +107,64 @@ def test_zero_headcount_edge_case_no_division_by_zero(
     assert res["npv_reskill_vnd"] == 0.0
     assert res["roi_pct"] == 0.0
     assert res["payback_months"] is None
+
+
+def test_unified_payback_and_npv_consistency(
+    sample_exposure_df: pd.DataFrame, sample_salaries: dict[str, float]
+) -> None:
+    hc = build_default_headcount(1000)
+    params = FinancialParams()
+    diag = compute_workforce_diagnostics(hc, sample_salaries, sample_exposure_df, params)
+    pm = build_priority_matrix(diag, params)
+
+    for _, row in pm.iterrows():
+        n_grp = int(row["headcount"])
+        if n_grp <= 0:
+            continue
+        single = simulate_reskilling_roi(diag, params, targeted_isco1=[str(row["isco1"])])
+        pm_pb = None if pd.isna(row["payback_months_est"]) else int(row["payback_months_est"])
+        assert single["payback_months"] == pm_pb
+        assert abs(single["npv_reskill_vnd"] / n_grp - float(row["npv_36m_per_person_vnd"])) < 1e-2
+
+
+def test_monte_carlo_bounds_and_determinism(
+    sample_exposure_df: pd.DataFrame, sample_salaries: dict[str, float]
+) -> None:
+    hc = build_default_headcount(1000)
+    params = FinancialParams()
+    diag = compute_workforce_diagnostics(hc, sample_salaries, sample_exposure_df, params)
+
+    mc1 = run_monte_carlo_sensitivity(diag, params, targeted_isco1=["2", "3", "4"], n_sims=300, seed=42)
+    mc2 = run_monte_carlo_sensitivity(diag, params, targeted_isco1=["2", "3", "4"], n_sims=300, seed=42)
+    assert mc1 == mc2
+    assert mc1["p10_npv_vnd"] <= mc1["p50_npv_vnd"] <= mc1["p90_npv_vnd"]
+    assert 0.0 <= mc1["prob_npv_positive_pct"] <= 100.0
+    assert 0.0 <= mc1["prob_reskill_beats_cut_pct"] <= 100.0
+    assert mc1["p50_npv_vnd"] > mc1["p50_cut_npv_vnd"]
+
+
+def test_enterprise_gender_audit_snapshot_and_alert_trigger(
+    sample_exposure_df: pd.DataFrame, sample_salaries: dict[str, float]
+) -> None:
+    hc = build_default_headcount(1000)
+    params = FinancialParams()
+    diag = compute_workforce_diagnostics(hc, sample_salaries, sample_exposure_df, params)
+    cut_res = simulate_cut_and_replace(diag, params, targeted_isco1=["2", "3", "4"])
+
+    vnm_wf = pd.read_csv(SNAP_DIR / "mart_vietnam_workforce_isco1.csv")
+    audit = compute_enterprise_gender_audit(diag, cut_res, ["2", "3", "4"], vnm_wf, threshold_pct=5.0)
+    assert audit["vnm_lfs_reference_year"] >= 2024
+    assert 40.0 <= audit["firm_female_share_pct"] <= 60.0
+    assert audit["governance_alert"] is False
+
+    # Synthetic female-heavy Clerical exposure stress test must trip the 5.0 pp governance alert
+    stress_rows = []
+    for isco in ["1", "2", "3", "4", "5", "9"]:
+        fem = 95.0 if isco == "4" else 10.0
+        stress_rows.append({"isco1": isco, "year": 2024, "sex": "SEX_T", "emp_thousands": 100.0})
+        stress_rows.append({"isco1": isco, "year": 2024, "sex": "SEX_F", "emp_thousands": fem})
+    stress_wf = pd.DataFrame(stress_rows)
+
+    audit_stress = compute_enterprise_gender_audit(diag, cut_res, ["2", "3", "4"], stress_wf, threshold_pct=5.0)
+    assert audit_stress["female_cut_disparity_pp"] >= 5.0
+    assert audit_stress["governance_alert"] is True

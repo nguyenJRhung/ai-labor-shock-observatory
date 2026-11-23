@@ -65,7 +65,7 @@ def _compute_pretrend_wald(model: Any, ref_year: int = 2022) -> dict[str, Any]:
     R = np.zeros((len(pre_terms), len(terms)), dtype=float)
     for i, t in enumerate(pre_terms):
         R[i, terms.index(t)] = 1.0
-    wt = model.wald_test(R=R)
+    wt = model.wald_test(R=R, q=np.zeros(len(pre_terms)), distribution="chi2")
     return {
         "stat": float(wt.stat),
         "f_statistic": float(wt.f_statistic) if hasattr(wt, "f_statistic") else None,

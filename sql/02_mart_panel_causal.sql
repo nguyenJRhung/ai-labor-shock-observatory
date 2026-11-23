@@ -79,7 +79,8 @@ SELECT
     t.aei_usage_pct,
     t.aei_automation_pct,
     t.aei_augmentation_pct,
-    t.aui_proxy
+    t.aui_global,
+    t.aui_lmic_relative
 FROM stg_ilostat_lfs l
 INNER JOIN mart_lfs_country_eligibility el
     ON l.iso3 = el.iso3 AND el.is_eligible = 1

@@ -1,5 +1,5 @@
 {
-  "built_at_utc": "2026-11-23 11:52:20 UTC",
+  "built_at_utc": "2026-11-23 12:07:24 UTC",
   "duckdb_path": "data\\observatory.duckdb",
   "duplicate_primary_keys_lfs": 0,
   "mart_panel_causal_lfs": {
@@ -513,10 +513,10 @@
     "income_level": "UMC",
     "region": "East Asia & Pacific",
     "ref_year": 2024,
-    "female_exposure_2025": 0.22447153060871564,
+    "female_exposure_2025": 0.2244715306087156,
     "male_exposure_2025": 0.2070693874619673,
-    "gender_exposure_gap": 0.017402143146748345,
-    "female_grad34_share": 0.047921398364832155,
+    "gender_exposure_gap": 0.017402143146748317,
+    "female_grad34_share": 0.04792139836483217,
     "male_grad34_share": 0.03419513447861345,
     "female_clerical_share": 0.027120846472799054,
     "male_clerical_share": 0.021533784692122707,
@@ -539,10 +539,43 @@
     "high_tech_readiness": 1,
     "aei_usage_count": 10651.0,
     "aei_usage_pct": 1.1043096172708176,
+    "aei_lmic_usage_share_pct": 3.715395992632695,
     "aei_automation_pct": 51.84489719275186,
     "aei_augmentation_pct": 45.620129565299024,
-    "aui_proxy": 0.7128650719708691,
+    "aui_global": 0.8604789993877846,
+    "aui_lmic_relative": 2.398399860207734,
     "in_causal_panel": 1
+  },
+  "data_audit_notes": {
+    "phl_2025_raw_codes": [
+      {
+        "classif1": "OCU_ISCO08_0",
+        "obs_value": 47990.739
+      },
+      {
+        "classif1": "OCU_ISCO08_TOTAL",
+        "obs_value": 47990.739
+      }
+    ],
+    "ind_eligibility": {
+      "iso3": "IND",
+      "pre_2022_years": 1,
+      "post_2022_years": 3,
+      "isco1_groups_count": 9,
+      "min_year": 2022,
+      "max_year": 2025,
+      "is_eligible": 0
+    },
+    "lfs_countries_missing_from_modeled": [
+      {
+        "iso3": "GRD",
+        "country_name": "Grenada"
+      },
+      {
+        "iso3": "KIR",
+        "country_name": "Kiribati"
+      }
+    ]
   },
   "app_snapshots_rows": {
     "ilo_exposure_isco1.csv": 9,

@@ -1,5 +1,7 @@
 # AI Labor Shock & Skills Exposure Observatory (LMICs & Vietnam)
 
+[![CI — Data, Causal & BA Financial Tests](https://github.com/nguyenJRhung/ai-labor-shock-observatory/actions/workflows/ci.yml/badge.svg)](https://github.com/nguyenJRhung/ai-labor-shock-observatory/actions/workflows/ci.yml)
+
 > **Executive Summary (BLUF — 30 giây):**  
 > Các doanh nghiệp và nhà hoạch định chính sách tại các nền kinh tế thu nhập thấp & trung bình (LMICs, trong đó có Việt Nam) đang thiếu một công cụ định lượng để tách bạch **tác động thực của GenAI lên cơ cấu việc làm** khỏi nhiễu chu kỳ vĩ mô, và chuyển hóa tín hiệu đó thành **bài toán ROI tái đào tạo nhân sự (Reskilling NPV & Payback)**.  
 > Dự án này xây dựng một **Hệ thống Quan sát Nhân quả & Mô phỏng Chiến lược Nhân sự** vận hành **0 đồng**, kết hợp dữ liệu thực tế từ **ILO 2025, ILOSTAT LFS, Anthropic Economic Index, GitHub Innovation Graph và World Bank WDI**, đối chiếu chéo chính xác giữa **Python (`pyfixest`) và R (`fixest`)**.
@@ -12,20 +14,22 @@
 
 ![Saturated TWFE Event Study](docs/figures/fig05_event_study_causal.png)
 
-- **Kiểm định Xu hướng Song song (Pre-trend 2015–2021):** Đạt (`Wald p = 0.274` trên Actual LFS), trong khi dữ liệu nội suy *ILO Modeled* (`124` nước, $N=9,450$) bị vi phạm (`p = 0.00051`) — khẳng định tầm quan trọng của việc dùng dữ liệu điều tra thực tế.
-- **Tác động Hậu 2022 (`post_2022 × exposure_2025`):** $\hat{\beta} = +0.1502$ ($SE = 0.0715, p = 0.0362$ với unit cluster; $p = 0.0308$ với country cluster). Chưa có bằng chứng sa thải ròng hàng loạt do GenAI tại LMICs giai đoạn 2023–2025; sự mở rộng tương đối tập trung ở các nước **sẵn sàng công nghệ cao** ($\hat{\beta} = +0.1650, p = 0.0375$) và nhóm **UMC** ($\hat{\beta} = +0.1664, p = 0.0381$), đồng thời gắn chặt với chuyển dịch cơ cấu khỏi nông nghiệp (`Leave-One-Occupation-Out` bỏ `ISCO-6` đưa hệ số về `+0.0196, p = 0.785`).
-- **Đối chiếu chéo Python `pyfixest` vs. R `fixest`:** Khớp tuyệt đối ở mọi hệ số và sai số chuẩn (`max |Δβ| = 1.85e-15`, `max |ΔSE| = 3.50e-15`).
-- **Chuyên sâu Việt Nam (`VNM`):** `2,760,619` GitHub developers cuối 2025 (`401.7` dev / 10k dân LĐ, tăng `+123.1%` từ 2022; lên `3,244,777` ở `2026-Q2`); tương tác *Automation* trên Anthropic AEI chiếm `51.8%` vs. *Augmentation* `45.6%`; lao động nữ chịu mức phơi nhiễm gia quyền cao hơn nam giới (`0.2245` vs. `0.2071`, `Gender Gap = +0.0174`).
+![Robustness Specification Curve](docs/figures/fig07_robustness_forest_plot.png)
 
-### B. Mô phỏng Tài chính BA: Doanh nghiệp Mẫu 1.000 Nhân sự Việt Nam
+- **Kiểm định Xu hướng Song song (Pre-trend 2015–2021):** Đạt (`Wald p = 0.274` trên Actual LFS), trong khi dữ liệu nội suy *ILO Modeled* (`124` nước, $N=9,450$) bị vi phạm (`p = 0.00051`) — khẳng định tầm quan trọng của việc dùng dữ liệu điều tra thực tế.
+- **Tác động Hậu 2022 (`post_2022 × exposure_2025`) & 9 Kiểm định Độ bền vững:** Baseline không gia quyền ($\hat{\beta} = +0.1502, SE = 0.0715, p = 0.0362$) và WLS tỷ trọng nghề 2022 ($\hat{\beta} = +0.3046, p = 0.0007$) cùng Balanced Panel 2017–2024 ($\hat{\beta} = +0.1718, p = 0.0252$) dương có ý nghĩa. Tuy nhiên, khi kiểm soát xu hướng tuyến tính riêng theo từng nhóm nghề ($\hat{\beta} = +0.0769, p = 0.284$), so sánh trực tiếp Văn phòng `ISCO-4` vs. Tay chân `ISCO 7–9` ($\hat{\beta} = +0.0047, p = 0.848$), bỏ `ISCO-6` (`+0.0196, p = 0.785`), hoặc chạy **500 lần hoán vị FWL Randomization Inference (`p = 0.428`)**, kết quả trở về 0 về mặt thống kê — chứng minh giai đoạn 2023–2025 **chưa có làn sóng sa thải ròng do GenAI**, là cửa sổ vàng để tái đào tạo.
+- **Đối chiếu chéo `5/5` mô hình Python `pyfixest` vs. R `fixest`:** Khớp tuyệt đối trên cả `Event Study`, `Pooled DiD`, `Occupation Linear Trends`, `Binary Clerical vs. Manual`, và `Triple-Diff Gender` (`max |Δβ| = 2.16e-15`, `max |ΔSE| = 3.83e-11`).
+- **Chuyên sâu Việt Nam (`VNM`):** `2,760,619` GitHub developers cuối 2025 (`401.7` dev / 10k dân LĐ, tăng `+123.1%` từ 2022; lên `3,244,777` ở `2026-Q2`); Anthropic **AUI toàn cầu = `0.8605`** (**`2.3984`** nội khối LMICs); tương tác *Automation* chiếm `51.8%` vs. *Augmentation* `45.6%`; lao động nữ chịu phơi nhiễm gia quyền cao hơn nam (`0.2245` vs. `0.2071`, `Gender Gap = +0.0174`).
+
+### B. Mô phỏng Tài chính BA: Doanh nghiệp Mẫu 1.000 Nhân sự Việt Nam (Kèm Monte Carlo & Gender Audit)
 
 ![Reskilling ROI vs Cut & Replace](docs/figures/fig06_reskilling_roi_scenarios.png)
 
-| Chiến lược hành động (Khung 36 tháng) | Đầu tư ban đầu | NPV 36 tháng | ROI (%) | Hoàn vốn | Break-even Lift |
-| :--- | ---: | ---: | ---: | :---: | :---: |
-| **A. Status Quo (Giữ nguyên)** | 0 Tỷ | **0.00 Tỷ** *(Opp. Cost -21.89 Tỷ)* | 0.0% | — | — |
-| **B. Cut & Replace (Cắt 34 người, khóa HITL ISCO-1)** | 1.89 Tỷ | **+4.05 Tỷ** | 213.8% | Tháng 22 | — |
-| **C. Targeted Reskilling + AI (520 người ISCO 2–4)** | 7.18 Tỷ | **+21.89 Tỷ** | **305.0%** | **Tháng 10** | **5.35%** *(kỳ vọng 12.62%)* |
+| Chiến lược hành động (Khung 36 tháng) | Đầu tư ban đầu | NPV Cơ sở | Monte Carlo P10 / P50 / P90 | ROI (%) | Hoàn vốn | Break-even / Gender Audit |
+| :--- | ---: | ---: | ---: | ---: | :---: | :--- |
+| **A. Status Quo (Giữ nguyên)** | 0 Tỷ | **0.00 Tỷ** | — | 0.0% | — | Chi phí cơ hội `-21.89 Tỷ` |
+| **B. Cut & Replace (Cắt 34 người, khóa HITL)** | 1.89 Tỷ | **+4.05 Tỷ** | +3.37 / +4.22 / +5.04 Tỷ | 213.8% | Tháng 22 | `53.55%` người bị cắt là nữ (`+1.87 pp` vs DN) |
+| **C. Targeted Reskilling + AI (520 người ISCO 2–4)** | 7.18 Tỷ | **+21.89 Tỷ** | **+11.06 / +21.78 / +33.51 Tỷ** | **305.0%** | **Tháng 10** | **Break-even 5.35%** (`100%` NPV > 0; **`99.0%` thắng Cut**) |
 
 ---
 
@@ -42,7 +46,7 @@
 Lớp 2: Causal Engine (src/causal/)          Lớp 3: BA & Financial Engine (src/business/)
 - Saturated TWFE Event Study (Python & R)   - Workforce Diagnostics (Quỹ lương phơi nhiễm)
 - Triple-Diff Gender & Heterogeneity        - NPV 36M, ROI %, Payback, Break-even Lift
-- 4 Robustness & Placebo Refutations        - Cut & Replace vs. Targeted Reskilling + HITL
+- 9 Robustness, WLS & RI Proofs (R 5/5)      - Monte Carlo 1,000x & Gender Audit + HITL
                      │                                 │
                      └────────────────┬────────────────┘
                                       ▼
@@ -92,6 +96,6 @@ Rscript src/causal/verify_in_r.R
 - [x] **Tuần 1:** Khởi tạo cấu trúc repo 3 lớp, thiết lập `.venv`, viết BRD + KPI Tree, kiểm chứng 5 nguồn dữ liệu mở ([docs/00_Data_Coverage_Audit.md](docs/00_Data_Coverage_Audit.md)).
 - [x] **Tuần 2–4:** Hoàn thiện ETL toàn khối LMICs & kho dữ liệu `observatory.duckdb` (`sql/01_staging_harmonize.sql`, `02_mart_panel_causal.sql`, `03_mart_vietnam_ba.sql`) với `0` khóa trùng lặp.
 - [x] **Tuần 5–6:** EDA đa chiều (*Gender Exposure Gap*, *Theory vs. Adoption*, *Vietnam Tech Trend*) và xuất 4 biểu đồ 300 DPI (`docs/figures/fig01`–`fig04`).
-- [x] **Tuần 7–8:** Lõi Suy luận Nhân quả (`pyfixest`), Triple-Diff giới tính, 4 kiểm định phản bác và đối chiếu chéo R `fixest` khớp tới `1.85e-15`.
+- [x] **Tuần 7–8:** Lõi Suy luận Nhân quả (`pyfixest`), Triple-Diff giới tính, 9 kiểm định phản bác & độ bền vững (Occ. Trends, WLS, Binary DiD, FWL RI) và đối chiếu chéo R `fixest` **5/5 mô hình** khớp tới `2.16e-15`.
 - [x] **Tuần 9–10:** Mô hình tài chính `Reskilling ROI` (`src/business/`) & ứng dụng Streamlit 3 tab tích hợp cơ chế *Human-in-the-Loop* (`app/streamlit_app.py`).
 - [x] **Tuần 11–12:** Bộ kiểm thử tự động `pytest`, GitHub Actions CI, `Makefile`, *Executive Policy Memo*, *Model Governance Card* và *Interview Study Guide*.

@@ -46,6 +46,7 @@ def run() -> dict:
         _register_parquet_table(con, "raw_ilostat_lfs", processed_dir / "ilostat_lfs_lmics.parquet")
         _register_parquet_table(con, "raw_ilostat_modeled", processed_dir / "ilostat_modeled_lmics.parquet")
         _register_parquet_table(con, "raw_wdi_macro", processed_dir / "wdi_lmics_macro.parquet")
+        _register_parquet_table(con, "raw_wdi_world_wap", processed_dir / "wdi_world_wap.parquet")
         _register_parquet_table(con, "raw_github_annual", processed_dir / "github_annual_lmics.parquet")
         _register_parquet_table(con, "raw_github_quarterly", processed_dir / "github_quarterly_lmics.parquet")
         _register_parquet_table(con, "raw_aei_country", processed_dir / "aei_country_lmics.parquet")
@@ -128,6 +129,28 @@ def run() -> dict:
             "SELECT * FROM mart_theory_vs_adoption WHERE iso3 = 'VNM'"
         ).df().to_dict(orient="records")
 
+        # Forensic data audit checks (real anomalies observed in raw/mart tables)
+        phl_2025_codes = con.execute("""
+            SELECT classif1, obs_value
+            FROM raw_ilostat_lfs
+            WHERE iso3 = 'PHL' AND year = 2025 AND sex = 'SEX_T'
+            ORDER BY classif1
+        """).df().to_dict(orient="records")
+
+        ind_elig = con.execute("""
+            SELECT iso3, pre_2022_years, post_2022_years, isco1_groups_count, min_year, max_year, is_eligible
+            FROM mart_lfs_country_eligibility
+            WHERE iso3 = 'IND'
+        """).df().to_dict(orient="records")
+
+        missing_from_modeled = con.execute("""
+            SELECT e.iso3, e.country_name
+            FROM mart_lfs_country_eligibility e
+            LEFT JOIN (SELECT DISTINCT iso3 FROM mart_panel_causal_modeled) m ON e.iso3 = m.iso3
+            WHERE e.is_eligible = 1 AND m.iso3 IS NULL
+            ORDER BY e.iso3
+        """).df().to_dict(orient="records")
+
         summary = {
             "built_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
             "duckdb_path": str(db_path.relative_to(PROJECT_ROOT)),
@@ -148,6 +171,11 @@ def run() -> dict:
             "eligible_lfs_countries": eligible_list,
             "vietnam_gender_exposure": vnm_gender[0] if vnm_gender else None,
             "vietnam_theory_vs_adoption": vnm_theory[0] if vnm_theory else None,
+            "data_audit_notes": {
+                "phl_2025_raw_codes": phl_2025_codes,
+                "ind_eligibility": ind_elig[0] if ind_elig else None,
+                "lfs_countries_missing_from_modeled": missing_from_modeled,
+            },
             "app_snapshots_rows": snapshot_sizes,
         }
 

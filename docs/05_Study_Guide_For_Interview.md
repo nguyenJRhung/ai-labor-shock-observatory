@@ -21,15 +21,17 @@ Tài liệu này giúp bạn **làm chủ 100% kiến thức kỹ thuật, kinh 
   - **$\gamma_{c,t}$ (Country × Year FE)** nuốt trọn mọi cú sốc vĩ mô riêng của từng nước trong từng năm! Nhờ vậy ta so sánh *nghề phơi nhiễm cao vs. nghề phơi nhiễm thấp* **trong chính cùng một quốc gia và cùng một năm**.
 - **Vì sao phải kiểm tra `Actual LFS` vs. `ILO Modeled`?**
   - Kết quả thật chứng minh: trên **Actual LFS (49 LMICs)**, Pre-trend Wald test đạt **`p = 0.274`** (vượt qua kiểm định xu hướng song song), còn **ILO Modeled (124 LMICs)** bị vi phạm nặng **`p = 0.00051`** do phép nội suy của ILO làm méo biến động năm COVID 2020 (`+0.224, p = 0.0018`) và làm phẳng tín hiệu hậu 2022.
-- **Cách đọc trung thực kết quả $\hat{\beta}_{\text{post2022}} = +0.1502$ ($p = 0.036$):**
-  - Hệ số dương không có nghĩa là "AI tự sinh thêm việc làm ở mọi nơi", mà phản ánh **chưa có làn sóng cắt giảm ròng tại LMICs giai đoạn 2023–2025**; các nền kinh tế sẵn sàng công nghệ cao (`high_tech_readiness = 1`, $\hat{\beta}=+0.165, p=0.037$) đang mở rộng việc làm tri thức–dịch vụ nhanh hơn nông nghiệp (`Leave-One-Occupation-Out` khi bỏ `ISCO-6` đưa hệ số về `+0.0196, p = 0.785`).
+- **Cách đọc trung thực kết quả $\hat{\beta}_{\text{post2022}} = +0.1502$ ($p = 0.036$) cùng Kiểm định 5–9:**
+  - Hệ số baseline và `WLS` theo tỷ trọng nghề 2022 (`+0.3046, p = 0.0007`) có giá trị dương, nhưng đây **không** phải bằng chứng "AI tự sinh việc làm" mà là tín hiệu **chưa có sa thải ròng tại LMICs 2023–2025**. Khi thêm xu hướng tuyến tính theo nghề (`+0.0769, p = 0.284`), so sánh trực tiếp Văn phòng `ISCO-4` vs. Tay chân `ISCO 7–9` (`+0.0047, p = 0.848`), hoặc chạy **500 lần hoán vị FWL Randomization Inference (`p = 0.428`)**, tác động ròng bằng 0 về thống kê — khẳng định doanh nghiệp đang có cửa sổ thời gian vàng để tái đào tạo nhân sự trước khi làn sóng tự động hóa lan sâu.
 
-### 3. Mô hình Tài chính Doanh nghiệp BA (`src/business/`)
-- **NPV, ROI, Payback & Break-even Productivity Lift:**
+### 3. Mô hình Tài chính Doanh nghiệp BA & Quản trị Rủi ro (`src/business/`)
+- **NPV, ROI, Payback đồng nhất & Break-even Productivity Lift:**
   - *Realization Rate ($\rho = 50\%$):* Khái niệm BA tối quan trọng — giải phóng 10 giờ gõ văn bản bằng AI không tự động hóa thành 10 giờ lợi nhuận; doanh nghiệp chỉ hiện thực hóa được ~50% giá trị thời gian đó.
-  - *Break-even Productivity Lift (`5.35%`):* Tỷ lệ tăng năng suất tối thiểu để tổng dòng tiền chiết khấu 36 tháng bù đắp đủ chi phí đào tạo (`7.18 Tỷ`) và bản quyền AI hàng tháng. Vì `5.35%` nhỏ hơn nhiều so với kỳ vọng `12.62%`, biên an toàn của dự án đào tạo cực cao.
-- **So sánh 3 chiến lược trên 1.000 nhân sự mẫu:**
-  - `Targeted Reskilling` (`NPV = +21.89 Tỷ`, `Hoàn vốn tháng 10`) thắng áp đảo `Cut & Replace` (`NPV = +4.05 Tỷ`, `Hoàn vốn tháng 22`, lỗ `-0.46 Tỷ` ở kịch bản thận trọng) vì cắt giảm 34 người tốn ngay `1.89 Tỷ` tiền đền bù + tuyển mới và gây suy giảm vận hành 6 tháng đầu.
+  - *Công thức hoàn vốn thống nhất (`discounted_cashflow_metrics`):* Cả ma trận 2×2 từng nhóm nghề (`ISCO 2`: `7 tháng`, `ISCO 4`: `11 tháng`, `ISCO 3`: `13 tháng`) lẫn kịch bản tổng hợp 520 nhân sự (`10 tháng`) dùng chung một hàm chiết khấu dòng tiền hàng tháng có `ramp-up` 3 tháng.
+  - *Break-even Productivity Lift (`5.35%`):* Tỷ lệ tăng năng suất tối thiểu để tổng dòng tiền chiết khấu 36 tháng bù đắp đủ chi phí đào tạo (`7.18 Tỷ`) và bản quyền AI hàng tháng — thấp hơn nhiều mức kỳ vọng `12.62%`.
+- **Monte Carlo 1.000 kịch bản (`seed=42`) & Kiểm toán Giới tính (`Enterprise Gender Audit`):**
+  - `Targeted Reskilling` đạt phân vị **P10 = `+11.06 Tỷ` / P50 = `+21.78 Tỷ` / P90 = `+33.51 Tỷ`**, xác suất **`100.0%` NPV dương**, thắng *Cut & Replace* (`P50 = +4.22 Tỷ`) ở **`99.0%` số mô phỏng** vì cắt 34 người tốn `1.89 Tỷ` đền bù ngay lập tức và mất ổn định vận hành 6 tháng.
+  - Tự động tính tỷ lệ lao động nữ chịu tác động dựa trên LFS 2024 Việt Nam (`51.68%` toàn DN; `55.29%` tái đào tạo vs. `53.55%` cắt giảm) và bật cảnh báo khi chênh lệch $\ge 5.0\text{ pp}$.
 
 ---
 
@@ -42,10 +44,10 @@ Tài liệu này giúp bạn **làm chủ 100% kiến thức kỹ thuật, kinh 
    **Đáp:** Dự báo ML chỉ trả lời "chỉ số năm sau có thể là bao nhiêu" chứ không tách được tác động của AI khỏi suy thoái kinh tế, lạm phát hay hậu COVID-19. Thiết kế *Saturated TWFE Event Study* dùng cặp hiệu ứng cố định $\alpha_{c,o} + \gamma_{c,t}$ khử sạch toàn bộ biến động vĩ mô riêng của từng nước từng năm, cho phép tách đúng sự phân kỳ giữa nhóm nghề phơi nhiễm cao và thấp.
 
 3. **Hỏi:** *Làm sao bạn biết mô hình kinh tế lượng của mình không ra kết quả ngẫu nhiên hay sai giả định?*  
-   **Đáp:** Em kiểm chứng qua 5 lớp: (1) Pre-trend Wald Test (`p = 0.274` -> đạt xu hướng song song); (2) Placebo Test giả lập cú sốc năm 2019 (`p = 0.277` -> không có hiệu ứng giả); (3) Loại bỏ giai đoạn COVID 2020–2021 (`+0.168, p = 0.029`); (4) Thay 3 bộ thước đo phơi nhiễm khác nhau đều nhất quán dấu & mức ý nghĩa; (5) Đối chiếu độc lập code Python `pyfixest` với R `fixest` — sai số tuyệt đối chỉ ở mức `1.85e-15`.
+   **Đáp:** Em kiểm chứng qua **9 kiểm định phản bác & độ bền vững + đối chiếu 5/5 mô hình sang R**: (1) Pre-trend Wald Test (`p = 0.274`) & Placebo Date 2019 (`p = 0.277`); (2) Loại COVID 2020–2021 (`+0.168, p = 0.029`); (3) Thay 3 thước đo ILO 2025/2023/Grad34 đều dương có ý nghĩa; (4) `WLS` theo tỷ trọng nghề 2022 (`+0.3046, p = 0.0007`) & Balanced Panel 2017–2024 (`+0.1718, p = 0.025`); (5) Kiểm định khắt khe hơn bằng xu hướng tuyến tính theo nghề (`+0.0769, p = 0.284`), Binary DiD `ISCO-4` vs. `ISCO 7–9` (`+0.0047, p = 0.848`), và **500 lần FWL Randomization Inference (`p = 0.428`)** để không kết luận quá đà; (6) Đối chiếu **5/5 mô hình** Python `pyfixest` với R `fixest` đạt sai số **`max |Δβ| = 2.16e-15`** và **`max |ΔSE| = 3.83e-11`**.
 
-4. **Hỏi:** *Điểm yếu lớn nhất bạn phát hiện trong dữ liệu dự án là gì?*  
-   **Đáp:** Hai phát hiện trung thực: (1) Dữ liệu nội suy *ILO Modeled* vi phạm xu hướng song song (`p = 0.00051`) nên phải lọc chỉ lấy *Actual LFS* của 49 LMICs; (2) Khi chạy *Leave-One-Occupation-Out* bỏ nhóm Nông nghiệp (`ISCO-6`), hệ số giảm từ `+0.1502` xuống `+0.0196 (p = 0.785)` — chứng tỏ phần lớn sự mở rộng việc làm tri thức tại các nước UMC gắn với chuyển dịch cơ cấu chung, không nên thổi phồng thành "AI tự tạo việc làm".
+4. **Hỏi:** *Điểm yếu lớn nhất bạn phát hiện trong dữ liệu và mô hình là gì?*  
+   **Đáp:** Bốn phát hiện trung thực đã được chứng minh bằng code & test: (1) Dữ liệu nội suy *ILO Modeled* vi phạm xu hướng song song (`p = 0.00051`) nên phải dùng *Actual LFS* của 49 LMICs (riêng `PHL 2025` thiếu mã `ISCO 1–9`, `IND` mới có từ 2022, `GRD`/`KIR` thiếu trong Modeled); (2) Khi chạy *LOOO* bỏ `ISCO-6` (`+0.0196, p = 0.785`), thêm xu hướng tuyến tính nghề (`p = 0.284`), hay chạy hoán vị 9 cụm nghề (`RI p = 0.428`), tác động ròng trở về 0 về thống kê — do đó diễn giải đúng là "chưa có sa thải ròng hậu 2022", không thổi phồng thành "AI tự sinh việc làm"; (3) Trong chỉ số Anthropic AUI, em đã tách rạch ròi mẫu số toàn cầu (`aui_global`, VN = `0.8605`) khỏi mẫu số nội khối LMICs (`aui_lmic_relative`, VN = `2.3984`).
 
 5. **Hỏi:** *Trong SQL, bạn xử lý thế nào khi dữ liệu thô ILOSTAT bị trùng dòng theo nguồn điều tra?*  
    **Đáp:** Em dùng CTE kết hợp `COUNT(DISTINCT year) OVER (PARTITION BY iso3, source)` để chấm điểm độ dài chuỗi lịch sử của từng cuộc điều tra, rồi dùng `ROW_NUMBER() OVER (PARTITION BY iso3, isco1, sex, year ORDER BY span_years DESC, source ASC)` giữ đúng 1 dòng tất định. Kết quả `pytest` xác nhận `0` khóa chính trùng lặp.

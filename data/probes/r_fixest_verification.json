@@ -1,5 +1,5 @@
 {
-  "verified_at_utc": "2026-11-23 11:52:46 UTC",
+  "verified_at_utc": "2026-11-23 12:09:33 UTC",
   "r_version": "R version 4.5.2 (2025-10-31 ucrt)",
   "fixest_version": "0.14.2",
   "n_obs": 3987,
@@ -7,99 +7,140 @@
     {
       "year": 2015,
       "term": "year::2015:exposure",
-      "estimate": -0.055011286192,
-      "se_unit": 0.12733083506,
-      "pvalue_unit": 0.66592813361,
-      "se_iso": 0.086840816564
+      "estimate": -0.05501128619216,
+      "se_unit": 0.1273308350597,
+      "pvalue_unit": 0.665928133612,
+      "se_iso": 0.08684081656413
     },
     {
       "year": 2016,
       "term": "year::2016:exposure",
-      "estimate": -0.086529260191,
-      "se_unit": 0.1179715363,
-      "pvalue_unit": 0.46365893286,
-      "se_iso": 0.094189646644
+      "estimate": -0.08652926019136,
+      "se_unit": 0.1179715363001,
+      "pvalue_unit": 0.4636589328636,
+      "se_iso": 0.09418964664441
     },
     {
       "year": 2017,
       "term": "year::2017:exposure",
-      "estimate": -0.11488598576,
-      "se_unit": 0.098862365603,
-      "pvalue_unit": 0.24583288458,
-      "se_iso": 0.080733415531
+      "estimate": -0.1148859857581,
+      "se_unit": 0.09886236560269,
+      "pvalue_unit": 0.2458328845755,
+      "se_iso": 0.08073341553082
     },
     {
       "year": 2018,
       "term": "year::2018:exposure",
-      "estimate": -0.058880942289,
-      "se_unit": 0.092327316623,
-      "pvalue_unit": 0.52397383139,
-      "se_iso": 0.071317261947
+      "estimate": -0.05888094228851,
+      "se_unit": 0.09232731662309,
+      "pvalue_unit": 0.523973831389,
+      "se_iso": 0.0713172619472
     },
     {
       "year": 2019,
       "term": "year::2019:exposure",
-      "estimate": -0.054394195649,
-      "se_unit": 0.087725365648,
-      "pvalue_unit": 0.53554522925,
-      "se_iso": 0.073864150862
+      "estimate": -0.05439419564919,
+      "se_unit": 0.08772536564812,
+      "pvalue_unit": 0.5355452292474,
+      "se_iso": 0.07386415086151
     },
     {
       "year": 2020,
       "term": "year::2020:exposure",
-      "estimate": 0.072125305856,
-      "se_unit": 0.075999678389,
-      "pvalue_unit": 0.34313077792,
-      "se_iso": 0.060811954159
+      "estimate": 0.07212530585565,
+      "se_unit": 0.07599967838881,
+      "pvalue_unit": 0.3431307779249,
+      "se_iso": 0.06081195415941
     },
     {
       "year": 2021,
       "term": "year::2021:exposure",
-      "estimate": -0.044809140852,
-      "se_unit": 0.054044746925,
-      "pvalue_unit": 0.40749066178,
-      "se_iso": 0.051734786327
+      "estimate": -0.04480914085202,
+      "se_unit": 0.05404474692475,
+      "pvalue_unit": 0.4074906617786,
+      "se_iso": 0.05173478632668
     },
     {
       "year": 2023,
       "term": "year::2023:exposure",
-      "estimate": 0.067044645405,
-      "se_unit": 0.05889264816,
-      "pvalue_unit": 0.25556406539,
-      "se_iso": 0.06738827151
+      "estimate": 0.06704464540475,
+      "se_unit": 0.05889264816044,
+      "pvalue_unit": 0.2555640653897,
+      "se_iso": 0.06738827151038
     },
     {
       "year": 2024,
       "term": "year::2024:exposure",
-      "estimate": 0.16331377723,
-      "se_unit": 0.06475966004,
-      "pvalue_unit": 0.012026128524,
-      "se_iso": 0.057697998445
+      "estimate": 0.1633137772341,
+      "se_unit": 0.06475966003987,
+      "pvalue_unit": 0.01202612852442,
+      "se_iso": 0.0576979984452
     },
     {
       "year": 2025,
       "term": "year::2025:exposure",
-      "estimate": 0.09579823473,
-      "se_unit": 0.089200567926,
-      "pvalue_unit": 0.2834272449,
-      "se_iso": 0.077303459986
+      "estimate": 0.09579823473029,
+      "se_unit": 0.08920056792641,
+      "pvalue_unit": 0.2834272448988,
+      "se_iso": 0.07730345998596
     }
   ],
   "pooled_did": {
-    "estimate": 0.15024090289,
+    "estimate": 0.1502409028913,
     "se_unit_cluster": 0.071517892471,
-    "pvalue_unit_cluster": 0.036231728027,
-    "se_country_cluster": 0.067496550456,
-    "pvalue_country_cluster": 0.030750826746
+    "pvalue_unit_cluster": 0.03623172802708,
+    "se_country_cluster": 0.06749655045638,
+    "pvalue_country_cluster": 0.03075082674602
+  },
+  "occ_linear_trends": {
+    "estimate": 0.07691704619145,
+    "se_unit_cluster": 0.07171098803938,
+    "pvalue_unit_cluster": 0.2840395446626
+  },
+  "binary_clerical_vs_manual": {
+    "n_obs": 1772,
+    "estimate": 0.004738753530572,
+    "se_unit_cluster": 0.02470731111581,
+    "pvalue_unit_cluster": 0.8481018896375
+  },
+  "triple_diff_gender": {
+    "n_obs": 7916,
+    "male_estimate": 0.1295907676311,
+    "male_se": 0.07146368627231,
+    "female_diff_estimate": 0.08502036050979,
+    "female_diff_se": 0.1217705115658
   },
   "python_vs_r_comparison": {
     "available": true,
+    "models_verified_count": 5,
     "n_obs_r": 3987,
     "n_obs_python": 3987,
-    "max_abs_coef_diff": 1.8457457784e-15,
-    "max_abs_se_diff": 3.4972025276e-15,
-    "did_coef_diff": 8.3266726847e-17,
-    "did_se_diff": 1.3877787808e-17,
+    "per_model_diffs": {
+      "event_study": {
+        "max_coef_diff": 2.123301534596e-15,
+        "max_se_diff": 3.191891195797e-15
+      },
+      "pooled_did": {
+        "max_coef_diff": 1.110223024625e-16,
+        "max_se_diff": 1.387778780781e-17
+      },
+      "occ_linear_trends": {
+        "max_coef_diff": 1.026956297778e-15,
+        "max_se_diff": 1.026956297778e-15
+      },
+      "binary_clerical_vs_manual": {
+        "max_coef_diff": 4.336808689942e-17,
+        "max_se_diff": 1.734723475977e-17
+      },
+      "triple_diff_gender": {
+        "max_coef_diff": 2.164934898019e-15,
+        "max_se_diff": 3.83476167487e-11
+      }
+    },
+    "max_abs_coef_diff": 2.164934898019e-15,
+    "max_abs_se_diff": 3.83476167487e-11,
+    "did_coef_diff": 1.110223024625e-16,
+    "did_se_diff": 1.387778780781e-17,
     "exact_match_pass": true
   }
 }
