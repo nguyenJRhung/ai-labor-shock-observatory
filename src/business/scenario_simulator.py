@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import math
+from dataclasses import replace
 from typing import Any
 
 import numpy as np
@@ -18,6 +19,7 @@ from src.business.reskilling_roi import (
     derive_macro_priors_for_country,
     discounted_cashflow_metrics,
     load_enterprise_preset,
+    optimize_reskilling_budget,
     params_from_assumptions,
     simulate_reskilling_roi,
 )
@@ -385,46 +387,65 @@ def run_monte_carlo_sensitivity(
     npv_hybrid = np.empty(n_sims, dtype=float)
     disr_pv_factor = float(np.sum(np.array([1.0 / 6.0 if m <= 6 else 0.0 for m in months]) * dfs)) * params.handover_disruption_months_per_cut
 
-    for i in range(n_sims):
-        raw_shares = exp_arr * auto_arr * ad_c[i]
+    # 100% Vectorized Cut & Replace + Hybrid evaluation across batches of draws (no inner sim loop)
+    chunk_size = 2500
+    is_auto_unlocked = ((ratio_arr >= 1.0) & (~locked_arr))[None, :]
+    exp_auto = (exp_arr * auto_arr)[None, :]
+    sal_exp = sal_arr * exp_arr
+    ramps_dfs = ramps * dfs
+    pv_df_hc = hc_arr[None, :] * pv_df_sum
+    pv_ramp_hc = hc_arr[None, :] * pv_ramp_sum
+
+    for s0 in range(0, n_sims, chunk_size):
+        s1 = min(n_sims, s0 + chunk_size)
+        ad_sl = ad_c[s0:s1]
+        re_sl = re_c[s0:s1]
+        h_sl = h_c[s0:s1]
+        rc_sl = rc_c[s0:s1]
+        ac_sl = ac_c[s0:s1]
+
+        raw_shares = ad_sl[:, None] * exp_auto
         capped = np.minimum(raw_shares, params.max_headcount_reduction_cap_pct)
-        cuts = np.where(locked_arr, 0.0, np.round(hc_arr * capped))
-        sev_i = float(np.sum(cuts * sal_arr * params.replacement_cost_months_salary))
-        saved_m_i = float(np.sum(cuts * sal_arr))
-        rem_arr = np.maximum(0.0, hc_arr - cuts)
-        rem_hc_i = float(np.sum(rem_arr))
-        surv_gain_i = float(
-            np.sum(rem_arr * sal_arr * exp_arr)
-            * ad_c[i]
-            * re_c[i]
+        cuts = np.where(locked_arr[None, :], 0.0, np.round(hc_arr[None, :] * capped))
+        sev_sl = cuts @ (sal_arr * params.replacement_cost_months_salary)
+        saved_m_sl = cuts @ sal_arr
+        rem_arr = np.maximum(0.0, hc_arr[None, :] - cuts)
+        surv_gain = (
+            (rem_arr @ sal_exp)
+            * ad_sl
+            * re_sl
             * params.untrained_ai_realization_ratio
             * params.survivor_ai_seat_coverage
         )
-        ai_cut_m_i = rem_hc_i * ac_c[i] * params.survivor_ai_seat_coverage
-        npv_cut[i] = (
-            saved_m_i * pv_df_sum
-            + surv_gain_i * pv_untrained_ramp
-            - ai_cut_m_i * pv_df_sum
-            - saved_m_i * disr_pv_factor
-            - sev_i
+        ai_cut_m = rem_arr.sum(axis=1) * ac_sl * params.survivor_ai_seat_coverage
+        npv_cut[s0:s1] = (
+            saved_m_sl * pv_df_sum
+            + surv_gain * pv_untrained_ramp
+            - ai_cut_m * pv_df_sum
+            - saved_m_sl * disr_pv_factor
+            - sev_sl
         )
 
-        # Hybrid NPV draw across same correlated trial
-        freezes = np.where((ratio_arr >= 1.0) & (~locked_arr), cuts, 0.0)
-        init_train_arr = np.where(h_c[i] > 0, np.maximum(0.0, hc_arr - freezes), hc_arr)
-        upfront_h = float(np.sum(init_train_arr)) * rc_c[i] * (1.0 + params.change_management_overhead_pct)
-        eta_h = max(0.5, 1.0 - h_c[i] * 0.5 * params.productivity_ramp_months)
-        net_pv_h = 0.0
-        for j in range(len(hc_arr)):
-            f_vec = np.minimum(freezes[j], hc_arr[j] * (1.0 - np.exp(-h_c[i] * months))) if (freezes[j] > 0 and h_c[i] > 0) else np.zeros_like(months)
-            a_vec = np.maximum(0.0, hc_arr[j] - f_vec)
-            pay_s = f_vec * sal_arr[j]
-            pg = a_vec * sal_arr[j] * exp_arr[j] * ad_c[i] * re_c[i] * ramps * eta_h
-            ac_v = a_vec * ac_c[i]
-            bf_v = init_train_arr[j] * h_c[i] * rc_c[i] * params.backfill_retrain_cost_ratio
-            net_pv_h += float(np.sum((pay_s + pg - ac_v - bf_v) * dfs))
-        net_pv_h -= float(np.sum(init_train_arr)) * rc_c[i] * params.annual_refresh_cost_pct * refresh_pv_factor
-        npv_hybrid[i] = net_pv_h - upfront_h
+        # Vectorized Hybrid NPV over (chunk, G, M)
+        freezes = np.where(is_auto_unlocked, cuts, 0.0)
+        init_train = np.where(h_sl[:, None] > 0.0, np.maximum(0.0, hc_arr[None, :] - freezes), hc_arr[None, :])
+        init_sum = init_train.sum(axis=1)
+        upfront_h = init_sum * rc_sl * (1.0 + params.change_management_overhead_pct)
+        eta_h = np.maximum(0.5, 1.0 - h_sl * 0.5 * params.productivity_ramp_months)
+
+        cum_exits = hc_arr[None, :, None] * (1.0 - np.exp(-h_sl[:, None, None] * months[None, None, :]))
+        f_mat = np.where((freezes[:, :, None] > 0.0) & (h_sl[:, None, None] > 0.0), np.minimum(freezes[:, :, None], cum_exits), 0.0)
+        pv_f = np.einsum("sgm,m->sg", f_mat, dfs)
+        pv_f_ramp = np.einsum("sgm,m->sg", f_mat, ramps_dfs)
+        pv_a = np.maximum(0.0, pv_df_hc - pv_f)
+        pv_a_ramp = np.maximum(0.0, pv_ramp_hc - pv_f_ramp)
+
+        pv_pay_s = pv_f @ sal_arr
+        pv_prod = (pv_a_ramp @ sal_exp) * ad_sl * re_sl * eta_h
+        pv_ai_h = pv_a.sum(axis=1) * ac_sl
+        pv_bf_h = init_sum * h_sl * rc_sl * params.backfill_retrain_cost_ratio * pv_df_sum
+        pv_rf_h = init_sum * rc_sl * params.annual_refresh_cost_pct * refresh_pv_factor
+        npv_hybrid[s0:s1] = pv_pay_s + pv_prod - pv_ai_h - pv_bf_h - pv_rf_h - upfront_h
 
     p05_thresh = float(np.quantile(npv_reskill, 0.05))
     cvar_5 = float(np.mean(npv_reskill[npv_reskill <= p05_thresh]))
@@ -507,6 +528,71 @@ def compute_enterprise_gender_audit(
         "governance_alert": bool(abs(disparity_pp) >= threshold_pct and cut_hc > 0),
         "female_share_by_isco1": {k: round(v * 100.0, 2) for k, v in sorted(female_share_map.items())},
     }
+
+
+def compute_tornado_sensitivity(
+    headcount_by_isco1: dict[str, int],
+    salary_by_isco1: dict[str, float],
+    exposure_df: pd.DataFrame,
+    params: FinancialParams,
+    locked_isco1: list[str] | set[str] | None = None,
+    targeted_isco1: list[str] | set[str] | None = None,
+    delta_pct: float = 0.20,
+) -> list[dict[str, Any]]:
+    """Compute +/-20% one-way Tornado NPV swings and approximate variance contribution (%) per driver."""
+    drivers = [
+        ("realization_rate", "Realization Rate (Chuyển hóa giờ tiết kiệm)", 0.10, 0.90),
+        ("adoption_multiplier", "Tốc độ áp dụng AI (Adoption Multiplier)", 0.10, 1.00),
+        ("annual_attrition_rate", "Tỷ lệ nghỉ việc tự nhiên (%/năm)", 0.0, 0.45),
+        ("reskilling_cost_vnd", "Chi phí tái đào tạo / Người (VNĐ)", 1e6, 100e6),
+        ("ai_seat_cost_vnd", "Phí bản quyền AI / Người / Tháng (VNĐ)", 50e3, 5e6),
+        ("discount_rate_annual", "Tỷ lệ chiết khấu năm (WACC %)", 0.03, 0.25),
+    ]
+    base_diag = compute_workforce_diagnostics(headcount_by_isco1, salary_by_isco1, exposure_df, params, locked_isco1=locked_isco1)
+    base_npv = simulate_reskilling_roi(base_diag, params, targeted_isco1=targeted_isco1)["npv_reskill_vnd"]
+
+    rows = []
+    for attr, label, lo_bound, hi_bound in drivers:
+        val = float(getattr(params, attr))
+        lo_val = float(np.clip(val * (1.0 - delta_pct), lo_bound, hi_bound))
+        hi_val = float(np.clip(val * (1.0 + delta_pct), lo_bound, hi_bound))
+
+        kw_lo: dict[str, Any] = {attr: lo_val}
+        kw_hi: dict[str, Any] = {attr: hi_val}
+        p_lo = replace(params, **kw_lo)
+        p_hi = replace(params, **kw_hi)
+        npv_lo = simulate_reskilling_roi(
+            compute_workforce_diagnostics(headcount_by_isco1, salary_by_isco1, exposure_df, p_lo, locked_isco1=locked_isco1),
+            p_lo,
+            targeted_isco1=targeted_isco1,
+        )["npv_reskill_vnd"]
+        npv_hi = simulate_reskilling_roi(
+            compute_workforce_diagnostics(headcount_by_isco1, salary_by_isco1, exposure_df, p_hi, locked_isco1=locked_isco1),
+            p_hi,
+            targeted_isco1=targeted_isco1,
+        )["npv_reskill_vnd"]
+        swing = abs(npv_hi - npv_lo)
+        rows.append(
+            {
+                "driver": attr,
+                "label": label,
+                "base_value": val,
+                "low_param": lo_val,
+                "high_param": hi_val,
+                "base_npv_vnd": base_npv,
+                "low_npv_vnd": npv_lo,
+                "high_npv_vnd": npv_hi,
+                "swing_vnd": swing,
+                "_sq_swing": swing ** 2,
+            }
+        )
+
+    tot_sq = sum(r["_sq_swing"] for r in rows)
+    for r in rows:
+        r["variance_share_pct"] = (r["_sq_swing"] / tot_sq * 100.0) if tot_sq > 0 else 0.0
+        del r["_sq_swing"]
+
+    return sorted(rows, key=lambda r: r["swing_vnd"], reverse=True)
 
 
 def compare_strategies(
@@ -685,6 +771,12 @@ def generate_reference_case_and_chart() -> dict[str, Any]:
             "npv_hybrid_vnd": s_res["hybrid"]["npv_vnd"],
         }
 
+    tornado = compute_tornado_sensitivity(
+        headcount, salary, exp_df, params, locked_isco1=locked, targeted_isco1=targeted
+    )
+    ref_diag = compute_workforce_diagnostics(headcount, salary, exp_df, params, locked_isco1=locked)
+    budget_sample = optimize_reskilling_budget(ref_diag, params, budget_cap_vnd=3_000_000_000.0, allowed_isco1=targeted)
+
     output = {
         "reference_profile": {
             "total_headcount": 1000,
@@ -695,6 +787,8 @@ def generate_reference_case_and_chart() -> dict[str, Any]:
             "note": "Reference parameters configurable via Human-in-the-Loop controls.",
         },
         **res,
+        "tornado_sensitivity": tornado,
+        "budget_constrained_sample": budget_sample,
         "macro_priors": macro_priors,
         "presets_summary": presets_summary,
         "scenario_sensitivity": scenario_sensitivity,

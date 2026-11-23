@@ -1,0 +1,35 @@
+{
+  "benchmarked_at_utc": "2026-11-23 13:02:48 UTC",
+  "scales": [
+    {
+      "headcount": 1000,
+      "mc_trials": 1000,
+      "latency_ms": 35.31,
+      "peak_memory_mb": 2.907
+    },
+    {
+      "headcount": 10000,
+      "mc_trials": 1000,
+      "latency_ms": 31.23,
+      "peak_memory_mb": 2.907
+    },
+    {
+      "headcount": 50000,
+      "mc_trials": 1000,
+      "latency_ms": 30.19,
+      "peak_memory_mb": 2.907
+    },
+    {
+      "headcount": 250000,
+      "mc_trials": 1000,
+      "latency_ms": 27.21,
+      "peak_memory_mb": 2.907
+    }
+  ],
+  "mc_10k_trials_stress": {
+    "headcount": 50000,
+    "mc_trials": 10000,
+    "latency_ms": 87.62,
+    "peak_memory_mb": 10.757
+  }
+}

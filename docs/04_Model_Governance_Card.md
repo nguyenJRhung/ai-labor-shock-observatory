@@ -9,7 +9,7 @@ Tài liệu này đáp ứng chuẩn **Nhóm tiêu chí 2 & 3 (Data Quality & Ec
 | Hạng mục | Thực tế quan sát được | Rủi ro sai lệch nếu bỏ qua | Biện pháp kiểm soát & Bằng chứng đã cài đặt |
 | :--- | :--- | :--- | :--- |
 | **Gộp nhóm `ISCO-4 -> ISCO-1` & `G = 9` cụm** | `427` nghề ISCO-4 gộp thành `9` nhóm ISCO-1 tạo đúng 9 giá trị `exposure` duy nhất; CRV1 thông thường cho $p=0.036$, nhưng Two-way CRV1 cho $p=0.321$ và **Webb 6-point WCB cho $p=0.362$**. | Phóng đại độ ý nghĩa thống kê do sai số chuẩn quá lạc quan khi số cụm phơi nhiễm nhỏ ($G=9$). | Công bố trung thực p-value Webb WCB (`0.3624`), kiểm tra trọn dải **P25 / Median / Task-Wtd / P75 / GPT-4o / Gemini**, và **Dose-Response (`Spearman rho = +0.40, p = 0.286`)**. |
-| **Biên Ngắn hạn (Youth & Weekly Hours)** | Đo tổng việc làm cấp 1 chữ số có thể bỏ sót đóng băng tuyển dụng hoặc giảm giờ làm. | Nguy cơ âm tính giả (*false negative*) nếu GenAI đánh vào nhân sự trẻ mới ra trường trước. | Bổ sung ETL + SQL marts cho **Youth 15–24 (`48` LMICs, `+0.3136, p=0.006`)** & **Weekly Hours (`45` LMICs, `+0.0047, p=0.713`)**. |
+| **Biên Ngắn hạn & Tiền lương (`Youth, Hours, Wages`) + `HonestDiD`** | Đo tổng việc làm cấp 1 chữ số có thể bỏ sót đóng băng tuyển dụng, giờ làm hoặc cắt lương; kết quả OLS/TWFE thường nhạy nếu vi phạm xu hướng song song. | Nguy cơ âm tính giả (*false negative*) hoặc ngộ nhận ý nghĩa dương hậu 2022. | Bổ sung **Youth 15–24 (`48` LMICs, `+0.3136, p=0.006`)**, **Weekly Hours (`45` LMICs, `+0.0047, p=0.713`)**, **Monthly Earnings (`35` LMICs, `-0.1350`, bác bởi pre-trend `p=6.09e-5`)**, và **Rambachan & Roth (2023) `HonestDiD Δ^RM(M̄)` (`M̄_breakdown = 0.00`)**. |
 | **Độ nhạy Chuyển dịch Cơ cấu (`Checks 3, 5, 8`)** | Bỏ `ISCO-6` (Nông nghiệp) đưa hệ số về `+0.0196 (p=0.785)`; thêm trend tuyến tính nghề đưa về `+0.0769 (p=0.284)`; Binary `ISCO-4` vs `7–9` bằng `+0.0047 (p=0.848)`. | Kết luận sai rằng GenAI đang "tạo việc làm ròng" hoặc đang "sa thải hàng loạt". | Kết luận trung thực: **chưa có sa thải ròng hậu 2022**, mức tăng baseline gắn với chuyển dịch cơ cấu rời nông nghiệp. |
 | **Actual LFS vs. ILO Modeled & Độ phủ** | Actual LFS (`49` LMICs) đạt pre-trend ($p=0.274$); Modeled (`124` LMICs) vi phạm ($p=0.00051$). `PHL 2025` chỉ có `TOTAL`/`OCU_0`; `IND` thiếu tiền 2022 (`pre=1`); `GRD`/`KIR` thiếu trong Modeled. | Lệch mẫu và suy diễn sai dấu khi dùng dữ liệu nội suy. | Khóa cứng `mart_panel_causal_lfs` làm lõi chính; kiểm toán tự động `phl_2025_raw_codes`, `ind_eligibility`, `missing_from_modeled` trong `warehouse_summary.json`. |
 
@@ -35,12 +35,12 @@ Tài liệu này đáp ứng chuẩn **Nhóm tiêu chí 2 & 3 (Data Quality & Ec
 
 ---
 
-## 4. Kinh tế Đơn vị, Rào chắn HITL & Kiểm thử CI
+## 4. Kinh tế Đơn vị, Rào chắn HITL, Privacy-by-Design & Kiểm thử CI
 
-| Quy mô triển khai | Kiến trúc hạ tầng | Chi phí cố định / tháng | Chi phí biến đổi / 1.000 NV | Thời gian xử lý |
-| :--- | :--- | ---: | ---: | ---: |
-| **MVP Cá nhân / Live Demo** | DuckDB + Parquet + CSV Snapshot + Streamlit Community Cloud (`requirements.txt` 7 gói) + GitHub Actions CI | **0 VNĐ** | **0 VNĐ** | ~1s UI render |
-| **Doanh nghiệp vừa & lớn (`1k–55k NV`)** | Docker + Postgres/DuckDB nội bộ (tổng hợp ẩn danh không PII) | ~500k–3M VNĐ | ~0–50k VNĐ | <3s tính toàn bộ Copula MC & Preset |
+| Quy mô triển khai | Kiến trúc hạ tầng | Chi phí cố định / tháng | Chi phí biến đổi / 1.000 NV | Thời gian xử lý & RAM (Benchmark Thực đo) |
+| :--- | :--- | ---: | ---: | :--- |
+| **MVP Cá nhân / Live Demo** | DuckDB + Parquet + CSV Snapshot + Streamlit Community Cloud (`requirements.txt` 8 gói) + GitHub Actions CI | **0 VNĐ** | **0 VNĐ** | `35.3 ms` (`1k` NV, `2.91 MB` RAM); ~1s UI |
+| **Doanh nghiệp Lớn (`10k–250k NV`)** | **Docker (`Dockerfile` + `docker-compose.yml`)** + Vectorized NumPy Copula Engine (`1,000–10,000` trials) | ~500k–3M VNĐ | ~0–50k VNĐ | **`27.2–31.2 ms`** (`250k` NV, **`2.91 MB`** RAM); `87.6 ms` (`10k` MC, `10.76 MB`) |
 
-1. **Khóa HITL:** Nhóm `ISCO-1` bị khóa mặc định (`assert cut_n == 0`); mọi thay đổi lương, nhân sự, tỷ lệ nghỉ việc và giả định *Fair Cut* đều tương tác trực tiếp trên UI.
-2. **Độ tin cậy Kỹ thuật:** Đạt `0` lỗi lint **Ruff**, `19/19` bài kiểm thử `pytest` (bao gồm chạy thật `sql/01`–`03` trên DuckDB fixture trong CI + `AppTest` đổi preset 54,110 NV), và đối chiếu R `fixest` **6/6 mô hình** đạt **`6.11e-15`**.
+1. **Khóa HITL & Privacy-by-Design PII Blocker:** Nhóm `ISCO-1` bị khóa mặc định (`assert cut_n == 0`); mọi file CSV doanh nghiệp tải lên đều qua **`src/business/pii_guardrail.py`** chặn tự động cột/chuỗi PII (`name`, `email`, `phone`, `cccd`); mọi thay đổi giả định xuất thẳng sang **4-sheet Excel `.xlsx` công thức sống (`src/business/excel_board_pack.py`)**.
+2. **Độ tin cậy Kỹ thuật, Data Lineage & Tự động hóa:** Đạt `0` lỗi lint **Ruff**, `0` lỗi kiểu tĩnh **Mypy (`src/`)**, **`27/27` kiểm thử `pytest`** (`86.21%` coverage $\ge 85\%$ bao gồm DuckDB SQL fixture & headless `AppTest`), **`data/probes/data_lineage.json` (`SHA-256`)**, đối chiếu R `fixest` **`7/7` mô hình (`1.46e-14`)**, và **CI đa job (`python-quality-and-tests` + `r-fixest-smoke`)** kèm **`quarterly_data_refresh.yml`**.

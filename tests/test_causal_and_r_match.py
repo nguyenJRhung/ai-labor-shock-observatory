@@ -6,6 +6,11 @@ import json
 import math
 from pathlib import Path
 
+import pandas as pd
+import pytest
+
+from src.causal.exposure_adapter import get_exposure_column, prepare_causal_dataframe
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PROBES_DIR = PROJECT_ROOT / "data" / "probes"
 
@@ -44,6 +49,8 @@ def test_causal_results_complete_and_finite() -> None:
         "12_dose_response_by_occupation",
         "13_youth_vs_prime_age_margin",
         "14_weekly_hours_intensive_margin",
+        "15_wage_earnings_margin",
+        "16_honest_did_rambachan_roth",
     }
     assert expected_checks.issubset(set(rob.keys()))
     assert math.isfinite(rob["1_placebo_2019"]["estimate"])
@@ -73,13 +80,20 @@ def test_causal_results_complete_and_finite() -> None:
     hm = rob["14_weekly_hours_intensive_margin"]
     assert hm["ln_hours_did"]["n_countries"] >= 35
     assert math.isfinite(hm["ln_hours_did"]["estimate"])
+    wm = rob["15_wage_earnings_margin"]
+    assert wm["ln_earnings_did"]["n_countries"] >= 25
+    assert math.isfinite(wm["ln_earnings_did"]["estimate"])
+    assert math.isfinite(wm["pretrend_wald_unit_cluster"]["pvalue"])
+    hdid = rob["16_honest_did_rambachan_roth"]
+    assert hdid["m_bar_breakdown"] >= 0.0
+    assert len(hdid["rm_sensitivity_curve"]) >= 4
 
 
 def test_python_pyfixest_matches_r_fixest() -> None:
     r_ver = json.loads((PROBES_DIR / "r_fixest_verification.json").read_text(encoding="utf-8"))
     cmp = r_ver["python_vs_r_comparison"]
     assert cmp["available"] is True
-    assert cmp["models_verified_count"] == 6
+    assert cmp["models_verified_count"] == 7
     expected_models = {
         "event_study",
         "pooled_did",
@@ -87,6 +101,7 @@ def test_python_pyfixest_matches_r_fixest() -> None:
         "binary_clerical_vs_manual",
         "triple_diff_gender",
         "youth_triple_diff",
+        "earnings_margin_did",
     }
     assert set(cmp["per_model_diffs"].keys()) == expected_models
     for m_name in expected_models:
@@ -96,3 +111,18 @@ def test_python_pyfixest_matches_r_fixest() -> None:
     assert cmp["max_abs_coef_diff"] < 1e-5
     assert cmp["max_abs_se_diff"] < 1e-3
     assert cmp["exact_match_pass"] is True
+
+
+def test_exposure_adapter_contracts() -> None:
+    assert get_exposure_column("ilo_2025") == "exposure_2025"
+    with pytest.raises(ValueError, match="Unknown exposure measure"):
+        get_exposure_column("nonexistent_measure")
+
+    df_in = pd.DataFrame({"iso3": ["VNM", "PHL"], "exposure_2025": [0.20, 0.50]})
+    df_std = prepare_causal_dataframe(df_in, measure_key="ilo_2025", standardize_exposure=True)
+    assert "exposure" in df_std.columns
+    assert abs(float(df_std["exposure"].mean())) < 1e-12
+    assert "exposure" not in df_in.columns
+
+    with pytest.raises(KeyError, match="not found"):
+        prepare_causal_dataframe(pd.DataFrame({"iso3": ["VNM"]}), measure_key="ilo_2025")

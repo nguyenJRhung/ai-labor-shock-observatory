@@ -26,10 +26,10 @@ Giai đoạn 2023–2026 chứng kiến làn sóng ứng dụng Generative AI v�
 ## 3. Phạm vi MVP 12 tuần (Scope Definition)
 
 ### Trong phạm vi (In-Scope)
-- **Dữ liệu mở 100% (0 đồng):** Tích hợp tự động 7 tập dữ liệu thực tế chuẩn quốc tế: ILO 2025 (Mean, IQR P25–P75, Task-Weighted, GPT-4o & Gemini), ILOSTAT Actual LFS + Youth `15–24` + Weekly Hours + ILO Modeled, Anthropic Economic Index (AEI), GitHub Innovation Graph và World Bank WDI (`WLD WAP`).
-- **Kho dữ liệu cục bộ tái lập:** DuckDB + SQL staging/mart (`sql/`) kèm `validators.py` chuẩn hóa bảng `Quốc gia × Nghề ISCO-08 × Giới tính/Độ tuổi × Năm`.
-- **Lõi Kinh tế lượng nhân quả (Model/Measure-Agnostic):** Continuous-Treatment Event Study (Saturated TWFE), Triple-Diff giới tính & tuổi trẻ, **14 kiểm định phản bác & độ bền vững** (bao gồm *Two-Way CRV1*, *Webb 6-point Wild Cluster Bootstrap (G=9)*, *Dose-Response*, *Youth 15–24 Margin* và *Weekly Hours Intensive Margin*), đối chiếu chéo **6/6 mô hình** giữa Python (`pyfixest`) và R (`fixest`).
-- **Lớp nghiệp vụ CFO-Grade BA & Delivery:** BRD, Cây KPI 3 tầng + Cầu nối Layer 2 $\rightarrow$ Layer 3, mô hình **Fair Cut vs. Reskilling (attrition `18%/năm`) vs. Hybrid Freeze**, **4×4 Gaussian Copula Monte Carlo (`CVaR 5%`)**, hồ sơ chuẩn **FPT / Techcombank FY2025**, và ứng dụng Streamlit 1-click deploy miễn phí.
+- **Dữ liệu mở 100% (0 đồng):** Tích hợp tự động 8 tập dữ liệu thực tế chuẩn quốc tế: ILO 2025 (Mean, IQR P25–P75, Task-Weighted, GPT-4o & Gemini), ILOSTAT Actual LFS + Youth `15–24` + Weekly Hours + Monthly Earnings + ILO Modeled, Anthropic Economic Index (AEI), GitHub Innovation Graph và World Bank WDI (`WLD WAP`).
+- **Kho dữ liệu cục bộ tái lập:** DuckDB + SQL staging/mart (`sql/`) kèm `validators.py` và `data_lineage.json` (`SHA-256`) chuẩn hóa bảng `Quốc gia × Nghề ISCO-08 × Giới tính/Độ tuổi × Năm`.
+- **Lõi Kinh tế lượng nhân quả (Model/Measure-Agnostic):** Continuous-Treatment Event Study (Saturated TWFE), Triple-Diff giới tính & tuổi trẻ, **16 kiểm định phản bác & độ bền vững** (bao gồm *Two-Way CRV1*, *Webb 6-point Wild Cluster Bootstrap (G=9)*, *Dose-Response*, *Youth 15–24*, *Weekly Hours*, **Check 15 Wage Earnings Margin** và **Check 16 Rambachan & Roth `HonestDiD Δ^RM`**), đối chiếu chéo **7/7 mô hình** giữa Python (`pyfixest`) và R (`fixest`).
+- **Lớp nghiệp vụ CFO-Grade BA & Delivery:** BRD, Cây KPI 3 tầng + Cầu nối Layer 2 $\rightarrow$ Layer 3, mô hình **Fair Cut vs. Reskilling (attrition `18%/năm`) vs. Hybrid Freeze**, **Vectorized 4×4 Gaussian Copula Monte Carlo (`CVaR 5%`)**, **Capital Allocation CapEx Optimizer & FY1–FY3 P&L / EBITDA Margin Lift (`bps`)**, **Tornado Variance Attribution**, **Live-Formula `.xlsx` Board Pack 4 sheet**, **Privacy-by-Design PII Blocker**, **Docker + docker-compose**, và ứng dụng Streamlit 1-click deploy miễn phí.
 
 ### Ngoài phạm vi (Out-of-Scope)
 - Thu thập dữ liệu tin tuyển dụng thời gian thực bằng crawler trả phí hoặc vi phạm điều khoản nền tảng.

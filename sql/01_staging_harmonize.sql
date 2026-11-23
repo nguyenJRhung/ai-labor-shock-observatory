@@ -339,3 +339,38 @@ ranked AS (
 SELECT iso3, isco1, sex, year, source, weekly_hours
 FROM ranked
 WHERE rn = 1;
+
+-- Khử trùng tất định bảng Tiền lương danh nghĩa trung bình tháng (LCU) theo Nghề ISCO-08
+CREATE OR REPLACE TABLE stg_ilostat_earnings_ocu AS
+WITH parsed AS (
+    SELECT
+        UPPER(TRIM(iso3)) AS iso3,
+        REPLACE(TRIM(classif1), 'OCU_ISCO08_', '') AS isco1,
+        UPPER(TRIM(sex)) AS sex,
+        CAST(year AS INTEGER) AS year,
+        TRIM(source) AS source,
+        CAST(obs_value AS DOUBLE) AS monthly_earnings_lcu
+    FROM raw_ilostat_earnings_ocu
+    WHERE regexp_matches(TRIM(classif1), '^OCU_ISCO08_[1-9]$')
+      AND UPPER(TRIM(sex)) = 'SEX_T'
+      AND year BETWEEN 2015 AND 2025
+      AND obs_value > 0
+),
+source_span AS (
+    SELECT iso3, source, COUNT(DISTINCT year) AS span_years
+    FROM parsed
+    GROUP BY iso3, source
+),
+ranked AS (
+    SELECT
+        p.*,
+        ROW_NUMBER() OVER (
+            PARTITION BY p.iso3, p.isco1, p.year
+            ORDER BY COALESCE(s.span_years, 0) DESC, p.source ASC
+        ) AS rn
+    FROM parsed p
+    LEFT JOIN source_span s ON p.iso3 = s.iso3 AND p.source = s.source
+)
+SELECT iso3, isco1, sex, year, source, monthly_earnings_lcu
+FROM ranked
+WHERE rn = 1;

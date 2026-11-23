@@ -1,4 +1,4 @@
-name: CI — Data, Causal & BA Financial Tests
+name: CI — Data, Causal, Static Quality & R Verification
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  pytest:
+  python-quality-and-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -18,15 +18,53 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install lightweight test dependencies
+      - name: Install CI dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pandas numpy pyyaml duckdb requests plotly streamlit ruff
+          pip install -r requirements.txt pytest pytest-cov ruff mypy
 
       - name: Run Ruff lint check
         run: ruff check src/ app/ tests/
 
-      - name: Run automated test suite
+      - name: Run Mypy static type check
+        run: mypy src/
+
+      - name: Run automated pytest suite with 85%+ coverage gate
         env:
           PYTHONPATH: .
-        run: pytest -v
+        run: |
+          pytest -v \
+            --cov=src.business \
+            --cov=src.etl.validators \
+            --cov=src.causal.exposure_adapter \
+            --cov-report=term-missing \
+            --cov-fail-under=85
+
+  r-fixest-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up R (Posit binary packages)
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install fixest and jsonlite
+        run: Rscript -e "install.packages(c('fixest', 'jsonlite'), Ncpus = 2)"
+
+      - name: Verify 7/7 Python-vs-R JSON & live fixest::feols engine
+        run: |
+          Rscript - << 'EOF'
+          res <- jsonlite::fromJSON("data/probes/r_fixest_verification.json")$python_vs_r_comparison
+          stopifnot(isTRUE(res$exact_match_pass), res$models_verified_count == 7, res$max_abs_coef_diff < 1e-10)
+          set.seed(42)
+          df <- expand.grid(unit = paste0("U", 1:20), year = 2019:2024)
+          df$exp <- rep(seq(0.1, 0.5, length.out = 20), times = 6)
+          df$post <- as.integer(df$year >= 2023)
+          df$y <- rnorm(nrow(df), mean = 0.05 * df$exp * df$post, sd = 0.1)
+          fit <- fixest::feols(y ~ i(year, exp, ref = 2022) | unit + year, data = df, cluster = ~unit)
+          stopifnot(all(is.finite(coef(fit))), all(is.finite(fixest::se(fit))))
+          cat("[CI R Smoke] 7/7 JSON verified & live fixest::feols passed!\n")
+          EOF

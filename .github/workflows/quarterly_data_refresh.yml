@@ -1,0 +1,54 @@
+name: Quarterly Upstream Data & Drift Probe
+
+on:
+  schedule:
+    - cron: "0 6 1 1,4,7,10 *"
+  workflow_dispatch:
+
+jobs:
+  upstream-probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install HTTP probe dependencies
+        run: python -m pip install --upgrade pip && pip install requests pandas
+
+      - name: Probe World Bank, ILOSTAT SDMX, GitHub Innovation Graph, and Anthropic AEI endpoints
+        run: |
+          python - << 'EOF'
+          import io
+          import pandas as pd
+          import requests
+
+          wdi_url = "https://api.worldbank.org/v2/country/VNM/indicator/NY.GDP.MKTP.KD.ZG?format=json"
+          r_wdi = requests.get(wdi_url, timeout=30)
+          r_wdi.raise_for_status()
+          payload = r_wdi.json()
+          assert isinstance(payload, list) and len(payload) == 2 and len(payload[1]) > 0
+
+          ilo_url = "https://rplumber.ilo.org/data/indicator/?id=EAR_EMTA_SEX_OCU_NB_A&ref_area=VNM&format=.csv"
+          r_ilo = requests.get(ilo_url, timeout=45)
+          r_ilo.raise_for_status()
+          df_ilo = pd.read_csv(io.StringIO(r_ilo.text))
+          assert {"ref_area", "classif1", "time", "obs_value"}.issubset(df_ilo.columns)
+
+          gh_url = "https://raw.githubusercontent.com/github/innovationgraph/main/data/developers.csv"
+          r_gh = requests.head(gh_url, timeout=30, allow_redirects=True)
+          r_gh.raise_for_status()
+
+          aei_url = "https://huggingface.co/api/datasets/Anthropic/EconomicIndex/tree/main/release_2026_06_26/data"
+          r_aei = requests.get(aei_url, timeout=30)
+          r_aei.raise_for_status()
+
+          print(
+              f"[Quarterly Probe OK] WDI rows={len(payload[1])}, ILO rows={len(df_ilo)}, "
+              f"GH={r_gh.status_code}, AEI files={len(r_aei.json())}"
+          )
+          EOF

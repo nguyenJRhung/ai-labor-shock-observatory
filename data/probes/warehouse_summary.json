@@ -1,9 +1,10 @@
 {
-  "built_at_utc": "2026-11-23 12:33:29 UTC",
+  "built_at_utc": "2026-11-23 12:59:07 UTC",
   "duckdb_path": "data\\observatory.duckdb",
   "duplicate_primary_keys_lfs": 0,
   "duplicate_primary_keys_youth": 0,
   "duplicate_primary_keys_hours": 0,
+  "duplicate_primary_keys_earnings": 0,
   "mart_panel_causal_lfs": {
     "total_rows": 11933,
     "rows_sex_total": 3987,
@@ -26,6 +27,12 @@
   "mart_panel_hours_ocu": {
     "total_rows": 3645,
     "eligible_countries_count": 45,
+    "min_year": 2015,
+    "max_year": 2025
+  },
+  "mart_panel_earnings_ocu": {
+    "total_rows": 2847,
+    "eligible_countries_count": 35,
     "min_year": 2015,
     "max_year": 2025
   },
@@ -528,10 +535,10 @@
     "region": "East Asia & Pacific",
     "ref_year": 2024,
     "female_exposure_2025": 0.22447153060871564,
-    "male_exposure_2025": 0.2070693874619673,
-    "gender_exposure_gap": 0.017402143146748345,
+    "male_exposure_2025": 0.20706938746196735,
+    "gender_exposure_gap": 0.01740214314674829,
     "female_grad34_share": 0.04792139836483217,
-    "male_grad34_share": 0.03419513447861345,
+    "male_grad34_share": 0.034195134478613456,
     "female_clerical_share": 0.027120846472799054,
     "male_clerical_share": 0.021533784692122707,
     "female_emp_thousands": 25474.463,
@@ -542,7 +549,7 @@
     "country_name": "Viet Nam",
     "income_level": "UMC",
     "emp_ref_year": 2024,
-    "theoretical_exposure_2025": 0.21536546231328824,
+    "theoretical_exposure_2025": 0.21536546231328826,
     "theoretical_grad34_share": 0.04073882020318602,
     "white_collar_share": 0.13481213001606554,
     "total_emp_thousands": 53436.104,

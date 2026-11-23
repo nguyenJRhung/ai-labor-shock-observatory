@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import duckdb
 import pandas as pd
 import pytest
+
+from src.etl.validators import validate_dataframe
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DUCKDB_PATH = PROJECT_ROOT / "data" / "observatory.duckdb"
@@ -72,10 +75,12 @@ def test_aui_matched_denominators_and_audit_notes() -> None:
     assert summary["duplicate_primary_keys_lfs"] == 0
     assert summary["duplicate_primary_keys_youth"] == 0
     assert summary["duplicate_primary_keys_hours"] == 0
+    assert summary["duplicate_primary_keys_earnings"] == 0
     assert summary["mart_panel_causal_lfs"]["eligible_countries_count"] >= 45
     assert summary["mart_panel_causal_lfs"]["rows_sex_total"] > 0
     assert summary["mart_panel_youth_ocu"]["eligible_countries_count"] >= 35
     assert summary["mart_panel_hours_ocu"]["eligible_countries_count"] >= 35
+    assert summary["mart_panel_earnings_ocu"]["eligible_countries_count"] >= 25
     audit = summary["data_audit_notes"]
     assert audit["ind_eligibility"]["iso3"] == "IND"
     assert audit["ind_eligibility"]["is_eligible"] == 0
@@ -125,3 +130,55 @@ def test_duckdb_primary_key_uniqueness_and_constraints() -> None:
         assert ind_rows == 0
     finally:
         con.close()
+
+
+def test_data_lineage_manifest_valid() -> None:
+    lineage_fp = PROBES_DIR / "data_lineage.json"
+    assert lineage_fp.exists()
+    lineage = json.loads(lineage_fp.read_text(encoding="utf-8"))
+    assert len(lineage.get("sql_transforms", [])) >= 3
+    assert len(lineage.get("parquet_inputs", [])) >= 1
+    assert len(lineage.get("app_snapshots", [])) >= 7
+    sha_re = re.compile(r"^[0-9a-f]{64}$")
+    for grp in ["sql_transforms", "parquet_inputs", "app_snapshots"]:
+        for entry in lineage.get(grp, []):
+            assert sha_re.match(entry["sha256"]), f"Invalid SHA-256 in {entry}"
+
+
+def test_etl_validators_contracts() -> None:
+    df_ok = pd.DataFrame({"iso3": ["VNM", "PHL"], "share": [0.35, 0.55]})
+    assert len(
+        validate_dataframe(
+            df_ok,
+            required_cols=["iso3", "share"],
+            non_null_cols=["iso3"],
+            numeric_bounds={"share": (0.0, 1.0)},
+            name="ok",
+        )
+    ) == 2
+
+    with pytest.raises(ValueError, match="must not be empty"):
+        validate_dataframe(pd.DataFrame(), required_cols=["iso3"], name="empty")
+    with pytest.raises(ValueError, match="missing required columns"):
+        validate_dataframe(df_ok, required_cols=["iso3", "missing_col"], name="miss")
+    with pytest.raises(ValueError, match="null values"):
+        validate_dataframe(
+            pd.DataFrame({"iso3": ["VNM", None]}),
+            required_cols=["iso3"],
+            non_null_cols=["iso3"],
+            name="nulls",
+        )
+    with pytest.raises(ValueError, match="values < 0.0"):
+        validate_dataframe(
+            pd.DataFrame({"share": [-0.1, 0.5]}),
+            required_cols=["share"],
+            numeric_bounds={"share": (0.0, 1.0)},
+            name="lo",
+        )
+    with pytest.raises(ValueError, match="values > 1.0"):
+        validate_dataframe(
+            pd.DataFrame({"share": [0.5, 1.2]}),
+            required_cols=["share"],
+            numeric_bounds={"share": (0.0, 1.0)},
+            name="hi",
+        )

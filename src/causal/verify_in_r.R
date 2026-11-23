@@ -1,7 +1,8 @@
 # ==============================================================================
-# Cross-Check 6 Causal Econometric Models in R (fixest::feols) vs Python pyfixest
+# Cross-Check 7 Causal Econometric Models in R (fixest::feols) vs Python pyfixest
 # Models: (1) Event Study, (2) Pooled DiD + Two-Way CRV1, (3) Occupation-Detrended DiD,
-#         (4) Binary Clerical vs Manual DiD, (5) Triple-Diff Gender, (6) Youth vs Prime-Age Triple-Diff
+#         (4) Binary Clerical vs Manual DiD, (5) Triple-Diff Gender,
+#         (6) Youth vs Prime-Age Triple-Diff, (7) Monthly Earnings (Wage) Margin DiD
 # ==============================================================================
 
 suppressPackageStartupMessages({
@@ -18,10 +19,11 @@ root_dir <- normalizePath(file.path(script_dir, "..", ".."), winslash = "/", mus
 
 panel_path <- file.path(root_dir, "data", "processed", "mart_panel_causal_lfs.csv")
 youth_path <- file.path(root_dir, "data", "processed", "mart_panel_youth_ocu.csv")
+earnings_path <- file.path(root_dir, "data", "processed", "mart_panel_earnings_ocu.csv")
 py_json_path <- file.path(root_dir, "data", "probes", "causal_results.json")
 out_json_path <- file.path(root_dir, "data", "probes", "r_fixest_verification.json")
 
-stopifnot(file.exists(panel_path), file.exists(youth_path))
+stopifnot(file.exists(panel_path), file.exists(youth_path), file.exists(earnings_path))
 
 df_all <- read_csv(panel_path, show_col_types = FALSE) %>%
   mutate(
@@ -78,6 +80,13 @@ df_youth <- read_csv(youth_path, show_col_types = FALSE) %>%
 yd_unit <- feols(ln_emp ~ post_2022:exposure + post_2022:exposure:is_youth | unit_age_fe + country_age_year_fe,
                  data = df_youth, cluster = ~unit_age_fe)
 
+# 7. Monthly Earnings (Wage) Margin DiD
+df_ear <- read_csv(earnings_path, show_col_types = FALSE) %>%
+  mutate(isco1 = as.character(isco1), exposure = as.numeric(exposure_2025)) %>%
+  filter(!is.na(exposure), !is.na(ln_earnings))
+ear_unit <- feols(ln_earnings ~ post_2022:exposure | unit_fe + country_year_fe,
+                  data = df_ear, cluster = ~unit_fe)
+
 es_ct <- coeftable(es_unit)
 es_rows <- lapply(seq_len(nrow(es_ct)), function(i) {
   nm <- rownames(es_ct)[i]
@@ -99,6 +108,7 @@ det_ct_u  <- coeftable(det_unit)
 bin_ct_u  <- coeftable(bin_unit)
 td_ct_u   <- coeftable(td_unit)
 yd_ct_u   <- coeftable(yd_unit)
+ear_ct_u  <- coeftable(ear_unit)
 
 comparison <- list(available = FALSE)
 if (file.exists(py_json_path)) {
@@ -112,6 +122,7 @@ if (file.exists(py_json_path)) {
   py_td_f <- py_res$triple_diff_gender$unit_cluster$female_differential
   py_yd_p <- py_res$robustness_checks$`13_youth_vs_prime_age_margin`$triple_diff_youth_vs_prime$prime_age_baseline
   py_yd_y <- py_res$robustness_checks$`13_youth_vs_prime_age_margin`$triple_diff_youth_vs_prime$youth_differential
+  py_ear  <- py_res$robustness_checks$`15_wage_earnings_margin`$ln_earnings_did
 
   es_coef_diff <- 0.0
   es_se_diff <- 0.0
@@ -154,12 +165,15 @@ if (file.exists(py_json_path)) {
     abs(unname(yd_ct_u["post_2022:exposure:is_youth", "Std. Error"]) - py_yd_y$se)
   )
 
-  max_coef_diff <- max(es_coef_diff, did_coef_diff, det_coef_diff, bin_coef_diff, td_coef_diff, yd_coef_diff)
-  max_se_diff   <- max(es_se_diff,   did_se_diff,   det_se_diff,   bin_se_diff,   td_se_diff,   yd_se_diff)
+  ear_coef_diff <- abs(unname(ear_ct_u[1, "Estimate"]) - py_ear$estimate)
+  ear_se_diff   <- abs(unname(ear_ct_u[1, "Std. Error"]) - py_ear$se)
+
+  max_coef_diff <- max(es_coef_diff, did_coef_diff, det_coef_diff, bin_coef_diff, td_coef_diff, yd_coef_diff, ear_coef_diff)
+  max_se_diff   <- max(es_se_diff,   did_se_diff,   det_se_diff,   bin_se_diff,   td_se_diff,   yd_se_diff,   ear_se_diff)
 
   comparison <- list(
     available = TRUE,
-    models_verified_count = 6L,
+    models_verified_count = 7L,
     n_obs_r = nobs(es_unit),
     n_obs_python = py_res$main_lfs_ilo2025$n_obs,
     per_model_diffs = list(
@@ -168,7 +182,8 @@ if (file.exists(py_json_path)) {
       occ_linear_trends = list(max_coef_diff = det_coef_diff, max_se_diff = det_se_diff),
       binary_clerical_vs_manual = list(max_coef_diff = bin_coef_diff, max_se_diff = bin_se_diff),
       triple_diff_gender = list(max_coef_diff = td_coef_diff, max_se_diff = td_se_diff),
-      youth_triple_diff = list(max_coef_diff = yd_coef_diff, max_se_diff = yd_se_diff)
+      youth_triple_diff = list(max_coef_diff = yd_coef_diff, max_se_diff = yd_se_diff),
+      earnings_margin_did = list(max_coef_diff = ear_coef_diff, max_se_diff = ear_se_diff)
     ),
     max_abs_coef_diff = max_coef_diff,
     max_abs_se_diff = max_se_diff,
@@ -218,12 +233,18 @@ out_obj <- list(
     youth_diff_estimate = unname(yd_ct_u["post_2022:exposure:is_youth", "Estimate"]),
     youth_diff_se = unname(yd_ct_u["post_2022:exposure:is_youth", "Std. Error"])
   ),
+  earnings_margin_did = list(
+    n_obs = nobs(ear_unit),
+    estimate = unname(ear_ct_u[1, "Estimate"]),
+    se_unit_cluster = unname(ear_ct_u[1, "Std. Error"]),
+    pvalue_unit_cluster = unname(ear_ct_u[1, "Pr(>|t|)"])
+  ),
   python_vs_r_comparison = comparison
 )
 
 write_json(out_obj, out_json_path, auto_unbox = TRUE, pretty = TRUE, digits = 12)
-cat("[R fixest] 6-model verification written to:", out_json_path, "\n")
+cat("[R fixest] 7-model verification written to:", out_json_path, "\n")
 if (isTRUE(comparison$available)) {
-  cat(sprintf("[R vs Python 6/6] max |coef diff| = %.3e | max |se diff| = %.3e | PASS = %s\n",
+  cat(sprintf("[R vs Python 7/7] max |coef diff| = %.3e | max |se diff| = %.3e | PASS = %s\n",
               comparison$max_abs_coef_diff, comparison$max_abs_se_diff, comparison$exact_match_pass))
 }

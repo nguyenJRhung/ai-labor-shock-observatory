@@ -873,11 +873,11 @@
     "prob_reskill_beats_cut_pct": 62.2,
     "prob_hybrid_beats_cut_pct": 98.1,
     "p10_cut_npv_vnd": 11570702527.631258,
-    "p50_cut_npv_vnd": 14099847178.924421,
+    "p50_cut_npv_vnd": 14099847178.924423,
     "p90_cut_npv_vnd": 16671916854.311537,
-    "p10_hybrid_npv_vnd": 15590892017.551367,
-    "p50_hybrid_npv_vnd": 27789485997.14987,
-    "p90_hybrid_npv_vnd": 41604743157.1316
+    "p10_hybrid_npv_vnd": 15590892017.55137,
+    "p50_hybrid_npv_vnd": 27789485997.14988,
+    "p90_hybrid_npv_vnd": 41604743157.13162
   },
   "gender_audit": {
     "vnm_lfs_reference_year": 2024,
@@ -899,6 +899,134 @@
       "9": 48.75
     }
   },
+  "tornado_sensitivity": [
+    {
+      "driver": "realization_rate",
+      "label": "Realization Rate (Chuyển hóa giờ tiết kiệm)",
+      "base_value": 0.5,
+      "low_param": 0.4,
+      "high_param": 0.6,
+      "base_npv_vnd": 16949375348.605396,
+      "low_npv_vnd": 9539341711.665634,
+      "high_npv_vnd": 24359408985.545162,
+      "swing_vnd": 14820067273.879528,
+      "variance_share_pct": 46.14675166773098
+    },
+    {
+      "driver": "adoption_multiplier",
+      "label": "Tốc độ áp dụng AI (Adoption Multiplier)",
+      "base_value": 0.6,
+      "low_param": 0.48,
+      "high_param": 0.72,
+      "base_npv_vnd": 16949375348.605396,
+      "low_npv_vnd": 9539341711.665634,
+      "high_npv_vnd": 24359408985.545162,
+      "swing_vnd": 14820067273.879528,
+      "variance_share_pct": 46.14675166773098
+    },
+    {
+      "driver": "reskilling_cost_vnd",
+      "label": "Chi phí tái đào tạo / Người (VNĐ)",
+      "base_value": 12000000.0,
+      "low_param": 9600000.0,
+      "high_param": 14400000.0,
+      "base_npv_vnd": 16949375348.605396,
+      "low_npv_vnd": 19185668492.92918,
+      "high_npv_vnd": 14713082204.281624,
+      "swing_vnd": 4472586288.647556,
+      "variance_share_pct": 4.2029888884751605
+    },
+    {
+      "driver": "ai_seat_cost_vnd",
+      "label": "Phí bản quyền AI / Người / Tháng (VNĐ)",
+      "base_value": 550000.0,
+      "low_param": 440000.0,
+      "high_param": 660000.0,
+      "base_npv_vnd": 16949375348.605396,
+      "low_npv_vnd": 18733240771.500305,
+      "high_npv_vnd": 15165509925.710495,
+      "swing_vnd": 3567730845.78981,
+      "variance_share_pct": 2.6743913081848842
+    },
+    {
+      "driver": "annual_attrition_rate",
+      "label": "Tỷ lệ nghỉ việc tự nhiên (%/năm)",
+      "base_value": 0.18,
+      "low_param": 0.144,
+      "high_param": 0.216,
+      "base_npv_vnd": 16949375348.605396,
+      "low_npv_vnd": 17665329302.499756,
+      "high_npv_vnd": 16204006921.519855,
+      "swing_vnd": 1461322380.9799004,
+      "variance_share_pct": 0.44867601849034927
+    },
+    {
+      "driver": "discount_rate_annual",
+      "label": "Tỷ lệ chiết khấu năm (WACC %)",
+      "base_value": 0.1,
+      "low_param": 0.08000000000000002,
+      "high_param": 0.12,
+      "base_npv_vnd": 16949375348.605396,
+      "low_npv_vnd": 17640547905.33088,
+      "high_npv_vnd": 16294926304.356838,
+      "swing_vnd": 1345621600.974041,
+      "variance_share_pct": 0.3804404493876301
+    }
+  ],
+  "budget_constrained_sample": {
+    "budget_cap_vnd": 3000000000.0,
+    "budget_spent_vnd": 2994599999.9999995,
+    "budget_utilization_pct": 99.82,
+    "allocated_headcount": 217,
+    "allocation_by_isco1": [
+      {
+        "isco1": "2",
+        "occupation_group": "Professionals",
+        "enrolled_headcount": 160,
+        "capex_vnd": 2207999999.9999995,
+        "expected_npv_36m_vnd": 9107487924.22828,
+        "profitability_index": 4.12
+      },
+      {
+        "isco1": "4",
+        "occupation_group": "Clerical support workers",
+        "enrolled_headcount": 57,
+        "capex_vnd": 786599999.9999999,
+        "expected_npv_36m_vnd": 1437878147.154467,
+        "profitability_index": 1.83
+      }
+    ],
+    "constrained_npv_vnd": 10545366071.382746,
+    "constrained_roi_pct": 352.1460652969594,
+    "constrained_payback_months": 8,
+    "annual_revenue_benchmark_vnd": 595980000000.0,
+    "annual_fy_pnl": [
+      {
+        "fiscal_year": "FY1",
+        "capex_vnd": 2994599999.9999995,
+        "opex_ai_backfill_refresh_vnd": 1816587503.603059,
+        "gross_productivity_value_vnd": 6897026059.1405945,
+        "net_ebitda_impact_vnd": 2085838555.5375361,
+        "ebitda_margin_lift_bps": 34.99846564545012
+      },
+      {
+        "fiscal_year": "FY2",
+        "capex_vnd": 0.0,
+        "opex_ai_backfill_refresh_vnd": 2207187503.603059,
+        "gross_productivity_value_vnd": 7524028428.153376,
+        "net_ebitda_impact_vnd": 5316840924.550317,
+        "ebitda_margin_lift_bps": 89.21173402715388
+      },
+      {
+        "fiscal_year": "FY3",
+        "capex_vnd": 0.0,
+        "opex_ai_backfill_refresh_vnd": 2207187503.603059,
+        "gross_productivity_value_vnd": 7524028428.153376,
+        "net_ebitda_impact_vnd": 5316840924.550317,
+        "ebitda_margin_lift_bps": 89.21173402715388
+      }
+    ]
+  },
   "macro_priors": {
     "VNM": {
       "iso3": "VNM",
@@ -907,7 +1035,7 @@
       "devs_per_10k_wap": 401.65650815102777,
       "lmic_tech_composite_pct": 77.1,
       "adoption_multiplier_prior": 0.66,
-      "macro_beta_post2022": 0.15024090289134376,
+      "macro_beta_post2022": 0.15024090289134384,
       "replacement_cost_months_prior": 4.6
     },
     "PHL": {
@@ -917,7 +1045,7 @@
       "devs_per_10k_wap": 326.50341833728027,
       "lmic_tech_composite_pct": 68.7,
       "adoption_multiplier_prior": 0.62,
-      "macro_beta_post2022": 0.15024090289134376,
+      "macro_beta_post2022": 0.15024090289134384,
       "replacement_cost_months_prior": 4.6
     },
     "IDN": {
@@ -927,7 +1055,7 @@
       "devs_per_10k_wap": 251.24500873950183,
       "lmic_tech_composite_pct": 56.6,
       "adoption_multiplier_prior": 0.58,
-      "macro_beta_post2022": 0.15024090289134376,
+      "macro_beta_post2022": 0.15024090289134384,
       "replacement_cost_months_prior": 4.6
     },
     "THA": {
@@ -937,7 +1065,7 @@
       "devs_per_10k_wap": 288.53048584031075,
       "lmic_tech_composite_pct": 75.9,
       "adoption_multiplier_prior": 0.65,
-      "macro_beta_post2022": 0.15024090289134376,
+      "macro_beta_post2022": 0.15024090289134384,
       "replacement_cost_months_prior": 4.6
     },
     "IND": {
@@ -947,7 +1075,7 @@
       "devs_per_10k_wap": 245.346186868946,
       "lmic_tech_composite_pct": 50.6,
       "adoption_multiplier_prior": 0.55,
-      "macro_beta_post2022": 0.15024090289134376,
+      "macro_beta_post2022": 0.15024090289134384,
       "replacement_cost_months_prior": 4.6
     }
   },

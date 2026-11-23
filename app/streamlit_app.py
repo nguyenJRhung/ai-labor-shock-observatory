@@ -15,13 +15,24 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from src.business.excel_board_pack import build_excel_board_pack_bytes  # noqa: E402
+from src.business.pii_guardrail import (  # noqa: E402
+    PIIDetectedError,
+    build_template_workforce_csv,
+    validate_and_parse_workforce_csv,
+)
 from src.business.reskilling_roi import (  # noqa: E402
     FinancialParams,
     build_default_headcount,
+    compute_workforce_diagnostics,
     derive_macro_priors_for_country,
     load_enterprise_preset,
+    optimize_reskilling_budget,
 )
-from src.business.scenario_simulator import compare_strategies  # noqa: E402
+from src.business.scenario_simulator import (  # noqa: E402
+    compare_strategies,
+    compute_tornado_sensitivity,
+)
 from src.etl.common import load_business_assumptions  # noqa: E402
 
 PROBES_DIR = PROJECT_ROOT / "data" / "probes"
@@ -234,11 +245,12 @@ def render_tab_macro(bundle: dict) -> None:
     st.caption(
         f"Dữ liệu kiểm chứng từ DuckDB: {wh['mart_panel_causal_lfs']['eligible_countries_count']} nước LMICs đủ chuẩn LFS "
         f"(trùng khóa chính = {wh['duplicate_primary_keys_lfs']}; Youth 15–24: {wh.get('mart_panel_youth_ocu', {}).get('eligible_countries_count', 'N/A')} nước; "
-        f"Hours/week: {wh.get('mart_panel_hours_ocu', {}).get('eligible_countries_count', 'N/A')} nước)."
+        f"Hours/week: {wh.get('mart_panel_hours_ocu', {}).get('eligible_countries_count', 'N/A')} nước; "
+        f"Earnings/month: {wh.get('mart_panel_earnings_ocu', {}).get('eligible_countries_count', 'N/A')} nước)."
     )
 
     st.divider()
-    st.markdown("#### Kiểm định Sâu (Checks 10–14): Cận tổng hợp ISCO-4, Webb Bootstrap (G=9), Youth & Weekly Hours")
+    st.markdown("#### Kiểm định Sâu (Checks 10–16): Cận tổng hợp, Webb Bootstrap, Youth/Hours, Wage Margin & HonestDiD")
     wcb_tw = rob["11_wild_cluster_bootstrap_and_twoway"]
     ym = rob["13_youth_vs_prime_age_margin"]
     hm = rob["14_weekly_hours_intensive_margin"]
@@ -329,6 +341,59 @@ def render_tab_macro(bundle: dict) -> None:
             height=340,
         )
         st.plotly_chart(fig_dose, width="stretch")
+
+    wage_m = rob.get("15_wage_earnings_margin")
+    hdid = rob.get("16_honest_did_rambachan_roth")
+    if wage_m or hdid:
+        c_wage, c_hdid = st.columns(2)
+        if wage_m:
+            with c_wage:
+                ln_e = wage_m["ln_earnings_did"]
+                pre_w = wage_m["pretrend_wald_unit_cluster"]
+                w1, w2, w3 = st.columns(3)
+                w1.metric("Check 15: Wage Margin DiD", f"{ln_e['estimate']:+.4f}", f"p={ln_e['pvalue']:.4f}")
+                w2.metric("2-Way Cluster SE", f"{ln_e['se_twoway_iso3_isco1']:.4f}", f"p={ln_e['pvalue_twoway_iso3_isco1']:.4f}")
+                w3.metric("Mẫu Earnings LMICs", f"{ln_e['n_countries']} nước", f"N={ln_e['n_obs']:,}")
+                st.warning(
+                    f"Cảnh báo Pre-trend Wage (Wald p = {pre_w['pvalue']:.2e}): "
+                    "Tiền lương nhóm tay chân tăng bắt kịp (lương tối thiểu) nhanh hơn nhóm văn phòng trước năm 2022, "
+                    "nên không kết luận AI gây giảm lương danh nghĩa tại LMICs."
+                )
+        if hdid:
+            with c_hdid:
+                rm_df = pd.DataFrame(hdid["rm_sensitivity_curve"])
+                theta_val = float(hdid["theta_post_avg"])
+                h1, h2, h3 = st.columns(3)
+                h1.metric("Check 16: HonestDiD θ_post", f"{theta_val:+.4f}")
+                h2.metric("Điểm gãy Δ^RM (M̄ Breakdown)", f"{hdid['m_bar_breakdown']:.2f}")
+                h3.metric("Max Pre-2022 Jump |Δδ|", f"{hdid['pre_max_consecutive_jump']:.4f}")
+
+                fig_hd = go.Figure()
+                fig_hd.add_hline(y=0.0, line_dash="dash", line_color="#64748B")
+                fig_hd.add_hline(y=theta_val, line_dash="dot", line_color="#0F766E", annotation_text="θ_post")
+                fig_hd.add_trace(
+                    go.Scatter(
+                        x=rm_df["m_bar"],
+                        y=[theta_val] * len(rm_df),
+                        error_y=dict(
+                            type="data",
+                            symmetric=False,
+                            array=rm_df["ci_high"] - theta_val,
+                            arrayminus=theta_val - rm_df["ci_low"],
+                        ),
+                        mode="lines+markers",
+                        line=dict(color="#1D4ED8", width=2),
+                        marker=dict(size=7),
+                        name="KTC 95% Robust Δ^RM(M̄)",
+                    )
+                )
+                fig_hd.update_layout(
+                    title="Check 16: Rambachan & Roth (2023) HonestDiD Robust Confidence Set",
+                    xaxis_title="M̄ (Biên độ vi phạm xu hướng song song)",
+                    yaxis_title="Khoảng tin cậy 95% của θ_post",
+                    height=290,
+                )
+                st.plotly_chart(fig_hd, width="stretch")
 
 
 def render_tab_vietnam_gender(bundle: dict) -> None:
@@ -524,8 +589,35 @@ def render_tab_enterprise_ba(bundle: dict) -> None:
         else None
     )
     default_hc = build_default_headcount(int(total_hc_input), weights_by_isco1=preset_weights)
-    default_sal = preset_data["salary_by_isco1"]
+    default_sal = dict(preset_data["salary_by_isco1"])
     st.caption(f"**Nguồn hiệu chuẩn hồ sơ ({preset_data['label']}):** {preset_data['source_note']}")
+
+    upload_tag = "preset"
+    with st.expander("Tải dữ liệu Nhân sự Doanh nghiệp (.CSV — Tự động quét chặn PII Privacy-by-Design)", expanded=False):
+        u_col1, u_col2 = st.columns([1, 2])
+        with u_col1:
+            st.download_button(
+                label="Tải CSV mẫu (Ẩn danh ISCO-1)",
+                data=build_template_workforce_csv(),
+                file_name="workforce_template_anonymized.csv",
+                mime="text/csv",
+                key="dl_csv_template",
+            )
+        with u_col2:
+            uploaded_csv = st.file_uploader(
+                "Upload bảng tổng hợp theo ISCO-1 (chặn cột họ tên, email, SĐT, CCCD)",
+                type=["csv"],
+                key="workforce_csv_uploader",
+            )
+        if uploaded_csv is not None:
+            try:
+                up_hc, up_sal = validate_and_parse_workforce_csv(uploaded_csv.getvalue())
+                default_hc = up_hc
+                default_sal = up_sal
+                upload_tag = f"csv_{uploaded_csv.name}"
+                st.success(f"Đã xác thực `{uploaded_csv.name}` (0 PII phát hiện) và nạp cơ cấu nhân sự thực tế.")
+            except (PIIDetectedError, ValueError) as exc:
+                st.error(str(exc))
 
     st.markdown("#### Bảng Tùy chỉnh Nhân sự & Mức lương theo Nhóm nghề (Có thể sửa trực tiếp)")
     editor_df = pd.DataFrame(
@@ -545,7 +637,7 @@ def render_tab_enterprise_ba(bundle: dict) -> None:
         disabled=["ISCO1", "Nhóm nghề", "Điểm Phơi nhiễm 2025"],
         width="stretch",
         hide_index=True,
-        key=f"workforce_editor_{preset_key}_{int(total_hc_input)}",
+        key=f"workforce_editor_{preset_key}_{int(total_hc_input)}_{upload_tag}",
     )
 
     hc_map = {str(r["ISCO1"]): int(max(0, r["Nhân sự (Người)"])) for _, r in edited.iterrows()}
@@ -717,12 +809,133 @@ def render_tab_enterprise_ba(bundle: dict) -> None:
         width="stretch",
     )
 
-    st.download_button(
-        label="Tải xuống Decision Brief (JSON)",
-        data=json.dumps(sim, ensure_ascii=False, indent=2),
-        file_name="enterprise_reskilling_decision_brief.json",
-        mime="application/json",
+    st.divider()
+    st.markdown("#### Phân tích Độ nhạy Tornado (±20% Drivers) — Đóng góp Phương sai NPV")
+    tornado_rows = compute_tornado_sensitivity(
+        hc_map,
+        sal_map,
+        exp_df,
+        params,
+        locked_isco1=locked_groups,
+        targeted_isco1=targeted_groups,
     )
+    if tornado_rows:
+        df_tor = pd.DataFrame(tornado_rows).iloc[::-1]
+        base_npv_b = float(df_tor["base_npv_vnd"].iloc[0]) / 1e9
+        low_delta_b = (df_tor["low_npv_vnd"] - df_tor["base_npv_vnd"]) / 1e9
+        high_delta_b = (df_tor["high_npv_vnd"] - df_tor["base_npv_vnd"]) / 1e9
+        fig_tor = go.Figure()
+        fig_tor.add_trace(
+            go.Bar(
+                y=df_tor["label"],
+                x=low_delta_b,
+                orientation="h",
+                name="-20% Tham số",
+                marker_color="#DC2626",
+            )
+        )
+        fig_tor.add_trace(
+            go.Bar(
+                y=df_tor["label"],
+                x=high_delta_b,
+                orientation="h",
+                name="+20% Tham số",
+                marker_color="#0F766E",
+                text=[f"Var {v:.1f}%" for v in df_tor["variance_share_pct"]],
+                textposition="outside",
+            )
+        )
+        fig_tor.add_vline(x=0.0, line_color="#334155", line_width=1.5)
+        fig_tor.update_layout(
+            barmode="overlay",
+            title=f"Độ nhạy NPV quanh mức cơ sở {base_npv_b:,.2f} Tỷ VNĐ (Top Variance Drivers)",
+            xaxis_title="Biến động NPV (Tỷ VNĐ so với mức cơ sở)",
+            height=340,
+        )
+        st.plotly_chart(fig_tor, width="stretch")
+
+    st.divider()
+    st.markdown("#### Tối ưu Phân bổ Vốn CapEx (Budget Cap Optimizer) & Tác động P&L FY1–FY3")
+    opt_c1, opt_c2 = st.columns([1, 2])
+    with opt_c1:
+        use_budget_cap = st.checkbox("Áp dụng Giới hạn Ngân sách CapEx", value=True, key="use_budget_cap_cb")
+    with opt_c2:
+        budget_cap_b = st.slider(
+            "Ngân sách CapEx Tối đa (Tỷ VNĐ)",
+            min_value=0.5,
+            max_value=20.0,
+            value=3.0,
+            step=0.5,
+            disabled=not use_budget_cap,
+            key="budget_cap_slider",
+        )
+
+    budget_opt = None
+    if use_budget_cap:
+        diag_opt = compute_workforce_diagnostics(
+            hc_map, sal_map, exp_df, params, locked_isco1=locked_groups
+        )
+        budget_opt = optimize_reskilling_budget(
+            diag_opt,
+            params,
+            budget_cap_vnd=float(budget_cap_b) * 1e9,
+            allowed_isco1=targeted_groups,
+        )
+        b1, b2, b3, b4 = st.columns(4)
+        b1.metric("Vốn Giải ngân Tối ưu", f"{budget_opt['budget_spent_vnd'] / 1e9:,.2f} Tỷ", f"{budget_opt['budget_utilization_pct']:.1f}% trần")
+        b2.metric("Nhân sự được Đào tạo", f"{budget_opt['allocated_headcount']:,} NV")
+        b3.metric("NPV 36 tháng (Giới hạn vốn)", f"{budget_opt['constrained_npv_vnd'] / 1e9:,.2f} Tỷ", f"ROI {budget_opt['constrained_roi_pct']:.1f}%")
+        pb_c = budget_opt["constrained_payback_months"]
+        b4.metric("Hoàn vốn (Budget Cap)", f"{pb_c} tháng" if pb_c is not None else "> 36 tháng")
+
+        alloc_c, pnl_c = st.columns(2)
+        with alloc_c:
+            if budget_opt["allocation_by_isco1"]:
+                st.dataframe(
+                    pd.DataFrame(budget_opt["allocation_by_isco1"]).style.format(
+                        {
+                            "capex_vnd": "{:,.0f}",
+                            "expected_npv_36m_vnd": "{:,.0f}",
+                            "profitability_index": "{:.2f}",
+                        }
+                    ),
+                    width="stretch",
+                )
+        with pnl_c:
+            if budget_opt["annual_fy_pnl"]:
+                st.dataframe(
+                    pd.DataFrame(budget_opt["annual_fy_pnl"]).style.format(
+                        {
+                            "capex_vnd": "{:,.0f}",
+                            "opex_ai_backfill_refresh_vnd": "{:,.0f}",
+                            "gross_productivity_value_vnd": "{:,.0f}",
+                            "net_ebitda_impact_vnd": "{:,.0f}",
+                            "ebitda_margin_lift_bps": "{:+.1f} bps",
+                        }
+                    ),
+                    width="stretch",
+                )
+
+    dl_c1, dl_c2 = st.columns(2)
+    with dl_c1:
+        st.download_button(
+            label="Tải xuống Decision Brief (JSON)",
+            data=json.dumps(sim, ensure_ascii=False, indent=2),
+            file_name="enterprise_reskilling_decision_brief.json",
+            mime="application/json",
+            key="dl_json_brief",
+        )
+    with dl_c2:
+        xlsx_bytes = build_excel_board_pack_bytes(
+            sim, params, preset_data["label"], budget_opt=budget_opt
+        )
+        st.download_button(
+            label="Tải xuống CFO Board Pack Excel (.xlsx — Công thức sống)",
+            data=xlsx_bytes,
+            file_name="cfo_ai_reskilling_board_pack.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            key="dl_excel_board_pack",
+        )
 
 
 def main() -> None:

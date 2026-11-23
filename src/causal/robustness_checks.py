@@ -543,8 +543,105 @@ def run_weekly_hours_intensive_margin(df_hours: pd.DataFrame) -> dict[str, Any]:
     }
 
 
+def run_wage_earnings_margin(df_earnings: pd.DataFrame) -> dict[str, Any]:
+    """Check 15: Wage / Monthly Earnings margin (country_year_fe absorbs LCU inflation & FX)."""
+    work = prepare_causal_dataframe(df_earnings, measure_key="ilo_2025")
+    m_es = pf.feols(
+        "ln_earnings ~ i(year, exposure, ref=2022) | unit_fe + country_year_fe",
+        data=work,
+        vcov={"CRV1": "unit_fe"},
+    )
+    wald = _compute_pretrend_wald(m_es, ref_year=2022)
+
+    m_u = pf.feols("ln_earnings ~ post_2022:exposure | unit_fe + country_year_fe", data=work, vcov={"CRV1": "unit_fe"})
+    m_c = pf.feols("ln_earnings ~ post_2022:exposure | unit_fe + country_year_fe", data=work, vcov={"CRV1": "iso3"})
+    m_tw = pf.feols("ln_earnings ~ post_2022:exposure | unit_fe + country_year_fe", data=work, vcov={"CRV1": "iso3 + isco1"})
+
+    ear_res = _extract_single_term(m_u, "post_2022:exposure")
+    ear_res["n_countries"] = int(work["iso3"].nunique())
+    ear_res["se_country_cluster"] = float(m_c.se().iloc[0])
+    ear_res["pvalue_country_cluster"] = float(m_c.pvalue().iloc[0])
+    ear_res["se_twoway_iso3_isco1"] = float(m_tw.se().iloc[0])
+    ear_res["pvalue_twoway_iso3_isco1"] = float(m_tw.pvalue().iloc[0])
+
+    return {
+        "pretrend_wald_unit_cluster": wald,
+        "ln_earnings_did": ear_res,
+        "note": "country_year_fe absorbs country-year CPI inflation and currency exchange rates identically.",
+    }
+
+
+def run_honest_did_sensitivity(df_lfs_t: pd.DataFrame) -> dict[str, Any]:
+    """Check 16: Rambachan & Roth (2023) Relative Magnitudes Delta^RM(M_bar) sensitivity on post-2022 average."""
+    work = prepare_causal_dataframe(df_lfs_t, measure_key="ilo_2025")
+    m_es = pf.feols(
+        "ln_emp ~ i(year, exposure, ref=2022) | unit_fe + country_year_fe",
+        data=work,
+        vcov={"CRV1": "unit_fe"},
+    )
+    coefs = m_es.coef()
+    ses = m_es.se()
+    vcov_full = np.asarray(m_es._vcov, dtype=float)
+    term_names = list(coefs.index)
+
+    # Guard covariance alignment vs reported pyfixest SEs
+    if np.max(np.abs(np.sqrt(np.diag(vcov_full)) - ses.to_numpy(dtype=float))) > 1e-8:
+        raise RuntimeError("HonestDiD covariance alignment check failed against model.se().")
+
+    beta_by_year = {2022: 0.0}
+    idx_by_year: dict[int, int] = {}
+    for pos, nm in enumerate(term_names):
+        if "year::" in str(nm):
+            yr = int(str(nm).split("::")[1].split(":")[0])
+            beta_by_year[yr] = float(coefs.iloc[pos])
+            idx_by_year[yr] = pos
+
+    pre_years = sorted([y for y in beta_by_year if y <= 2022])
+    pre_diffs = [abs(beta_by_year[y] - beta_by_year[y - 1]) for y in pre_years if (y - 1) in beta_by_year]
+    delta_max = float(max(pre_diffs))
+
+    post_years = sorted([y for y in idx_by_year if y >= 2023])
+    post_indices = [idx_by_year[y] for y in post_years]
+    k_post = len(post_years)
+    l_vec = np.full(k_post, 1.0 / k_post, dtype=float)
+    beta_post = np.array([beta_by_year[y] for y in post_years], dtype=float)
+    sigma_post = vcov_full[np.ix_(post_indices, post_indices)]
+
+    theta_hat = float(l_vec @ beta_post)
+    se_theta = float(np.sqrt(l_vec @ sigma_post @ l_vec))
+    avg_horizon = float(np.mean(np.arange(1, k_post + 1)))  # = 2.0 for 2023, 2024, 2025
+
+    m_grid = [0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0]
+    curve = []
+    for m_bar in m_grid:
+        bias_max = avg_horizon * m_bar * delta_max
+        ci_low = theta_hat - bias_max - 1.96 * se_theta
+        ci_high = theta_hat + bias_max + 1.96 * se_theta
+        curve.append(
+            {
+                "m_bar": m_bar,
+                "max_bias": bias_max,
+                "ci_low": float(ci_low),
+                "ci_high": float(ci_high),
+                "excludes_zero": bool(ci_low > 0.0 or ci_high < 0.0),
+            }
+        )
+
+    m_bar_breakdown = max(0.0, (abs(theta_hat) - 1.96 * se_theta) / (avg_horizon * delta_max)) if delta_max > 0 else 0.0
+    smooth_m_breakdown = max(0.0, (abs(theta_hat) - 1.96 * se_theta) / avg_horizon)
+
+    return {
+        "theta_post_avg": theta_hat,
+        "se_theta": se_theta,
+        "pre_max_consecutive_jump": delta_max,
+        "m_bar_breakdown": float(m_bar_breakdown),
+        "smoothness_m_breakdown_log_pts_per_yr": float(smooth_m_breakdown),
+        "rm_sensitivity_curve": curve,
+    }
+
+
 def plot_robustness_forest(output: dict[str, Any], out_path: Path) -> None:
-    """Plot Figure 07: Specification Curve / Forest Plot across all log-employment specs."""
+    """Plot Figure 07: Specification Curve / Forest Plot across all 16 causal checks."""
     rob = output["robustness_checks"]
     rows = [
         ("1. Baseline Unweighted (49 LMICs)", rob["4_lfs_vs_modeled_and_no_covid"]["actual_lfs"], "#0F766E"),
@@ -559,7 +656,8 @@ def plot_robustness_forest(output: dict[str, Any], out_path: Path) -> None:
         ("10. Binary DiD: Văn phòng (4) vs Tay chân (7-9)", rob["8_binary_clerical_vs_manual"]["baseline"], "#7C3AED"),
         ("11. Youth Margin (Tuổi 15–24, Log Emp.)", rob["13_youth_vs_prime_age_margin"]["youth_15_24_did"], "#059669"),
         ("12. Intensive Margin (Log Weekly Hours)", rob["14_weekly_hours_intensive_margin"]["ln_hours_did"], "#059669"),
-        ("13. Placebo Test (Giả lập 2019, 2015–2021)", rob["1_placebo_2019"], "#64748B"),
+        ("13. Wage Margin (Log Monthly Earnings LCU)", rob["15_wage_earnings_margin"]["ln_earnings_did"], "#059669"),
+        ("14. Placebo Test (Giả lập 2019, 2015–2021)", rob["1_placebo_2019"], "#64748B"),
     ]
 
     fig, ax = plt.subplots(figsize=(11.8, 7.2), dpi=300)
@@ -597,10 +695,10 @@ def plot_robustness_forest(output: dict[str, Any], out_path: Path) -> None:
     max_hi = max(float(r[1]["ci_high"]) for r in rows)
     min_lo = min(float(r[1]["ci_low"]) for r in rows)
     ax.set_xlim(min_lo - 0.05, max_hi + 0.25)
-    ax.set_xlabel("Hệ số tác động hậu 2022 trên Log(Việc làm) / Log(Giờ làm) ± KTC 95%")
+    ax.set_xlabel("Hệ số tác động hậu 2022 trên Log(Việc làm / Giờ làm / Tiền lương) ± KTC 95%")
     ax.set_title(
-        "Hình 7: Kiểm định Độ bền vững Toàn diện (14 Kiểm định, WCB, Youth & Hours Margins)",
-        fontsize=11.3,
+        "Hình 7: Kiểm định Độ bền vững Toàn diện (16 Kiểm định, WCB, HonestDiD & 4 Biên Lao động)",
+        fontsize=11.0,
         fontweight="bold",
         pad=12,
     )
@@ -612,7 +710,7 @@ def plot_robustness_forest(output: dict[str, Any], out_path: Path) -> None:
 
 
 def plot_youth_hours_and_dose_response(output: dict[str, Any], out_path: Path) -> None:
-    """Plot Figure 08: 3-panel short-run proof (Dose-Response ISCO 1-8, Youth vs Prime-Age, Weekly Hours)."""
+    """Plot Figure 08: 2x2 deep proofs (Dose-Response, Youth vs Prime, 4 Labor Margins, HonestDiD)."""
     rob = output["robustness_checks"]
     dose_rows = rob["12_dose_response_by_occupation"]["by_occupation"]
     rho = rob["12_dose_response_by_occupation"]["spearman_exposure_vs_shift_rho"]
@@ -620,12 +718,13 @@ def plot_youth_hours_and_dose_response(output: dict[str, Any], out_path: Path) -
     p_did = rob["13_youth_vs_prime_age_margin"]["prime_age_25_54_did"]
     td_y = rob["13_youth_vs_prime_age_margin"]["triple_diff_youth_vs_prime"]["youth_differential"]
     hrs_did = rob["14_weekly_hours_intensive_margin"]["ln_hours_did"]
-    hrs_raw = rob["14_weekly_hours_intensive_margin"]["weekly_hours_did"]
+    ear_did = rob["15_wage_earnings_margin"]["ln_earnings_did"]
+    honest = rob["16_honest_did_rambachan_roth"]
 
-    fig, axes = plt.subplots(1, 3, figsize=(15.5, 5.2), dpi=300)
+    fig, axes = plt.subplots(2, 2, figsize=(13.8, 9.4), dpi=300)
 
     # Panel A: Dose-Response across ISCO 1-9
-    ax = axes[0]
+    ax = axes[0, 0]
     exps = [r["exposure_2025"] for r in dose_rows]
     ests = [r["estimate"] for r in dose_rows]
     err_lo = [r["estimate"] - r["ci_low"] for r in dose_rows]
@@ -640,11 +739,11 @@ def plot_youth_hours_and_dose_response(output: dict[str, Any], out_path: Path) -
     ax.set_xlim(0.125, 0.59)
     ax.set_xlabel("Điểm phơi nhiễm GenAI ILO 2025")
     ax.set_ylabel("Dịch chuyển Log(Việc làm) so với ISCO-9")
-    ax.set_title(f"A. Dose-Response theo Nghề\n(Spearman rho = {rho:+.2f})", fontsize=10, fontweight="bold")
+    ax.set_title(f"A. Dose-Response 9 Nhóm nghề (Spearman rho = {rho:+.2f})", fontsize=10.2, fontweight="bold")
     ax.grid(alpha=0.25)
 
     # Panel B: Youth (15-24) vs Prime-Age (25-54)
-    ax = axes[1]
+    ax = axes[0, 1]
     labels_b = ["Tuổi trẻ (15–24)", "Trung niên (25–54)", "Chênh lệch Triple-Diff\n(Youth - Prime)"]
     vals_b = [y_did["estimate"], p_did["estimate"], td_y["estimate"]]
     elo_b = [y_did["estimate"] - y_did["ci_low"], p_did["estimate"] - p_did["ci_low"], td_y["estimate"] - td_y["ci_low"]]
@@ -652,45 +751,54 @@ def plot_youth_hours_and_dose_response(output: dict[str, Any], out_path: Path) -
     cols_b = ["#D97706", "#2563EB", "#7C3AED"]
     ax.axhline(0, color="#DC2626", linestyle="--", linewidth=1.0)
     x_pos = np.arange(len(labels_b))
-    ax.bar(x_pos, vals_b, color=cols_b, alpha=0.82, width=0.52)
+    ax.bar(x_pos, vals_b, color=cols_b, alpha=0.82, width=0.50)
     ax.errorbar(x_pos, vals_b, yerr=[elo_b, ehi_b], fmt="none", ecolor="#0F172A", capsize=4, elinewidth=1.6)
     for i, item in enumerate([y_did, p_did, td_y]):
         ax.text(i, vals_b[i] + ehi_b[i] + 0.015, f"{vals_b[i]:+.3f}\n(p={item['pvalue']:.3f})", ha="center", va="bottom", fontsize=7.8)
     ax.set_xticks(x_pos)
-    ax.set_xticklabels(labels_b, fontsize=8.3)
+    ax.set_xticklabels(labels_b, fontsize=8.4)
     ax.set_ylim(min(vals_b[i] - elo_b[i] for i in range(3)) - 0.08, max(vals_b[i] + ehi_b[i] for i in range(3)) + 0.14)
-    ax.set_title(f"B. Tuyển mới: Youth vs Prime-Age\n({y_did['n_countries']} LMICs)", fontsize=10, fontweight="bold")
+    ax.set_title(f"B. Tuyển mới: Youth vs Prime-Age ({y_did['n_countries']} LMICs)", fontsize=10.2, fontweight="bold")
     ax.grid(axis="y", alpha=0.25)
 
-    # Panel C: Intensive Margin - Weekly Hours Worked
-    ax = axes[2]
-    ax.axis("off")
-    summary_text = (
-        f"Biên Cường độ Làm việc (Weekly Hours)\n"
-        f"• Mẫu: {hrs_did['n_countries']} LMICs (N = {hrs_did['n_obs']:,})\n"
-        f"• Pre-trend Wald (2015–2021): p = {rob['14_weekly_hours_intensive_margin']['pretrend_wald_unit_cluster']['pvalue']:.3f}\n\n"
-        f"1) Log(Weekly Hours):\n"
-        f"   β = {hrs_did['estimate']:+.4f} (SE = {hrs_did['se']:.4f}, p = {hrs_did['pvalue']:.3f})\n"
-        f"   Country-cluster SE = {hrs_did['se_country_cluster']:.4f} (p = {hrs_did['pvalue_country_cluster']:.3f})\n\n"
-        f"2) Số giờ/tuần (Raw):\n"
-        f"   β = {hrs_raw['estimate']:+.3f} giờ/tuần (p = {hrs_raw['pvalue']:.3f})\n\n"
-        f"3) Suy luận cụm nhỏ (G = 9 ISCO-1):\n"
-        f"   • Two-way CRV1 (iso3+isco1) SE = {rob['11_wild_cluster_bootstrap_and_twoway']['twoway_iso3_isco1_cluster']['se']:.4f} (p = {rob['11_wild_cluster_bootstrap_and_twoway']['twoway_iso3_isco1_cluster']['pvalue']:.3f})\n"
-        f"   • Webb WCB (999 lần) p = {rob['11_wild_cluster_bootstrap_and_twoway']['webb_wild_cluster_bootstrap']['webb_wcb_two_sided_pvalue']:.3f}"
-    )
-    ax.text(
-        0.04,
-        0.92,
-        summary_text,
-        va="top",
-        ha="left",
-        fontsize=8.6,
-        family="DejaVu Sans",
-        bbox=dict(boxstyle="round,pad=0.6", facecolor="#F8FAFC", edgecolor="#CBD5E1"),
-    )
-    ax.set_title("C. Giờ Làm việc/Tuần & Suy luận Cụm nhỏ", fontsize=10, fontweight="bold")
+    # Panel C: All 4 Labor Market Margins (Headcount, Youth, Hours, Wages)
+    ax = axes[1, 0]
+    m_base = rob["4_lfs_vs_modeled_and_no_covid"]["actual_lfs"]
+    margins = [
+        ("Tổng Việc làm\n(49 LMICs)", m_base, "#0F766E"),
+        ("Tuổi trẻ 15–24\n(48 LMICs)", y_did, "#D97706"),
+        ("Giờ làm/Tuần\n(45 LMICs)", hrs_did, "#059669"),
+        ("Tiền lương/Tháng\n(35 LMICs)", ear_did, "#2563EB"),
+    ]
+    ym_pos = np.arange(len(margins))[::-1]
+    ax.axvline(0, color="#DC2626", linestyle="--", linewidth=1.0)
+    for y_idx, (lbl, item, col) in zip(ym_pos, margins):
+        est = float(item["estimate"])
+        ax.errorbar(est, y_idx, xerr=[[est - item["ci_low"]], [item["ci_high"] - est]], fmt="o", color=col, ecolor=col, capsize=4, elinewidth=2.0, markersize=6.5)
+        ax.text(max(est, item["ci_high"]) + 0.015, y_idx, f"{est:+.3f} (p={item['pvalue']:.3f})", va="center", fontsize=8.0)
+    ax.set_yticks(ym_pos)
+    ax.set_yticklabels([m[0] for m in margins], fontsize=8.5)
+    ax.set_xlim(min(float(m[1]["ci_low"]) for m in margins) - 0.05, max(float(m[1]["ci_high"]) for m in margins) + 0.22)
+    ax.set_xlabel("Hệ số DiD Hậu 2022 (Log Scale ± KTC 95%)")
+    ax.set_title("C. Đối chiếu 4 Biên Thị trường Lao động LMICs", fontsize=10.2, fontweight="bold")
+    ax.grid(axis="x", alpha=0.25)
 
-    fig.suptitle("Hình 8: Kiểm định Sâu — Dose-Response 9 Nhóm nghề, Lao động Trẻ (15–24) & Giờ Làm việc", fontsize=11.8, fontweight="bold", y=1.02)
+    # Panel D: Rambachan & Roth (2023) HonestDiD Robust CI Sensitivity
+    ax = axes[1, 1]
+    h_df = pd.DataFrame(honest["rm_sensitivity_curve"])
+    ax.axhline(0, color="#DC2626", linestyle="--", linewidth=1.0)
+    ax.axhline(honest["theta_post_avg"], color="#0F766E", linestyle=":", linewidth=1.3, label=f"Post-2022 Avg = {honest['theta_post_avg']:+.3f}")
+    ax.fill_between(h_df["m_bar"], h_df["ci_low"], h_df["ci_high"], color="#0F766E", alpha=0.18, label="KTC 95% Bền vững HonestDiD Delta^RM")
+    ax.plot(h_df["m_bar"], h_df["ci_low"], color="#0F766E", marker="o", linewidth=1.6)
+    ax.plot(h_df["m_bar"], h_df["ci_high"], color="#0F766E", marker="o", linewidth=1.6)
+    ax.axvline(honest["m_bar_breakdown"], color="#7C3AED", linestyle="-.", linewidth=1.3, label=f"Ngưỡng vỡ M_bar = {honest['m_bar_breakdown']:.2f}")
+    ax.set_xlabel("Tỷ lệ vi phạm xu hướng song song tối đa (M_bar)")
+    ax.set_ylabel("Khoảng tin cậy 95% trên Post-2022 Average")
+    ax.set_title("D. Kiểm định HonestDiD (Rambachan & Roth 2023)", fontsize=10.2, fontweight="bold")
+    ax.grid(alpha=0.25)
+    ax.legend(frameon=False, fontsize=7.8, loc="upper left")
+
+    fig.suptitle("Hình 8: Kiểm định Sâu — Dose-Response, Youth, Giờ làm, Tiền lương & HonestDiD", fontsize=12.0, fontweight="bold", y=1.01)
     fig.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_path, dpi=300, bbox_inches="tight", facecolor="white")
@@ -704,9 +812,10 @@ def run() -> dict[str, Any]:
     df_lfs_t = df_lfs_all[df_lfs_all["sex"] == "SEX_T"].copy()
     df_youth = pd.read_csv(processed_dir / "mart_panel_youth_ocu.csv")
     df_hours = pd.read_csv(processed_dir / "mart_panel_hours_ocu.csv")
+    df_earnings = pd.read_csv(processed_dir / "mart_panel_earnings_ocu.csv")
 
     base_bundle = run_main_causal()
-    print("[Robustness] Running 14 causal proof, short-run margin & refutation checks...")
+    print("[Robustness] Running 16 causal proof, short-run margin & HonestDiD checks...")
     placebo = run_placebo_date_test(df_lfs_t)
     measure_swap = run_measure_agnostic_swap(df_lfs_t)
     looo = run_leave_one_occupation_out(df_lfs_t)
@@ -721,6 +830,8 @@ def run() -> dict[str, Any]:
     dose_resp = run_dose_response_by_occupation(df_lfs_t)
     youth_margin = run_youth_vs_prime_age_margin(df_youth)
     hours_margin = run_weekly_hours_intensive_margin(df_hours)
+    earnings_margin = run_wage_earnings_margin(df_earnings)
+    honest_did = run_honest_did_sensitivity(df_lfs_t)
 
     output = {
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
@@ -745,6 +856,8 @@ def run() -> dict[str, Any]:
             "12_dose_response_by_occupation": dose_resp,
             "13_youth_vs_prime_age_margin": youth_margin,
             "14_weekly_hours_intensive_margin": hours_margin,
+            "15_wage_earnings_margin": earnings_margin,
+            "16_honest_did_rambachan_roth": honest_did,
         },
     }
 
@@ -758,7 +871,7 @@ def run() -> dict[str, Any]:
 
     out_path = PROJECT_ROOT / cfg["paths"]["probes_dir"] / "causal_results.json"
     out_path.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"[Causal & Robustness] Saved 14-check results to {out_path}")
+    print(f"[Causal & Robustness] Saved 16-check results to {out_path}")
     return output
 
 

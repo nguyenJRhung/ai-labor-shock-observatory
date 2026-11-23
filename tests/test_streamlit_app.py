@@ -25,3 +25,9 @@ def test_streamlit_app_renders_cleanly_and_switches_presets() -> None:
     sb_presets[0].select("fpt_tech_services_2025").run()
     assert not at.exception, f"Preset switch raised exceptions: {[e.value for e in at.exception]}"
     assert not at.error, f"Preset switch displayed errors: {[e.value for e in at.error]}"
+
+    cap_cbs = [c for c in at.checkbox if "Giới hạn Ngân sách CapEx" in c.label]
+    assert len(cap_cbs) == 1
+    cap_cbs[0].uncheck().run()
+    assert not at.exception, f"Uncheck budget cap raised exceptions: {[e.value for e in at.exception]}"
+    assert not at.error, f"Uncheck budget cap displayed errors: {[e.value for e in at.error]}"

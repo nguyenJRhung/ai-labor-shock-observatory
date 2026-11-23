@@ -274,6 +274,66 @@ def fetch_hours_ocu_panel(
     return df_out
 
 
+def fetch_earnings_ocu_panel(
+    base_url: str,
+    eligible_iso3: list[str],
+    start_year: int,
+    end_year: int,
+    raw_dir: Path,
+    out_path: Path,
+    force_download: bool = False,
+) -> pd.DataFrame:
+    """Fetch mean monthly earnings in LCU by ISCO-08 occupation (EAR_EMTA_SEX_OCU_NB_A)."""
+    if out_path.exists() and not force_download:
+        df_cached = pd.read_parquet(out_path)
+        if not df_cached.empty:
+            return df_cached
+
+    raw = _fetch_batched_ilostat(
+        "EAR_EMTA_SEX_OCU_NB_A",
+        base_url,
+        eligible_iso3,
+        raw_dir,
+        batch_size=10,
+        force_download=force_download,
+    )
+    if raw.empty:
+        raise RuntimeError("[ILOSTAT] EAR_EMTA_SEX_OCU_NB_A returned empty dataframe.")
+    raw.columns = [c.strip().lower() for c in raw.columns]
+    mask = (
+        raw["ref_area"].isin(set(eligible_iso3))
+        & (raw["sex"] == "SEX_T")
+        & raw["classif1"].astype(str).str.match(r"^OCU_ISCO08_[1-9]$")
+    )
+    sub = raw.loc[mask].copy()
+    sub["year"] = pd.to_numeric(sub["time"], errors="coerce")
+    sub["obs_value"] = pd.to_numeric(sub["obs_value"], errors="coerce")
+    sub = sub[
+        sub["year"].between(start_year, end_year, inclusive="both")
+        & sub["obs_value"].notna()
+        & (sub["obs_value"] > 0)
+    ].copy()
+    sub["year"] = sub["year"].astype("int32")
+    sub["obs_value"] = sub["obs_value"].astype("float64")
+    if "obs_status" not in sub.columns:
+        sub["obs_status"] = None
+
+    df_out = (
+        sub[["ref_area", "source", "indicator", "sex", "classif1", "year", "obs_value", "obs_status"]]
+        .rename(columns={"ref_area": "iso3"})
+        .reset_index(drop=True)
+    )
+    validate_dataframe(
+        df_out,
+        required_cols=["iso3", "classif1", "sex", "year", "obs_value"],
+        non_null_cols=["iso3", "classif1", "year", "obs_value"],
+        numeric_bounds={"obs_value": (0.01, None), "year": (2015, 2026)},
+        name="ilostat_earnings_ocu_lmics",
+    )
+    df_out.to_parquet(out_path, index=False)
+    return df_out
+
+
 def run(force_download: bool = False) -> tuple[pd.DataFrame, pd.DataFrame]:
     cfg = load_pipeline_config()
     lmics_df = get_lmics_metadata(cfg, force=force_download)
@@ -355,6 +415,17 @@ def run(force_download: bool = False) -> tuple[pd.DataFrame, pd.DataFrame]:
         force_download=force_download,
     )
     print(f"[ILOSTAT] Saved Weekly Hours: {len(df_hrs):,} rows across {df_hrs['iso3'].nunique()} LMICs.")
+
+    df_ear = fetch_earnings_ocu_panel(
+        base_url,
+        eligible_iso3,
+        start_year,
+        end_year,
+        raw_dir,
+        out_dir / "ilostat_earnings_ocu_lmics.parquet",
+        force_download=force_download,
+    )
+    print(f"[ILOSTAT] Saved Monthly Earnings: {len(df_ear):,} rows across {df_ear['iso3'].nunique()} LMICs.")
     return df_lfs, df_mod
 
 

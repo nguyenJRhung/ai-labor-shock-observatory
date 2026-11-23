@@ -1,5 +1,5 @@
 {
-  "verified_at_utc": "2026-11-23 12:36:07 UTC",
+  "verified_at_utc": "2026-11-23 13:00:58 UTC",
   "r_version": "R version 4.5.2 (2025-10-31 ucrt)",
   "fixest_version": "0.14.2",
   "n_obs": 3987,
@@ -58,7 +58,7 @@
       "estimate": -0.04480914085202,
       "se_unit": 0.05404474692475,
       "pvalue_unit": 0.4074906617786,
-      "se_iso": 0.05173478632667
+      "se_iso": 0.05173478632668
     },
     {
       "year": 2023,
@@ -119,41 +119,51 @@
     "youth_diff_estimate": 0.05493796654096,
     "youth_diff_se": 0.1355578591174
   },
+  "earnings_margin_did": {
+    "n_obs": 2847,
+    "estimate": -0.1349554192142,
+    "se_unit_cluster": 0.04217089803354,
+    "pvalue_unit_cluster": 0.001513722131074
+  },
   "python_vs_r_comparison": {
     "available": true,
-    "models_verified_count": 6,
+    "models_verified_count": 7,
     "n_obs_r": 3987,
     "n_obs_python": 3987,
     "per_model_diffs": {
       "event_study": {
-        "max_coef_diff": 2.109423746788e-15,
-        "max_se_diff": 3.663735981263e-15
+        "max_coef_diff": 1.054711873394e-15,
+        "max_se_diff": 3.30291349826e-15
       },
       "pooled_did": {
         "max_coef_diff": 2.775557561563e-17,
-        "max_se_diff": 9.71445146547e-17
+        "max_se_diff": 5.828670879282e-16
       },
       "occ_linear_trends": {
-        "max_coef_diff": 5.453970608471e-15,
-        "max_se_diff": 3.74700270811e-15
+        "max_coef_diff": 2.359223927328e-15,
+        "max_se_diff": 1.415534356397e-15
       },
       "binary_clerical_vs_manual": {
-        "max_coef_diff": 2.862293735362e-17,
-        "max_se_diff": 5.20417042793e-17
+        "max_coef_diff": 5.20417042793e-18,
+        "max_se_diff": 2.428612866368e-17
       },
       "triple_diff_gender": {
-        "max_coef_diff": 2.942091015257e-15,
-        "max_se_diff": 3.834767225985e-11
+        "max_coef_diff": 3.913536161804e-15,
+        "max_se_diff": 3.834808859349e-11
       },
       "youth_triple_diff": {
-        "max_coef_diff": 6.106226635438e-15,
-        "max_se_diff": 6.183881184896e-11
+        "max_coef_diff": 1.464800503115e-14,
+        "max_se_diff": 6.183922818259e-11
+      },
+      "earnings_margin_did": {
+        "max_coef_diff": 2.775557561563e-17,
+        "max_se_diff": 1.257327575388e-12
       }
     },
-    "max_abs_coef_diff": 6.106226635438e-15,
-    "max_abs_se_diff": 6.183881184896e-11,
+    "max_abs_coef_diff": 1.464800503115e-14,
+    "max_abs_se_diff": 6.183922818259e-11,
     "did_coef_diff": 2.775557561563e-17,
-    "did_se_diff": 9.71445146547e-17,
+    "did_se_diff": 5.828670879282e-16,
     "exact_match_pass": true
   }
 }

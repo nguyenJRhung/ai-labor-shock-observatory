@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Any
 
@@ -408,4 +409,134 @@ def simulate_reskilling_roi(
         "pv_attrition_backfill_vnd": float(np.sum(cf["backfill_m"] * cf["dfs"])),
         "pv_refresh_cost_vnd": float(np.sum(cf["refresh_m"] * cf["dfs"])),
         "monthly_schedule": schedule,
+    }
+
+
+def optimize_reskilling_budget(
+    diagnostics: dict[str, Any],
+    params: FinancialParams,
+    budget_cap_vnd: float,
+    allowed_isco1: list[str] | set[str] | None = None,
+    annual_revenue_vnd: float | None = None,
+) -> dict[str, Any]:
+    """Allocate limited CapEx budget across ISCO-1 groups by Profitability Index (NPV/Upfront)."""
+    df_diag: pd.DataFrame = diagnostics["group_df"]
+    upfront_per_person = params.reskilling_cost_vnd * (1.0 + params.change_management_overhead_pct)
+    if upfront_per_person <= 0 or budget_cap_vnd <= 0:
+        return {
+            "budget_cap_vnd": float(budget_cap_vnd),
+            "budget_spent_vnd": 0.0,
+            "budget_utilization_pct": 0.0,
+            "allocated_headcount": 0,
+            "allocation_by_isco1": [],
+            "constrained_npv_vnd": 0.0,
+            "constrained_roi_pct": 0.0,
+            "constrained_payback_months": None,
+            "annual_revenue_benchmark_vnd": 0.0,
+            "annual_fy_pnl": [],
+        }
+
+    allowed_set = (
+        {str(x) for x in allowed_isco1}
+        if allowed_isco1 is not None
+        else set(df_diag.loc[~df_diag["is_locked_hitl"], "isco1"].astype(str))
+    )
+    candidates: list[dict[str, Any]] = []
+    for _, row in df_diag.iterrows():
+        code = str(row["isco1"])
+        hc = int(row["headcount"])
+        if code not in allowed_set or hc <= 0:
+            continue
+        gain_p = float(row["monthly_salary_vnd"]) * float(row["effective_time_saved_share"])
+        cf_p = discounted_cashflow_metrics(
+            upfront_cost_vnd=upfront_per_person,
+            monthly_gross_gain_vnd=gain_p,
+            monthly_ai_cost_vnd=params.ai_seat_cost_vnd,
+            params=params,
+            n_trained=1,
+        )
+        npv_p = float(cf_p["npv_vnd"])
+        if npv_p > 0.0:
+            candidates.append(
+                {
+                    "isco1": code,
+                    "occupation_group": str(row["occupation_group"]),
+                    "available_headcount": hc,
+                    "monthly_salary_vnd": float(row["monthly_salary_vnd"]),
+                    "effective_time_saved_share": float(row["effective_time_saved_share"]),
+                    "npv_per_person_vnd": npv_p,
+                    "profitability_index": npv_p / upfront_per_person,
+                }
+            )
+
+    candidates.sort(key=lambda r: r["profitability_index"], reverse=True)
+    remaining_seats = int(math.floor(budget_cap_vnd / upfront_per_person))
+    alloc_rows = []
+    total_hc = 0
+    total_gain_m = 0.0
+    for c in candidates:
+        enroll = min(c["available_headcount"], remaining_seats)
+        if enroll <= 0:
+            continue
+        remaining_seats -= enroll
+        total_hc += enroll
+        total_gain_m += enroll * c["monthly_salary_vnd"] * c["effective_time_saved_share"]
+        alloc_rows.append(
+            {
+                "isco1": c["isco1"],
+                "occupation_group": c["occupation_group"],
+                "enrolled_headcount": enroll,
+                "capex_vnd": enroll * upfront_per_person,
+                "expected_npv_36m_vnd": enroll * c["npv_per_person_vnd"],
+                "profitability_index": round(c["profitability_index"], 2),
+            }
+        )
+
+    actual_upfront = total_hc * upfront_per_person
+    cf = discounted_cashflow_metrics(
+        upfront_cost_vnd=actual_upfront,
+        monthly_gross_gain_vnd=total_gain_m,
+        monthly_ai_cost_vnd=total_hc * params.ai_seat_cost_vnd,
+        params=params,
+        n_trained=total_hc,
+    )
+
+    est_rev = (
+        float(annual_revenue_vnd)
+        if annual_revenue_vnd is not None and annual_revenue_vnd > 0
+        else float(max(1.0, diagnostics["total_monthly_payroll_vnd"]) * 12.0 * 3.0)
+    )
+    annual_fy_pnl = []
+    n_years = max(1, (params.horizon_months + 11) // 12)
+    for fy in range(1, n_years + 1):
+        s_idx = (fy - 1) * 12
+        e_idx = min(params.horizon_months, fy * 12)
+        if s_idx >= params.horizon_months:
+            break
+        capex_y = actual_upfront if fy == 1 else 0.0
+        gross_y = float(np.sum(cf["gross_m"][s_idx:e_idx]))
+        opex_y = float(np.sum((total_hc * params.ai_seat_cost_vnd + cf["backfill_m"] + cf["refresh_m"][s_idx:e_idx])))
+        net_ebitda_y = gross_y - opex_y - capex_y
+        annual_fy_pnl.append(
+            {
+                "fiscal_year": f"FY{fy}",
+                "capex_vnd": capex_y,
+                "opex_ai_backfill_refresh_vnd": opex_y,
+                "gross_productivity_value_vnd": gross_y,
+                "net_ebitda_impact_vnd": net_ebitda_y,
+                "ebitda_margin_lift_bps": (net_ebitda_y / est_rev) * 10_000.0,
+            }
+        )
+
+    return {
+        "budget_cap_vnd": float(budget_cap_vnd),
+        "budget_spent_vnd": float(actual_upfront),
+        "budget_utilization_pct": float(actual_upfront / budget_cap_vnd * 100.0) if budget_cap_vnd > 0 else 0.0,
+        "allocated_headcount": total_hc,
+        "allocation_by_isco1": alloc_rows,
+        "constrained_npv_vnd": float(cf["npv_vnd"]) if total_hc > 0 else 0.0,
+        "constrained_roi_pct": float(cf["roi_pct"]) if total_hc > 0 else 0.0,
+        "constrained_payback_months": cf["payback_months"] if total_hc > 0 else None,
+        "annual_revenue_benchmark_vnd": est_rev,
+        "annual_fy_pnl": annual_fy_pnl,
     }

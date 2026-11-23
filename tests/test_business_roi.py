@@ -2,12 +2,20 @@
 
 from __future__ import annotations
 
+import io
 import json
 from pathlib import Path
 
+import openpyxl
 import pandas as pd
 import pytest
 
+from src.business.excel_board_pack import build_excel_board_pack_bytes
+from src.business.pii_guardrail import (
+    PIIDetectedError,
+    build_template_workforce_csv,
+    validate_and_parse_workforce_csv,
+)
 from src.business.reskilling_roi import (
     FinancialParams,
     build_default_headcount,
@@ -15,11 +23,14 @@ from src.business.reskilling_roi import (
     derive_macro_priors_for_country,
     load_enterprise_preset,
     npv_from_uniform_lift,
+    optimize_reskilling_budget,
     simulate_reskilling_roi,
 )
 from src.business.scenario_simulator import (
     build_priority_matrix,
+    compare_strategies,
     compute_enterprise_gender_audit,
+    compute_tornado_sensitivity,
     run_monte_carlo_sensitivity,
     simulate_cut_and_replace,
     simulate_hybrid_reskill_attrition_freeze,
@@ -230,3 +241,116 @@ def test_hybrid_strategy_and_macro_prior_bridge(
     fpt = load_enterprise_preset(assumptions, "fpt_tech_services_2025")
     assert fpt["total_headcount"] == 54110
     assert sum(fpt["headcount_by_isco1"].values()) == 54110
+
+
+def test_optimize_reskilling_budget_and_fy_pnl(
+    sample_exposure_df: pd.DataFrame, sample_salaries: dict[str, float]
+) -> None:
+    hc = build_default_headcount(1000)
+    params = FinancialParams()
+    diag = compute_workforce_diagnostics(hc, sample_salaries, sample_exposure_df, params)
+
+    zero_opt = optimize_reskilling_budget(diag, params, budget_cap_vnd=0.0, allowed_isco1=["2", "3", "4"])
+    assert zero_opt["allocated_headcount"] == 0
+    assert zero_opt["constrained_npv_vnd"] == 0.0
+
+    opt = optimize_reskilling_budget(diag, params, budget_cap_vnd=3_000_000_000.0, allowed_isco1=["2", "3", "4"])
+    assert opt["budget_spent_vnd"] <= 3_000_000_000.0
+    assert opt["allocated_headcount"] > 0
+    assert opt["constrained_npv_vnd"] > 0.0
+    pis = [r["profitability_index"] for r in opt["allocation_by_isco1"]]
+    assert pis == sorted(pis, reverse=True)
+    assert [r["fiscal_year"] for r in opt["annual_fy_pnl"]] == ["FY1", "FY2", "FY3"]
+
+
+def test_tornado_sensitivity_variance_sum(
+    sample_exposure_df: pd.DataFrame, sample_salaries: dict[str, float]
+) -> None:
+    hc = build_default_headcount(1000)
+    params = FinancialParams()
+    tor = compute_tornado_sensitivity(
+        hc, sample_salaries, sample_exposure_df, params, locked_isco1=["1"], targeted_isco1=["2", "3", "4"]
+    )
+    assert len(tor) == 6
+    swings = [r["swing_vnd"] for r in tor]
+    assert swings == sorted(swings, reverse=True)
+    assert abs(sum(r["variance_share_pct"] for r in tor) - 100.0) < 1e-4
+
+
+def test_pii_guardrail_blocks_pii_and_accepts_template() -> None:
+    tpl = build_template_workforce_csv()
+    hc_map, sal_map = validate_and_parse_workforce_csv(tpl)
+    assert len(hc_map) == 9 and sum(hc_map.values()) == 1000
+    assert sal_map["2"] > 0
+
+    for bad_col in ["email", "full_name", "cccd"]:
+        df_bad_col = pd.DataFrame(
+            {"isco1": ["2"], bad_col: ["test"], "headcount": [10], "monthly_salary_vnd": [20_000_000]}
+        )
+        with pytest.raises(PIIDetectedError):
+            validate_and_parse_workforce_csv(df_bad_col)
+
+    df_bad_mail = pd.DataFrame(
+        {"isco1": ["2"], "note": ["hr@corp.vn"], "headcount": [10], "monthly_salary_vnd": [20_000_000]}
+    )
+    with pytest.raises(PIIDetectedError):
+        validate_and_parse_workforce_csv(df_bad_mail)
+
+    df_bad_phone = pd.DataFrame(
+        {"isco1": ["2"], "note": ["0912345678"], "headcount": [10], "monthly_salary_vnd": [20_000_000]}
+    )
+    with pytest.raises(PIIDetectedError):
+        validate_and_parse_workforce_csv(df_bad_phone)
+
+    df_bad_cccd = pd.DataFrame(
+        {"isco1": ["2"], "note": ["079199012345"], "headcount": [10], "monthly_salary_vnd": [20_000_000]}
+    )
+    with pytest.raises(PIIDetectedError):
+        validate_and_parse_workforce_csv(df_bad_cccd)
+
+    with pytest.raises(ValueError, match="Thiếu cột"):
+        validate_and_parse_workforce_csv("isco1,headcount\n2,10\n")
+
+    with pytest.raises(ValueError, match=">= 0"):
+        validate_and_parse_workforce_csv("isco1,headcount,monthly_salary_vnd\n2,-5,10000000\n")
+
+
+def test_excel_board_pack_has_4_sheets_and_live_formulas(
+    sample_exposure_df: pd.DataFrame, sample_salaries: dict[str, float]
+) -> None:
+    hc = build_default_headcount(1000)
+    params = FinancialParams()
+    sim = compare_strategies(
+        hc,
+        sample_salaries,
+        sample_exposure_df,
+        params,
+        locked_isco1=["1"],
+        targeted_isco1=["2", "3", "4"],
+        run_monte_carlo=True,
+    )
+    diag = compute_workforce_diagnostics(hc, sample_salaries, sample_exposure_df, params, locked_isco1=["1"])
+    b_opt = optimize_reskilling_budget(diag, params, budget_cap_vnd=3_000_000_000.0, allowed_isco1=["2", "3", "4"])
+    xlsx_bytes = build_excel_board_pack_bytes(sim, params, "Test Profile", budget_opt=b_opt)
+
+    wb = openpyxl.load_workbook(io.BytesIO(xlsx_bytes), data_only=False)
+    assert wb.sheetnames == ["Executive_Summary", "Cashflow_36M", "Priority_Matrix_2x2", "Assumptions_Audit"]
+    ws_cf = wb["Cashflow_36M"]
+    assert str(ws_cf["G2"].value).startswith("=")
+    assert str(ws_cf["H2"].value).startswith("=")
+    assert str(ws_cf["I2"].value).startswith("=")
+    assert str(ws_cf["C38"].value) == "=SUM(C2:C37)"
+
+    ws_pm = wb["Priority_Matrix_2x2"]
+    assert str(ws_pm["E2"].value) == "=C2*D2"
+
+
+def test_scalability_benchmark_probe_valid() -> None:
+    bench_fp = PROBES_DIR / "scalability_benchmark.json"
+    assert bench_fp.exists()
+    bench = json.loads(bench_fp.read_text(encoding="utf-8"))
+    scales = bench["scales"]
+    assert 250000 in [r["headcount"] for r in scales]
+    assert all(r["latency_ms"] > 0.0 and r["peak_memory_mb"] > 0.0 for r in scales)
+    stress = bench["mc_10k_trials_stress"]
+    assert stress["mc_trials"] == 10000 and stress["latency_ms"] > 0.0

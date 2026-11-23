@@ -1,0 +1,131 @@
+{
+  "generated_at_utc": "2026-11-23 12:59:07 UTC",
+  "sql_transforms": [
+    {
+      "path": "sql/01_staging_harmonize.sql",
+      "sha256": "5bfe4918316abfad9c5ec9884d30687ec4b11f1aad1299025523ccee97777c03",
+      "bytes": 12789
+    },
+    {
+      "path": "sql/02_mart_panel_causal.sql",
+      "sha256": "153b00b51da9d62b123d1e1759c31fe8581e55f60ebef57e8173d6a33037e9f2",
+      "bytes": 9220
+    },
+    {
+      "path": "sql/03_mart_vietnam_ba.sql",
+      "sha256": "3e8dc8af0e1a5096319b124cdaf0eac71693fc2ae238e2d57f4dc63dd9231f84",
+      "bytes": 5202
+    }
+  ],
+  "parquet_inputs": [
+    {
+      "path": "data/processed/aei_country_lmics.parquet",
+      "sha256": "fa09c4511501935161d7b04581636c3f3a13e4ba8b43ff33617baafcf2b7832c",
+      "bytes": 18707
+    },
+    {
+      "path": "data/processed/aei_job_exposure.parquet",
+      "sha256": "11722d00f6a0a73dd0f917945e71903c9c27166e3e97182871c162fabf9829e4",
+      "bytes": 23856
+    },
+    {
+      "path": "data/processed/github_annual_lmics.parquet",
+      "sha256": "52a167cb0700743d31685063ddfac32f13362d8fbcbd59bee8c36012ea955f59",
+      "bytes": 31458
+    },
+    {
+      "path": "data/processed/github_quarterly_lmics.parquet",
+      "sha256": "0b7d543aeef589168d31edcc408ebc63803ea2da6662b848d927436ca5d862d7",
+      "bytes": 47727
+    },
+    {
+      "path": "data/processed/ilo_exposure_isco1.parquet",
+      "sha256": "303a4d6b2c0c3497a16cc5ec8b2a791c899bdd61eda7c11aa4243e1e98a53769",
+      "bytes": 13934
+    },
+    {
+      "path": "data/processed/ilo_exposure_isco4.parquet",
+      "sha256": "d30265469b017dfb531cad77a215127de9a95864ef22df430a37f454baac9bc4",
+      "bytes": 24476
+    },
+    {
+      "path": "data/processed/ilostat_age_ocu_lmics.parquet",
+      "sha256": "b452fd37e8bb01444cfef9d1392bdf1423e3944e0ed1ed300d650bca54481651",
+      "bytes": 90263
+    },
+    {
+      "path": "data/processed/ilostat_earnings_ocu_lmics.parquet",
+      "sha256": "93dcd4c22c13b5a7d146f7c32aa48b4777fc41fb9118aece40a100578487dcda",
+      "bytes": 30864
+    },
+    {
+      "path": "data/processed/ilostat_hours_ocu_lmics.parquet",
+      "sha256": "8dae9a0f2149d2fb50b2d24f1f62f0dc9d13baaad0938c33e3b74e60b867cbb3",
+      "bytes": 19001
+    },
+    {
+      "path": "data/processed/ilostat_lfs_lmics.parquet",
+      "sha256": "4c32b6cacfbbe50ccc3f37aca54d4b42de16eae45b5edc6a449b1dd921306dcb",
+      "bytes": 146675
+    },
+    {
+      "path": "data/processed/ilostat_modeled_lmics.parquet",
+      "sha256": "bd09c2d56844b695879df8acd8dd87f50bab3d2314bdb853863afba259525b08",
+      "bytes": 272354
+    },
+    {
+      "path": "data/processed/wdi_lmics_macro.parquet",
+      "sha256": "998e1d5736726d000e78d6f1c5f308f77053fec790e847c00d217499ddaa310d",
+      "bytes": 119838
+    },
+    {
+      "path": "data/processed/wdi_world_wap.parquet",
+      "sha256": "9399caa0a655088f3a2b4f08d4bc46c04e58aa1d76a9f59639e108d939a1c605",
+      "bytes": 1975
+    }
+  ],
+  "app_snapshots": [
+    {
+      "path": "data/probes/app_snapshots/aei_vietnam_profile.csv",
+      "rows": 1,
+      "sha256": "7610263b0a799ec645717e6e739720946661ccce58fa12dcc8802eb6aea37b2c",
+      "bytes": 390
+    },
+    {
+      "path": "data/probes/app_snapshots/github_vietnam_quarterly.csv",
+      "rows": 26,
+      "sha256": "7d8081b34b36149be718405d5af0ef41e06e1404e1c1447f23e88788dc272e30",
+      "bytes": 911
+    },
+    {
+      "path": "data/probes/app_snapshots/ilo_exposure_isco1.csv",
+      "rows": 9,
+      "sha256": "5bb83da80f12090b89bfbd1fa59c1b28b06dc1529c93f7025e62385f917f00c7",
+      "bytes": 2705
+    },
+    {
+      "path": "data/probes/app_snapshots/mart_gender_exposure_gap.csv",
+      "rows": 98,
+      "sha256": "79c5cb8d245d5e0afd7b0e7dfb3605bc73f0f882b74dcabda4b86fdd1906a7dc",
+      "bytes": 21158
+    },
+    {
+      "path": "data/probes/app_snapshots/mart_lfs_country_eligibility.csv",
+      "rows": 103,
+      "sha256": "df369353fec20f2873f7729b7912c165a7ce60acf60a8f7235d55ab4f86f5c31",
+      "bytes": 6624
+    },
+    {
+      "path": "data/probes/app_snapshots/mart_theory_vs_adoption.csv",
+      "rows": 103,
+      "sha256": "36ea489f6c1e9c0015f3ae87742e985ffe48fe59776b251ac33248f90079afde",
+      "bytes": 25919
+    },
+    {
+      "path": "data/probes/app_snapshots/mart_vietnam_workforce_isco1.csv",
+      "rows": 270,
+      "sha256": "a5c77c3d2a733f4d57cc13df62e424e1d55de865e9396812f2bbc12cbfe30629",
+      "bytes": 47854
+    }
+  ]
+}

@@ -81,6 +81,12 @@ def test_production_sql_pipeline_executes_cleanly_in_memory() -> None:
             for yr in range(2019, 2025)
             for occ in range(1, 10)
         ]
+        earnings_rows = [
+            {"iso3": iso, "source": "LFS", "indicator": "EAR_EMTA", "sex": "SEX_T", "classif1": f"OCU_ISCO08_{occ}", "year": yr, "obs_value": 5000.0 + 500.0 * occ, "obs_status": ""}
+            for iso in ["VNM", "PHL"]
+            for yr in range(2019, 2025)
+            for occ in range(1, 10)
+        ]
         df_wdi = pd.DataFrame(
             [
                 {"iso3": iso, "year": yr, "unemployment": 2.2, "gdp_growth": 6.5, "inflation_cpi": 3.2, "fdi_net_inflows_pct_gdp": 4.5, "trade_pct_gdp": 160.0, "female_lfpr": 68.0, "credit_private_pct_gdp": 120.0, "gdp_per_capita_const": 3500.0 + 100 * idx, "working_age_pop": 65_000_000.0 if iso == "VNM" else (70_000_000.0 if iso == "PHL" else 900_000_000.0)}
@@ -111,6 +117,7 @@ def test_production_sql_pipeline_executes_cleanly_in_memory() -> None:
             "raw_ilostat_modeled": df_mod,
             "raw_ilostat_age_ocu": pd.DataFrame(age_rows),
             "raw_ilostat_hours_ocu": pd.DataFrame(hrs_rows),
+            "raw_ilostat_earnings_ocu": pd.DataFrame(earnings_rows),
             "raw_wdi_macro": df_wdi,
             "raw_wdi_world_wap": df_world_wap,
             "raw_github_annual": df_gh,
@@ -127,6 +134,8 @@ def test_production_sql_pipeline_executes_cleanly_in_memory() -> None:
         assert con.execute("SELECT COUNT(*) FROM (SELECT iso3, isco1, sex, year FROM mart_panel_causal_lfs GROUP BY 1,2,3,4 HAVING COUNT(*) > 1)").fetchone()[0] == 0
         assert con.execute("SELECT COUNT(*) FROM (SELECT iso3, age_group, isco1, sex, year FROM mart_panel_youth_ocu GROUP BY 1,2,3,4,5 HAVING COUNT(*) > 1)").fetchone()[0] == 0
         assert con.execute("SELECT COUNT(*) FROM (SELECT iso3, isco1, sex, year FROM mart_panel_hours_ocu GROUP BY 1,2,3,4 HAVING COUNT(*) > 1)").fetchone()[0] == 0
+        assert con.execute("SELECT COUNT(*) FROM (SELECT iso3, isco1, sex, year FROM mart_panel_earnings_ocu GROUP BY 1,2,3,4 HAVING COUNT(*) > 1)").fetchone()[0] == 0
+        assert con.execute("SELECT COUNT(*) FROM mart_panel_earnings_ocu WHERE ln_earnings IS NOT NULL").fetchone()[0] > 0
 
         # Deterministic dedup kept SRC_LONG (not SRC_SHORT=999), excluded IND (pre<3), excluded PHL 2025 total-only
         vnm_2023_val = con.execute("SELECT emp_thousands FROM mart_panel_causal_lfs WHERE iso3='VNM' AND isco1='1' AND sex='SEX_T' AND year=2023").fetchone()[0]

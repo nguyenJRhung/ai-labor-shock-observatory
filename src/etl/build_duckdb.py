@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 import duckdb
 
@@ -15,6 +17,20 @@ SQL_FILES = [
     "sql/02_mart_panel_causal.sql",
     "sql/03_mart_vietnam_ba.sql",
 ]
+
+
+def _sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _fetchone(con: duckdb.DuckDBPyConnection, sql: str) -> tuple[Any, ...]:
+    row = con.execute(sql).fetchone()
+    assert row is not None, f"Query returned no rows: {sql}"
+    return row
 
 
 def _register_parquet_table(con: duckdb.DuckDBPyConnection, table_name: str, path: Path) -> None:
@@ -45,6 +61,7 @@ def run() -> dict:
         _register_parquet_table(con, "raw_ilostat_modeled", processed_dir / "ilostat_modeled_lmics.parquet")
         _register_parquet_table(con, "raw_ilostat_age_ocu", processed_dir / "ilostat_age_ocu_lmics.parquet")
         _register_parquet_table(con, "raw_ilostat_hours_ocu", processed_dir / "ilostat_hours_ocu_lmics.parquet")
+        _register_parquet_table(con, "raw_ilostat_earnings_ocu", processed_dir / "ilostat_earnings_ocu_lmics.parquet")
         _register_parquet_table(con, "raw_wdi_macro", processed_dir / "wdi_lmics_macro.parquet")
         _register_parquet_table(con, "raw_wdi_world_wap", processed_dir / "wdi_world_wap.parquet")
         _register_parquet_table(con, "raw_github_annual", processed_dir / "github_annual_lmics.parquet")
@@ -70,6 +87,9 @@ def run() -> dict:
         con.execute(
             f"COPY mart_panel_hours_ocu TO '{str(processed_dir / 'mart_panel_hours_ocu.csv').replace(chr(39), chr(39)*2)}' (HEADER, DELIMITER ',');"
         )
+        con.execute(
+            f"COPY mart_panel_earnings_ocu TO '{str(processed_dir / 'mart_panel_earnings_ocu.csv').replace(chr(39), chr(39)*2)}' (HEADER, DELIMITER ',');"
+        )
 
         # Export lightweight CSV snapshots (<200 KB) for GitHub & Streamlit Community Cloud
         snap_dir = PROJECT_ROOT / cfg["paths"]["probes_dir"] / "app_snapshots"
@@ -92,7 +112,9 @@ def run() -> dict:
             snapshot_sizes[fname] = int(len(df_snap))
 
         # Collect warehouse audit stats
-        lfs_stats = con.execute("""
+        lfs_stats = _fetchone(
+            con,
+            """
             SELECT
                 COUNT(*) AS total_rows,
                 SUM(CASE WHEN sex = 'SEX_T' THEN 1 ELSE 0 END) AS rows_sex_total,
@@ -100,16 +122,20 @@ def run() -> dict:
                 MIN(year) AS min_year,
                 MAX(year) AS max_year
             FROM mart_panel_causal_lfs
-        """).fetchone()
+        """,
+        )
 
-        mod_stats = con.execute("""
+        mod_stats = _fetchone(
+            con,
+            """
             SELECT
                 COUNT(*) AS total_rows,
                 SUM(CASE WHEN sex = 'SEX_T' THEN 1 ELSE 0 END) AS rows_sex_total,
                 COUNT(DISTINCT iso3) AS total_countries,
                 SUM(CASE WHEN sex = 'SEX_T' AND in_lfs_sample = 1 THEN 1 ELSE 0 END) AS rows_matched_lfs
             FROM mart_panel_causal_modeled
-        """).fetchone()
+        """,
+        )
 
         eligible_list = con.execute("""
             SELECT iso3, country_name, income_level, pre_2022_years, post_2022_years, isco1_groups_count, min_year, max_year
@@ -118,14 +144,17 @@ def run() -> dict:
             ORDER BY income_level, iso3
         """).df().to_dict(orient="records")
 
-        dup_check = con.execute("""
+        dup_check = _fetchone(
+            con,
+            """
             SELECT COUNT(*) FROM (
                 SELECT iso3, isco1, sex, year, COUNT(*) AS c
                 FROM mart_panel_causal_lfs
                 GROUP BY 1,2,3,4
                 HAVING COUNT(*) > 1
             )
-        """).fetchone()[0]
+        """,
+        )[0]
 
         vnm_gender = con.execute(
             "SELECT * FROM mart_gender_exposure_gap WHERE iso3 = 'VNM'"
@@ -157,33 +186,65 @@ def run() -> dict:
             ORDER BY e.iso3
         """).df().to_dict(orient="records")
 
-        dup_youth = con.execute("""
+        dup_youth = _fetchone(
+            con,
+            """
             SELECT COUNT(*) FROM (
                 SELECT iso3, age_group, isco1, sex, year, COUNT(*) AS c
                 FROM mart_panel_youth_ocu
                 GROUP BY 1,2,3,4,5
                 HAVING COUNT(*) > 1
             )
-        """).fetchone()[0]
+        """,
+        )[0]
 
-        dup_hours = con.execute("""
+        dup_hours = _fetchone(
+            con,
+            """
             SELECT COUNT(*) FROM (
                 SELECT iso3, isco1, sex, year, COUNT(*) AS c
                 FROM mart_panel_hours_ocu
                 GROUP BY 1,2,3,4
                 HAVING COUNT(*) > 1
             )
-        """).fetchone()[0]
+        """,
+        )[0]
 
-        youth_stats = con.execute("""
+        dup_earnings = _fetchone(
+            con,
+            """
+            SELECT COUNT(*) FROM (
+                SELECT iso3, isco1, sex, year, COUNT(*) AS c
+                FROM mart_panel_earnings_ocu
+                GROUP BY 1,2,3,4
+                HAVING COUNT(*) > 1
+            )
+        """,
+        )[0]
+
+        youth_stats = _fetchone(
+            con,
+            """
             SELECT COUNT(*), COUNT(DISTINCT iso3), MIN(year), MAX(year)
             FROM mart_panel_youth_ocu
-        """).fetchone()
+        """,
+        )
 
-        hours_stats = con.execute("""
+        hours_stats = _fetchone(
+            con,
+            """
             SELECT COUNT(*), COUNT(DISTINCT iso3), MIN(year), MAX(year)
             FROM mart_panel_hours_ocu
-        """).fetchone()
+        """,
+        )
+
+        earnings_stats = _fetchone(
+            con,
+            """
+            SELECT COUNT(*), COUNT(DISTINCT iso3), MIN(year), MAX(year)
+            FROM mart_panel_earnings_ocu
+        """,
+        )
 
         summary = {
             "built_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
@@ -191,6 +252,7 @@ def run() -> dict:
             "duplicate_primary_keys_lfs": int(dup_check),
             "duplicate_primary_keys_youth": int(dup_youth),
             "duplicate_primary_keys_hours": int(dup_hours),
+            "duplicate_primary_keys_earnings": int(dup_earnings),
             "mart_panel_causal_lfs": {
                 "total_rows": int(lfs_stats[0]),
                 "rows_sex_total": int(lfs_stats[1]),
@@ -216,6 +278,12 @@ def run() -> dict:
                 "min_year": int(hours_stats[2]) if hours_stats[2] is not None else None,
                 "max_year": int(hours_stats[3]) if hours_stats[3] is not None else None,
             },
+            "mart_panel_earnings_ocu": {
+                "total_rows": int(earnings_stats[0]),
+                "eligible_countries_count": int(earnings_stats[1]),
+                "min_year": int(earnings_stats[2]) if earnings_stats[2] is not None else None,
+                "max_year": int(earnings_stats[3]) if earnings_stats[3] is not None else None,
+            },
             "eligible_lfs_countries": eligible_list,
             "vietnam_gender_exposure": vnm_gender[0] if vnm_gender else None,
             "vietnam_theory_vs_adoption": vnm_theory[0] if vnm_theory else None,
@@ -229,6 +297,37 @@ def run() -> dict:
 
         summary_path = PROJECT_ROOT / cfg["paths"]["probes_dir"] / "warehouse_summary.json"
         summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        lineage = {
+            "generated_at_utc": summary["built_at_utc"],
+            "sql_transforms": [
+                {
+                    "path": rel,
+                    "sha256": _sha256_file(PROJECT_ROOT / rel),
+                    "bytes": (PROJECT_ROOT / rel).stat().st_size,
+                }
+                for rel in SQL_FILES
+            ],
+            "parquet_inputs": [
+                {
+                    "path": p.relative_to(PROJECT_ROOT).as_posix(),
+                    "sha256": _sha256_file(p),
+                    "bytes": p.stat().st_size,
+                }
+                for p in sorted(processed_dir.glob("*.parquet"))
+            ],
+            "app_snapshots": [
+                {
+                    "path": (snap_dir / fname).relative_to(PROJECT_ROOT).as_posix(),
+                    "rows": int(cnt),
+                    "sha256": _sha256_file(snap_dir / fname),
+                    "bytes": (snap_dir / fname).stat().st_size,
+                }
+                for fname, cnt in sorted(snapshot_sizes.items())
+            ],
+        }
+        lineage_path = PROJECT_ROOT / cfg["paths"]["probes_dir"] / "data_lineage.json"
+        lineage_path.write_text(json.dumps(lineage, ensure_ascii=False, indent=2), encoding="utf-8")
         print(
             f"[DuckDB] Built successfully: {lfs_stats[2]} eligible LMICs, "
             f"{lfs_stats[1]:,} SEX_T rows in mart_panel_causal_lfs, duplicate_keys={dup_check}"

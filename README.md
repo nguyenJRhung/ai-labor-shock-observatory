@@ -4,8 +4,8 @@
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/deploy?repository=nguyenJRhung/ai-labor-shock-observatory&branch=main&mainModule=app/streamlit_app.py)
 
 > **Executive Summary (BLUF — 30 giây):**  
-> Các doanh nghiệp và nhà hoạch định chính sách tại các nền kinh tế thu nhập thấp & trung bình (LMICs, trong đó có Việt Nam) cần một công cụ định lượng trung thực để tách bạch **tác động thực của GenAI lên việc làm, tuyển dụng trẻ (15–24 tuổi) và giờ làm việc** khỏi nhiễu vĩ mô, rồi chuyển hóa thành **mô hình tài chính CFO-grade (NPV, Payback, CVaR 5% và Chiến lược Hybrid không sa thải)**.  
-> Dự án vận hành **0 đồng**, tích hợp **ILO 2025 (P25/Median/Mean/P75 & GPT-4o/Gemini), ILOSTAT LFS + Youth + Weekly Hours + Modeled, Anthropic Economic Index, GitHub Innovation Graph và World Bank WDI**, đối chiếu chính xác **6/6 mô hình giữa Python (`pyfixest`) và R (`fixest`)**.
+> Các doanh nghiệp và nhà hoạch định chính sách tại các nền kinh tế thu nhập thấp & trung bình (LMICs, trong đó có Việt Nam) cần một công cụ định lượng trung thực để tách bạch **tác động thực của GenAI lên việc làm, tuyển dụng trẻ (15–24 tuổi), giờ làm việc và tiền lương danh nghĩa** khỏi nhiễu vĩ mô, rồi chuyển hóa thành **mô hình tài chính CFO-grade (NPV, Payback, CVaR 5%, Capital Allocation CapEx, FY1–FY3 EBITDA bps, Tornado Sensitivity & Excel Board Pack công thức sống)**.  
+> Dự án vận hành **0 đồng**, tích hợp **ILO 2025 (P25/Median/Mean/P75 & GPT-4o/Gemini), ILOSTAT LFS + Youth + Weekly Hours + Monthly Earnings + Modeled, Anthropic Economic Index, GitHub Innovation Graph và World Bank WDI**, đối chiếu chính xác **7/7 mô hình giữa Python (`pyfixest`) và R (`fixest`)**, đóng gói **Docker** và kiểm định qua **CI đa job (`ruff` + `mypy` + `pytest-cov >= 85%` + live `R fixest`)**.
 
 > **Deploy Demo Sống (1 Click trên Streamlit Community Cloud — 0đ):** Nhấn huy hiệu **Open in Streamlit** phía trên (hoặc [tại đây](https://share.streamlit.io/deploy?repository=nguyenJRhung/ai-labor-shock-observatory&branch=main&mainModule=app/streamlit_app.py)) để triển khai trực tiếp ứng dụng tương tác từ `main` dùng cấu hình nhẹ `requirements.txt` và snapshot CSV trong repo.
 
@@ -13,20 +13,20 @@
 
 ## 1. Kết quả Trọng tâm Đã Kiểm chứng Thực tế
 
-### A. Tác động Nhân quả Vĩ mô & 14 Kiểm định Sâu (`mart_panel_causal_lfs`, $N = 3,987$, `49` LMICs)
+### A. Tác động Nhân quả Vĩ mô & 16 Kiểm định Sâu (`mart_panel_causal_lfs`, $N = 3,987$, `49` LMICs)
 
 ![Saturated TWFE Event Study](docs/figures/fig05_event_study_causal.png)
 
 ![Robustness Specification Curve](docs/figures/fig07_robustness_forest_plot.png)
 
-![Dose-Response, Youth 15-24 & Weekly Hours](docs/figures/fig08_youth_hours_and_dose_response.png)
+![Dose-Response, Youth, Hours, Wages & HonestDiD](docs/figures/fig08_youth_hours_and_dose_response.png)
 
 - **Kiểm định Xu hướng Song song (Pre-trend 2015–2021):** Đạt (`Wald p = 0.274` trên Actual LFS), trong khi dữ liệu nội suy *ILO Modeled* (`124` nước, $N=9,450$) bị vi phạm (`p = 0.00051`).
-- **Tác động Hậu 2022 (`post_2022 × exposure_2025`) & Bằng chứng Toàn diện (14 Kiểm định):**
+- **Tác động Hậu 2022 (`post_2022 × exposure_2025`) & Bằng chứng Toàn diện (16 Kiểm định):**
   - Baseline không gia quyền ($\hat{\beta} = +0.1502, SE_{\text{unit}} = 0.0715, p = 0.0362$), `Task-Weighted Score 2025` ($+0.1463, p = 0.0430$), `GPT-4o` ($+0.1593, p = 0.0413$), `Gemini` ($+0.1347, p = 0.0461$), `WLS` tỷ trọng nghề 2022 ($+0.3046, p = 0.0007$) và Balanced Panel 2017–2024 ($+0.1718, p = 0.0252$) đều dương.
-  - **Suy luận Cụm nhỏ & Xu hướng Song song Mạnh:** Khi cụm 2 chiều (`iso3 + isco1`: $SE = 0.1419, p = 0.3206$), chạy **Webb 6-point Wild Cluster Bootstrap (999 lần qua 9 cụm nghề ISCO-1)**: **`p = 0.3624`**, kiểm soát xu hướng tuyến tính theo nghề ($+0.0769, p = 0.2840$), so sánh trực tiếp Văn phòng `ISCO-4` vs. Tay chân `ISCO 7–9` ($+0.0047, p = 0.8481$), hay kiểm tra *Dose-Response* 9 nhóm nghề (`Spearman rho = +0.40, p = 0.2861`), tín hiệu tách biệt khỏi chuyển dịch rời nông nghiệp `ISCO-6` (`-0.1447, p = 0.0017`) không khác 0 về mặt thống kê.
-  - **Biên Ngắn hạn Mới (`Check 13–14`):** Mở rộng dữ liệu thực từ ILOSTAT cho **Lao động Trẻ 15–24 tuổi** (`48` LMICs, Youth DiD `+0.3136, p = 0.0063`, Triple-Diff vs. `25–54` = `+0.0549, p = 0.6854`) và **Số giờ Làm việc/Tuần** (`45` LMICs, Pre-trend `p = 0.9665`, `ln_hours` `+0.0047, p = 0.7126`) xác nhận chưa có đóng băng tuyển dụng tuổi trẻ hay co rút giờ làm tại LMICs tính đến 2024–2025.
-- **Đối chiếu chéo `6/6` mô hình Python `pyfixest` vs. R `fixest`:** Khớp tuyệt đối trên cả `Event Study`, `Pooled DiD (+ Two-Way CRV1)`, `Occupation Linear Trends`, `Binary Clerical vs. Manual`, `Triple-Diff Gender` và `Youth Triple-Diff` (**`max |Δβ| = 6.11e-15`**, **`max |ΔSE| = 6.18e-11`**).
+  - **Suy luận Cụm nhỏ, Xu hướng Song song Mạnh & `HonestDiD` (Check 16):** Khi cụm 2 chiều (`iso3 + isco1`: $SE = 0.1419, p = 0.3206$), chạy **Webb 6-point Wild Cluster Bootstrap (999 lần qua 9 cụm nghề ISCO-1)**: **`p = 0.3624`**, kiểm soát xu hướng tuyến tính theo nghề ($+0.0769, p = 0.2840$), so sánh trực tiếp Văn phòng `ISCO-4` vs. Tay chân `ISCO 7–9` ($+0.0047, p = 0.8481$), hay kiểm tra *Dose-Response* 9 nhóm nghề (`Spearman rho = +0.40, p = 0.2861`), tín hiệu tách biệt khỏi chuyển dịch rời nông nghiệp `ISCO-6` (`-0.1447, p = 0.0017`) không khác 0 về mặt thống kê. Bổ sung **Rambachan & Roth (2023) `HonestDiD Δ^RM(M̄)`**: `θ_post = +0.1087 (SE = 0.0558)`, ngưỡng vỡ **`M̄_breakdown = 0.00`** (ngay cả tại `M̄ = 0`, KTC `[-0.00056, +0.21800]` đã chạm 0).
+  - **Biên Ngắn hạn Mới (`Check 13–15`):** Mở rộng dữ liệu thực từ ILOSTAT cho **Lao động Trẻ 15–24 tuổi** (`48` LMICs, Youth DiD `+0.3136, p = 0.0063`, Triple-Diff vs. `25–54` = `+0.0549, p = 0.6854`), **Số giờ Làm việc/Tuần** (`45` LMICs, Pre-trend `p = 0.9665`, `ln_hours` `+0.0047, p = 0.7126`), và **Tiền lương Danh nghĩa/Tháng** (`EAR_EMTA_SEX_OCU_NB_A`, `35` LMICs, $N=2,847$, DiD `-0.1350, p = 0.0015` nhưng **bị bác bởi Pre-trend Wald `p = 6.09e-5`** do nhóm tay chân/lương tối thiểu bắt kịp trước 2022) — khẳng định chưa có bằng chứng GenAI làm co rút việc làm, giờ làm hay tiền lương tại LMICs tính đến 2024–2025.
+- **Đối chiếu chéo `7/7` mô hình Python `pyfixest` vs. R `fixest`:** Khớp tuyệt đối trên cả `Event Study`, `Pooled DiD (+ Two-Way CRV1)`, `Occupation Linear Trends`, `Binary Clerical vs. Manual`, `Triple-Diff Gender`, `Youth Triple-Diff` và **`Earnings Margin DiD`** (**`max |Δβ| = 1.46e-14`**, **`max |ΔSE| = 6.18e-11`**).
 - **Chuyên sâu Việt Nam (`VNM`):** `2,760,619` GitHub developers cuối 2025 (`401.7` dev / 10k dân LĐ, tăng `+123.1%` từ 2022; lên `3,244,777` ở `2026-Q2`); Anthropic **AUI toàn cầu = `0.8605`** (**`2.3984`** nội khối LMICs); tương tác *Automation* `51.8%` vs. *Augmentation* `45.6%`; `Gender Exposure Gap = +0.0174` (`0.2245` nữ vs. `0.2071` nam).
 
 ### B. Mô phỏng Tài chính CFO-Grade: 4 Chiến lược, Nghỉ việc 18%/năm, Copula Monte Carlo & VN Presets
@@ -42,6 +42,10 @@ Mô hình Layer 3 chấm dứt thiên vị chống lại *Cut & Replace* (chỉ 
 | **C. Targeted Reskilling (520 NV, w/ 18% Attrition)** | 7.18 Tỷ | **+16.95 Tỷ** | **+1.51 Tỷ** | 236.2% | Tháng 11 | P10/P50/P90: **`+3.73 / +16.60 / +31.33 Tỷ`**; **`CVaR 5% = -1.80 Tỷ`** (`96.0% > 0`) |
 | **D. Hybrid (Reskill Aug. + Đóng băng bù Auto)** | **6.72 Tỷ** | **+28.30 Tỷ** | **+9.70 Tỷ** | **421.0%** | **Tháng 8** | **0 đền bù sa thải**, đóng băng tối đa 33 ghế Auto; **`98.1%` thắng Fair Cut** (`P50 = +27.79 Tỷ`) |
 
+- **Công cụ Quản trị Tài chính CFO Mới (Layer 3):**
+  - **Capital Allocation Optimizer & FY1–FY3 P&L:** Khi giới hạn trần CapEx **`3.0 Tỷ VNĐ`**, thuật toán xếp hạng theo *Profitability Index* phân bổ `2.99 Tỷ` (`99.8%`) cho **`217` NV** (`160` ISCO-2 `PI=4.12`, `57` ISCO-4 `PI=1.83`), mang về **`+10.55 Tỷ` NPV (`ROI 352.2%`, hoàn vốn tháng `8`)** và nâng **EBITDA Margin `+35.0 / +89.2 / +89.2 bps`** qua **FY1–FY3**.
+  - **Tornado Variance Attribution (±20% Drivers):** `Realization Rate` và `Adoption Multiplier` chia nhau **`92.3%` tổng phương sai NPV** (`46.15%` mỗi yếu tố, biên độ `14.82 Tỷ`), bỏ xa chi phí đào tạo (`4.20%`) và bản quyền AI (`2.67%`).
+  - **Privacy-by-Design, Live-Formula Excel & Hiệu năng Vectorized:** Bộ quét **chặn PII tự động (`pii_guardrail.py`)** trước khi nạp CSV doanh nghiệp; xuất **Board Pack Excel `.xlsx` 4 sheet với công thức sống (`excel_board_pack.py`)**; benchmark **`1,000 -> 250,000` nhân sự** chỉ mất **`27.2–35.3 ms`** và **`2.91 MB` RAM** (`87.6 ms` ở stress `10,000` lần Monte Carlo).
 - **Hiệu chuẩn theo Doanh nghiệp Thực tế Việt Nam (`presets_summary`):**
   - **FPT-Calibrated Tech & Services (`54,110` NV, BCTN FY2025 ~571.6M VNĐ/năm):** `92.68%` quỹ lương phơi nhiễm cao $\rightarrow$ Hybrid NPV **`+6,432.31 Tỷ`** vs. Reskilling **`+5,837.29 Tỷ`** vs. Fair Cut **`+1,811.16 Tỷ`** (hoàn vốn tháng `4`).
   - **Techcombank-Calibrated Banking (`12,705` NV, BCTC FY2025 ~47.5M VNĐ/tháng):** `91.99%` quỹ lương phơi nhiễm cao $\rightarrow$ Hybrid NPV **`+1,706.41 Tỷ`** vs. Reskilling **`+1,342.24 Tỷ`** vs. Fair Cut **`+642.63 Tỷ`** (hoàn vốn tháng `4`).
@@ -52,21 +56,21 @@ Mô hình Layer 3 chấm dứt thiên vị chống lại *Cut & Replace* (chỉ 
 ## 2. Kiến trúc Hệ thống 3 Lớp & Kho dữ liệu
 
 ```text
-[7 Tập Dữ liệu Mở: ILO 2025 (Mean/IQR/GPT4o/Gemini) + ILOSTAT LFS/Age/Hours/Modeled + AEI + GitHub + WDI]
+[8 Tập Dữ liệu Mở: ILO 2025 (Mean/IQR/GPT4o/Gemini) + ILOSTAT LFS/Age/Hours/Earnings/Modeled + AEI + GitHub + WDI]
                                       │
-                                      ▼  Lớp 1: Validators + ETL + DuckDB SQL (src/etl/ + sql/01..03)
+                                      ▼  Lớp 1: Validators + SHA-256 Lineage + DuckDB SQL (src/etl/ + sql/01..03)
                              [data/observatory.duckdb]
                                       │
                      ┌────────────────┴────────────────┐
                      ▼                                 ▼
 Lớp 2: Causal Engine (src/causal/)          Lớp 3: CFO-Grade BA Engine (src/business/)
-- Saturated TWFE + 14 Checks                - Workforce Diagnostics + Macro L2->L3 Priors
-- Webb Wild Bootstrap (G=9), Youth, Hours   - Fair Cut vs Reskilling vs Hybrid (0 Severance)
-- Dose-Response + R fixest Exact Match 6/6  - Attrition 18%/yr + Copula MC CVaR + VN Presets
+- Saturated TWFE + 16 Checks                - Workforce Diagnostics + Macro L2->L3 Priors
+- Webb WCB (G=9), HonestDiD Δ^RM, Youth/Hrs - Fair Cut vs Reskilling vs Hybrid (0 Severance)
+- Wage Margin + R fixest Exact Match 7/7    - CapEx Optimizer + Tornado + Excel + PII Blocker
                      │                                 │
                      └────────────────┬────────────────┘
                                       ▼
-         [3-Tab Streamlit App (app/streamlit_app.py) + 19 CI Tests (SQL Fixture + AppTest + Ruff)]
+         [3-Tab Streamlit App + Docker + CI đa job (Ruff, Mypy, 27 Pytest >=85%, R Smoke)]
 ```
 
 ---
@@ -110,6 +114,6 @@ Rscript src/causal/verify_in_r.R
 
 ## 5. Trạng thái Hoàn thành Dự án (Audit Zero-Defect Verified)
 
-- [x] **Layer 1 Data & SQL:** `validators.py`, `aui_global` & `aui_lmic_relative`, Youth `15–24` (`48` LMICs), Weekly Hours (`45` LMICs), `0` khóa trùng lặp, và test chạy thật `sql/01–03` trên CI (`test_sql_pipeline_fixture.py`).
-- [x] **Layer 2 Causal:** `14` kiểm định phản bác & độ bền vững (gồm **Webb WCB `p=0.362`**, **Two-way CRV1**, **IQR Bounds**, **Dose-Response**, **Youth Margin**, **Weekly Hours**), `fig05`, `fig07`, `fig08`, đối chiếu R `fixest` **6/6 mô hình** (`6.11e-15`).
-- [x] **Layer 3 BA Financial & App:** Fair *Cut & Replace*, **Attrition 18%/năm**, **Hybrid Freeze**, **4×4 Gaussian Copula Monte Carlo (`CVaR 5%`)**, **Layer 2 $\rightarrow$ Layer 3 Macro Priors**, preset **FPT / Techcombank FY2025**, `requirements.txt` tinh gọn, `.streamlit/config.toml`, `ruff` sạch 0 lỗi và `19` kiểm thử tự động `pytest` (gồm headless `AppTest`).
+- [x] **Layer 1 Data & SQL:** `validators.py`, `aui_global` & `aui_lmic_relative`, Youth `15–24` (`48` LMICs), Weekly Hours (`45` LMICs), **Monthly Earnings (`35` LMICs)**, `0` khóa trùng lặp, **`data_lineage.json` SHA-256**, và test chạy thật `sql/01–03` trên CI (`test_sql_pipeline_fixture.py`).
+- [x] **Layer 2 Causal:** **`16` kiểm định phản bác & độ bền vững** (gồm **Webb WCB `p=0.362`**, **Two-way CRV1**, **IQR Bounds**, **Dose-Response**, **Youth Margin**, **Weekly Hours**, **Check 15 Wage Margin**, **Check 16 HonestDiD `Δ^RM`**), `fig05`, `fig07`, `fig08`, đối chiếu R `fixest` **`7/7` mô hình** (`1.46e-14`).
+- [x] **Layer 3 BA Financial, Privacy, CI/CD & Docker:** Fair *Cut & Replace*, **Attrition 18%/năm**, **Hybrid Freeze**, **4×4 Vectorized Gaussian Copula (`CVaR 5%`, `27–35 ms` tới `250k NV`)**, **Capital Allocation Optimizer & FY1–FY3 EBITDA (`bps`)**, **Tornado Variance Attribution**, **Live-Formula `.xlsx` Board Pack**, **PII Blocker**, **Dockerfile + docker-compose**, **Ruff + Mypy (`0` lỗi)**, **`27/27` Pytest (`86.21%` coverage `>=85%`)**, và **CI đa job + Quarterly Upstream Cron**.

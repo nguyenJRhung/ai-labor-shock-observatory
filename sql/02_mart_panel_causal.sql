@@ -236,3 +236,43 @@ INNER JOIN stg_countries_lmics c
     ON h.iso3 = c.iso3
 INNER JOIN stg_ilo_exposure_isco1 e
     ON h.isco1 = e.isco1;
+
+-- Panel ngắn hạn Tiền lương danh nghĩa trung bình tháng (country_year_fe khử 100% lạm phát CPI & tỷ giá LCU)
+CREATE OR REPLACE TABLE mart_panel_earnings_ocu AS
+WITH ear_elig AS (
+    SELECT
+        iso3,
+        COUNT(DISTINCT CASE WHEN year BETWEEN 2015 AND 2022 THEN year END) AS pre_yrs,
+        COUNT(DISTINCT CASE WHEN year BETWEEN 2023 AND 2025 THEN year END) AS post_yrs,
+        COUNT(DISTINCT isco1) AS n_occ
+    FROM stg_ilostat_earnings_ocu
+    GROUP BY iso3
+)
+SELECT
+    w.iso3,
+    c.country_name,
+    c.income_level,
+    c.region,
+    w.isco1,
+    e.occupation_group,
+    w.sex,
+    w.year,
+    w.source,
+    w.monthly_earnings_lcu,
+    LN(w.monthly_earnings_lcu) AS ln_earnings,
+    e.exposure_2025,
+    e.exposure_2023,
+    e.share_exposed_grad34,
+    CASE WHEN w.year >= 2023 THEN 1 ELSE 0 END AS post_2022,
+    w.year - 2022 AS event_time,
+    w.iso3 || '_' || w.isco1 AS unit_fe,
+    w.iso3 || '_' || CAST(w.year AS VARCHAR) AS country_year_fe
+FROM stg_ilostat_earnings_ocu w
+INNER JOIN mart_lfs_country_eligibility el
+    ON w.iso3 = el.iso3 AND el.is_eligible = 1
+INNER JOIN ear_elig ee
+    ON w.iso3 = ee.iso3 AND ee.pre_yrs >= 3 AND ee.post_yrs >= 1 AND ee.n_occ >= 7
+INNER JOIN stg_countries_lmics c
+    ON w.iso3 = c.iso3
+INNER JOIN stg_ilo_exposure_isco1 e
+    ON w.isco1 = e.isco1;
