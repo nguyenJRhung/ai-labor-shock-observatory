@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -11,6 +12,8 @@ from src.business.reskilling_roi import (
     FinancialParams,
     build_default_headcount,
     compute_workforce_diagnostics,
+    derive_macro_priors_for_country,
+    load_enterprise_preset,
     npv_from_uniform_lift,
     simulate_reskilling_roi,
 )
@@ -19,9 +22,12 @@ from src.business.scenario_simulator import (
     compute_enterprise_gender_audit,
     run_monte_carlo_sensitivity,
     simulate_cut_and_replace,
+    simulate_hybrid_reskill_attrition_freeze,
 )
+from src.etl.common import load_business_assumptions
 
-SNAP_DIR = Path(__file__).resolve().parents[1] / "data" / "probes" / "app_snapshots"
+PROBES_DIR = Path(__file__).resolve().parents[1] / "data" / "probes"
+SNAP_DIR = PROBES_DIR / "app_snapshots"
 
 
 @pytest.fixture
@@ -137,10 +143,12 @@ def test_monte_carlo_bounds_and_determinism(
     mc1 = run_monte_carlo_sensitivity(diag, params, targeted_isco1=["2", "3", "4"], n_sims=300, seed=42)
     mc2 = run_monte_carlo_sensitivity(diag, params, targeted_isco1=["2", "3", "4"], n_sims=300, seed=42)
     assert mc1 == mc2
-    assert mc1["p10_npv_vnd"] <= mc1["p50_npv_vnd"] <= mc1["p90_npv_vnd"]
+    assert mc1["cvar_5pct_vnd"] <= mc1["p10_npv_vnd"] <= mc1["p50_npv_vnd"] <= mc1["p90_npv_vnd"]
+    assert mc1["p10_npv_vnd"] <= mc1["uncorrelated_p10_npv_vnd"] + 1e9
     assert 0.0 <= mc1["prob_npv_positive_pct"] <= 100.0
     assert 0.0 <= mc1["prob_reskill_beats_cut_pct"] <= 100.0
-    assert mc1["p50_npv_vnd"] > mc1["p50_cut_npv_vnd"]
+    assert 0.0 <= mc1["prob_hybrid_beats_cut_pct"] <= 100.0
+    assert mc1["p50_hybrid_npv_vnd"] >= mc1["p50_npv_vnd"]
 
 
 def test_enterprise_gender_audit_snapshot_and_alert_trigger(
@@ -168,3 +176,57 @@ def test_enterprise_gender_audit_snapshot_and_alert_trigger(
     audit_stress = compute_enterprise_gender_audit(diag, cut_res, ["2", "3", "4"], stress_wf, threshold_pct=5.0)
     assert audit_stress["female_cut_disparity_pp"] >= 5.0
     assert audit_stress["governance_alert"] is True
+
+
+def test_attrition_reduces_reskilling_npv(
+    sample_exposure_df: pd.DataFrame, sample_salaries: dict[str, float]
+) -> None:
+    hc = build_default_headcount(1000)
+    p_zero = FinancialParams(annual_attrition_rate=0.0, annual_refresh_cost_pct=0.0)
+    p_high = FinancialParams(annual_attrition_rate=0.25, annual_refresh_cost_pct=0.15)
+    d0 = compute_workforce_diagnostics(hc, sample_salaries, sample_exposure_df, p_zero)
+    dh = compute_workforce_diagnostics(hc, sample_salaries, sample_exposure_df, p_high)
+    r0 = simulate_reskilling_roi(d0, p_zero, targeted_isco1=["2", "3", "4"])
+    rh = simulate_reskilling_roi(dh, p_high, targeted_isco1=["2", "3", "4"])
+    assert r0["npv_reskill_vnd"] > rh["npv_reskill_vnd"]
+
+
+def test_fairness_stress_cut_and_replace_can_beat_reskilling(
+    sample_exposure_df: pd.DataFrame, sample_salaries: dict[str, float]
+) -> None:
+    """Prove model is not rigged: under expensive training + high turnover + low realization, Cut wins."""
+    hc = build_default_headcount(1000)
+    p_stress = FinancialParams(
+        reskilling_cost_vnd=45_000_000.0,
+        annual_attrition_rate=0.35,
+        realization_rate=0.30,
+        adoption_multiplier=0.45,
+        untrained_ai_realization_ratio=0.50,
+    )
+    diag = compute_workforce_diagnostics(hc, sample_salaries, sample_exposure_df, p_stress)
+    resk = simulate_reskilling_roi(diag, p_stress, targeted_isco1=["2", "3", "4"])
+    cut = simulate_cut_and_replace(diag, p_stress, targeted_isco1=["2", "3", "4"])
+    assert cut["npv_vnd"] > resk["npv_reskill_vnd"]
+
+
+def test_hybrid_strategy_and_macro_prior_bridge(
+    sample_exposure_df: pd.DataFrame, sample_salaries: dict[str, float]
+) -> None:
+    hc = build_default_headcount(1000)
+    params = FinancialParams()
+    diag = compute_workforce_diagnostics(hc, sample_salaries, sample_exposure_df, params)
+    hyb = simulate_hybrid_reskill_attrition_freeze(diag, params, targeted_isco1=["2", "3", "4"])
+    assert hyb["severance_cost_vnd"] == 0.0
+    assert hyb["frozen_attrition_seats"] > 0
+    assert hyb["npv_vnd"] > 0.0
+
+    theory_df = pd.read_csv(SNAP_DIR / "mart_theory_vs_adoption.csv")
+    causal_res = json.loads((PROBES_DIR / "causal_results.json").read_text(encoding="utf-8"))
+    priors = derive_macro_priors_for_country("VNM", theory_df, causal_res)
+    assert 0.35 <= priors["adoption_multiplier_prior"] <= 0.75
+    assert priors["replacement_cost_months_prior"] > 4.0
+
+    assumptions = load_business_assumptions()
+    fpt = load_enterprise_preset(assumptions, "fpt_tech_services_2025")
+    assert fpt["total_headcount"] == 54110
+    assert sum(fpt["headcount_by_isco1"].values()) == 54110

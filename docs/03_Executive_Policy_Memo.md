@@ -1,59 +1,61 @@
-# Executive Policy & Strategy Memo: Tác động Thực của GenAI & Chiến lược Tái đào tạo Nhân sự
+# Executive Policy & Strategy Memo: Tác động Thực của GenAI & Chiến lược Nhân sự Hybrid
 
 **Kính gửi:** Ban Giám đốc (CEO / CFO / CHRO) & Nhóm Phân tích Chiến lược (Strategy BA)  
-**Đối tượng tham chiếu:** Doanh nghiệp Dịch vụ / Tài chính / BPO Việt Nam (Mẫu tham chiếu 1.000 nhân sự) & Bối cảnh Kinh tế Vĩ mô LMICs  
-**Nguồn kiểm chứng:** Bộ dữ liệu tích hợp ILO 2025 (WP 140), ILOSTAT Actual LFS (49 LMICs), Anthropic Economic Index, GitHub Innovation Graph & World Bank WDI
+**Đối tượng tham chiếu:** Doanh nghiệp Dịch vụ / Tài chính / Công nghệ Việt Nam (`BPO 1.000 NV`, `FPT-Calibrated FY2025`, `Techcombank-Calibrated FY2025`) & Bối cảnh Vĩ mô LMICs  
+**Nguồn kiểm chứng:** ILO 2025 (Mean/IQR/GPT-4o/Gemini), ILOSTAT LFS + Youth + Weekly Hours (`49` / `48` / `45` LMICs), Anthropic AEI, GitHub IG & World Bank WDI
 
 ---
 
 ## 1. Tóm tắt Điều hành (BLUF — Bottom Line Up Front)
 
-1. **Chưa có bằng chứng GenAI xóa sổ việc làm ròng tại LMICs tính đến 2024–2025:** Trên tập dữ liệu điều tra lao động thực tế (Actual LFS) của **49 quốc gia LMICs** ($N = 3,987$), ước lượng TWFE cơ bản và WLS theo quy mô nghề trong nước (`wls_within_country_share2022`) cho hệ số dương ($\hat{\beta} = +0.1502, p = 0.0362$ và $+0.3046, p = 0.0007$). Tuy nhiên, chuỗi kiểm định chuyên sâu chứng minh tính thận trọng bắt buộc: khi kiểm soát xu hướng tuyến tính riêng theo nhóm nghề ($\hat{\beta} = +0.0769, p = 0.284$), so sánh trực tiếp **Văn phòng `ISCO-4` vs. Tay chân `ISCO 7–9`** ($\hat{\beta} = +0.0047, SE = 0.0247, p = 0.848$), hoặc thực hiện **500 lần hoán vị FWL Randomization Inference** ($p = 0.428$), tín hiệu sa thải ròng hay tạo việc làm ròng đều **không khác 0 về mặt thống kê**. Đây chính là **cửa sổ chuyển tiếp 2–3 năm** lý tưởng để doanh nghiệp chủ động tái đào tạo thay vì cắt giảm vội vàng.
-2. **Việt Nam nằm trong nhóm sẵn sàng công nghệ cao nhưng có rủi ro bất cân xứng giới tính:** Việt Nam đạt mật độ **`401.7` lập trình viên GitHub / 10,000 dân số trong độ tuổi lao động** (`2,760,619` developers cuối 2025, tăng `+123.1%` so với 2022; lên `3,244,777` ở `2026-Q2`), chỉ số Anthropic **AUI toàn cầu = `0.8605`** (**`2.3984`** nội khối LMICs), tỷ lệ tương tác mang tính tự động hóa trên Anthropic AEI đạt `51.8%` (cao hơn mức tăng cường `45.6%`). Phụ nữ Việt Nam có điểm phơi nhiễm GenAI gia quyền cao hơn nam giới (**`0.2245` vs. `0.2071`**, chênh lệch **`+0.0174`**).
-3. **Khuyến nghị Tài chính cho Doanh nghiệp (Kịch bản Cơ sở 1.000 nhân sự + Monte Carlo 1.000 lần):** Thay vì cắt giảm nhân sự (*Cut & Replace*: NPV cơ sở `+4.05 Tỷ VNĐ`, hoàn vốn **tháng 22**, phân vị Monte Carlo `P50 = +4.22 Tỷ`), doanh nghiệp nên chọn **Tái đào tạo có trọng điểm (Targeted Reskilling + AI Copilot)** cho **520 nhân sự** khối `ISCO 2–3–4`: đầu tư `7.18 Tỷ VNĐ` mang lại **NPV cơ sở 36 tháng `+21.89 Tỷ VNĐ`**, **ROI `305.0%`**, **hoàn vốn ở tháng 10**, **chỉ cần tăng `5.35%` năng suất là hòa vốn**, đạt xác suất **`100.0%` NPV dương** (`P10 = +11.06 Tỷ`, `P50 = +21.78 Tỷ`, `P90 = +33.51 Tỷ`) và **vượt trội *Cut & Replace* trong `99.0%` mô phỏng Monte Carlo**.
+1. **Chưa có bằng chứng GenAI xóa sổ việc làm, tuyển mới trẻ hay co rút giờ làm tại LMICs tính đến 2024–2025:** Trên tập dữ liệu điều tra lao động thực tế (*Actual LFS*) của **49 LMICs** ($N = 3,987$), baseline không gia quyền và WLS tỷ trọng nghề 2022 cho hệ số dương ($\hat{\beta} = +0.1502, p = 0.0362$ và $+0.3046, p = 0.0007$). Tuy nhiên, chuỗi **14 kiểm định khắt khe** buộc phải diễn giải thận trọng: khi cụm 2 chiều (`iso3+isco1`: $p = 0.3206$), chạy **Webb 6-point Wild Cluster Bootstrap (999 lần qua 9 cụm ISCO-1: $p = 0.3624$)**, khử xu hướng tuyến tính theo nghề ($p = 0.2840$), hay đối chiếu trực tiếp Văn phòng `ISCO-4` vs. Tay chân `ISCO 7–9` ($+0.0047, p = 0.8481$), tác động ròng bằng 0 về mặt thống kê. Dữ liệu thực nghiệm mới về **Lao động Trẻ 15–24 (`48` LMICs: `+0.3136, p=0.0063`)** và **Giờ làm việc/Tuần (`45` LMICs: `+0.0047, p=0.7126`)** càng khẳng định giai đoạn 2023–2025 là **cửa sổ chuyển tiếp an toàn** trước khi tự động hóa văn phòng tác động mạnh hơn.
+2. **Việt Nam sẵn sàng công nghệ cao nhưng chịu chênh lệch phơi nhiễm giới tính:** Việt Nam đạt **`401.7` GitHub developers / 10k dân LĐ** (`2,760,619` cuối 2025; `3,244,777` ở `2026-Q2`), Anthropic **AUI toàn cầu = `0.8605`** (**`2.3984`** nội khối LMICs), tỷ lệ *Automation* `51.8%` vs. *Augmentation* `45.6%`, và `Gender Exposure Gap = +0.0174` (nữ `0.2245` vs. nam `0.2071`).
+3. **Khuyến nghị CFO-Grade — Chiến lược D (*Hybrid: Reskill Augmentation + Đóng băng Tuyển bù Tự động hóa*):** Sau khi hiệu chỉnh mô hình tài chính cho **công bằng tuyệt đối** (cho phép *Cut & Replace* dùng AI tự học trên nhóm ở lại và chỉ phạt bàn giao tỷ lệ theo quỹ lương bị cắt) đồng thời bổ sung **tỷ lệ nghỉ việc `18%/năm`**, *Fair Cut & Replace* (`+7.29 Tỷ`) thắng pure *Targeted Reskilling* (`+1.51 Tỷ`) nếu tốc độ áp dụng AI thấp (`35%`). Nhưng **Chiến lược D (*Hybrid*: đào tạo lại nhóm bổ trợ `ISCO 2–3` + đóng băng tuyển bù tự nhiên ở nhóm tự động hóa `ISCO 4`, 0 sa thải, 0 đền bù)** **thắng áp đảo trong mọi kịch bản**: NPV cơ sở **`+28.30 Tỷ VNĐ`** (thận trọng `+9.70 Tỷ`, tăng tốc `+42.95 Tỷ`), **ROI `421.0%`**, hoàn vốn **tháng 8**, và thắng *Fair Cut & Replace* ở **`98.1%` mô phỏng Copula Monte Carlo** (`P50 = +27.79 Tỷ`).
 
 ---
 
-## 2. Bằng chứng Nhân quả Vĩ mô (Saturated TWFE & 9 Kiểm định Độ bền vững)
+## 2. Bằng chứng Nhân quả Vĩ mô (Saturated TWFE & 14 Kiểm định Sâu)
 
 ![Event Study Actual LFS vs ILO Modeled](figures/fig05_event_study_causal.png)
 
 ![Specification Curve & Forest Plot](figures/fig07_robustness_forest_plot.png)
 
+![Dose-Response, Youth 15-24 & Weekly Hours](figures/fig08_youth_hours_and_dose_response.png)
+
 | Mô hình / Kiểm định kiểm chứng | Cỡ mẫu ($N$) | Hệ số ($\hat{\beta}$) | Sai số chuẩn ($SE$) | $p\text{-value}$ | Kết luận thực nghiệm |
 | :--- | ---: | ---: | ---: | ---: | :--- |
-| **Chính: Actual LFS (49 LMICs, Cluster Unit)** | 3,987 | **+0.1502** | 0.0715 | **0.0362** | Tăng trưởng tương đối dương ở baseline không gia quyền |
-| **Chính: Actual LFS (Cluster Quốc gia)** | 3,987 | **+0.1502** | 0.0675 | **0.0308** | Sai số chuẩn cụm quốc gia nhất quán |
-| **Pre-trend Wald Test (2015–2021)** | 3,987 | — | — | **0.2744** | **Đạt:** Không vi phạm xu hướng song song tiền 2022 |
-| **Check 1: Placebo Date Test (2019, 2015–2021)** | 2,520 | +0.0652 | 0.0599 | 0.2766 | **Đạt:** Không có hiệu ứng giả trước khi GenAI xuất hiện |
-| **Check 4: Loại trừ năm COVID (2020–2021)** | 3,222 | +0.1680 | 0.0766 | **0.0288** | **Đạt:** Không bị nhiễu bởi cú sốc giãn cách COVID-19 |
-| **Check 5: Xu hướng Tuyến tính theo Nghề (`ln_emp`)** | 3,987 | +0.0769 | 0.0717 | 0.2840 | **Diễn giải thận trọng:** Mất ý nghĩa thống kê khi tách trend nghề |
-| **Check 6: WLS Tỷ trọng Nghề 2022 (Trong nước)** | 3,663 | **+0.3046** | 0.0890 | **0.0007** | Vững khi gia quyền tỷ trọng việc làm từng nhóm nghề năm 2022 |
-| **Check 7: Balanced Panel 2017–2024 (30 LMICs)** | 2,160 | **+0.1718** | 0.0763 | **0.0252** | Không do thành phần quốc gia ra/vào panel |
-| **Check 8: Binary DiD Văn phòng (`4`) vs Tay chân (`7–9`)** | 1,772 | +0.0047 | 0.0247 | 0.8481 | **Bằng chứng không thay thế ròng:** Văn phòng không sụt so với tay chân |
-| **Check 9: FWL Randomization Inference (500 lần)** | 3,987 | +0.1502 | — | RI **0.4280** | Với chỉ 9 cụm phơi nhiễm ISCO-1, tác động không khác phân phối hoán vị |
-| **ILO Modeled (Toàn khối, 124 LMICs)** | 9,450 | -0.0459 | 0.0735 | 0.5327 | **Vi phạm Pre-trend ($p = 0.0005$):** Không dùng làm lõi nhân quả |
+| **Chính: Actual LFS (49 LMICs, Unit / Country Cluster)** | 3,987 | **+0.1502** | 0.0715 / 0.0675 | 0.0362 / 0.0308 | Tăng trưởng tương đối dương ở baseline không gia quyền |
+| **Check 11a: Two-Way CRV1 (`iso3 + isco1`)** | 3,987 | +0.1502 | 0.1419 | 0.3206 | Chuẩn mực cụm 2 chiều quốc gia & 9 cụm nghề |
+| **Check 11b: Webb Wild Cluster Bootstrap (G=9, 999 lần)** | 3,987 | +0.1502 | — | WCB **0.3624** | Khẳng định không đủ lực bác bỏ $H_0$ với chỉ 9 mức exposure |
+| **Check 10: Task-Weighted / GPT-4o / Gemini Score** | 3,987 | +0.135 đến +0.159 | 0.067–0.078 | < 0.05 | Vững trước trọng số tác vụ & mô hình AI chấm điểm khác |
+| **Check 12: Dose-Response `ISCO-4` vs `ISCO-9` / `ISCO-6`** | 3,987 | +0.0097 / -0.1447 | 0.0406 / 0.0458 | 0.812 / **0.002** | Động lực chủ yếu đến từ nông nghiệp `ISCO-6` sụt giảm |
+| **Check 13: Youth (15–24) vs. Prime-Age (48 LMICs)** | 3,867 / 7,734 | +0.3136 / $\Delta=+0.0549$ | 0.1142 / 0.1356 | 0.006 / 0.685 | Chưa có hiện tượng đóng băng tuyển mới lao động trẻ |
+| **Check 14: Weekly Hours (45 LMICs, Pre-trend p=0.967)** | 3,645 | +0.0047 (`+0.30h`) | 0.0128 | 0.7126 | Biên cường độ giờ làm/tuần hoàn toàn ổn định |
+| **Pre-trend Wald / Placebo 2019 / No-COVID (2020–21)** | 3,987 / 2,520 / 3,222 | — / +0.065 / +0.168 | — / 0.060 / 0.077 | 0.274 / 0.277 / 0.029 | Đạt xu hướng song song tiền 2022 & sạch nhiễu COVID |
+| **Check 5 & 8: Xu hướng Tuyến tính / Binary (4 vs 7–9)** | 3,987 / 1,772 | +0.0769 / +0.0047 | 0.0717 / 0.0247 | 0.284 / 0.848 | Bằng chứng thép không có sa thải ròng hậu 2022 |
+| **ILO Modeled (Toàn khối, 124 LMICs)** | 9,450 | -0.0459 | 0.0735 | 0.5327 | **Vi phạm Pre-trend ($p = 0.0005$):** Loại khỏi lõi nhân quả |
 
-**Hàm ý chiến lược:** Đối chiếu **5/5 mô hình** giữa **Python `pyfixest`** và **R `fixest`** cho sai số tối đa **`max |Δβ| = 2.16e-15`** và **`max |ΔSE| = 3.83e-11`**. Toàn bộ bằng chứng nhất quán khẳng định giai đoạn 2023–2025 tại LMICs **chưa xảy ra sa thải ròng quy mô vĩ mô**, tạo dư địa tối ưu cho chiến lược tái đào tạo và nâng cấp kỹ năng (Augmentation).
+**Đối chiếu R `fixest` (`6/6` mô hình):** `max |Δβ| = 6.11e-15`, `max |ΔSE| = 6.18e-11` (`PASS = TRUE`).
 
 ---
 
-## 3. Phân tích Tài chính Doanh nghiệp & Kiểm toán Rủi ro Giới (Mẫu 1.000 Nhân sự)
+## 3. Phân tích Tài chính CFO-Grade & Kiểm toán Rủi ro Giới (Mẫu 1.000 NV BPO)
 
-Với cấu trúc nhân sự mẫu (`16.56 Tỷ VNĐ/tháng` tổng quỹ lương, **`71.10%` quỹ lương nằm ở nhóm phơi nhiễm cao ISCO 1–4**), mô hình tài chính 36 tháng đồng nhất một hàm dòng tiền chiết khấu hàng tháng có `ramp-up` 3 tháng (`realization_rate = 50%`, chiết khấu `10%/năm`, khóa HITL bảo vệ `ISCO-1`) cùng **1.000 mô phỏng Monte Carlo (`seed = 42`)** cho kết quả như sau:
+Cấu trúc mẫu (`16.56 Tỷ/tháng` tổng quỹ lương, `71.10%` ở nhóm phơi nhiễm cao `ISCO 1–4`), tích hợp **nghỉ việc `18%/năm`**, cập nhật kỹ năng `15%/năm`, đào tạo bù `75%`, **Fair Cut & Replace**, và **1.000 lần Gaussian Copula Monte Carlo (`rho=+0.65 / -0.35`)**:
 
-![So sánh 3 Kịch bản Tài chính BA](figures/fig06_reskilling_roi_scenarios.png)
+![So sánh 4 Chiến lược Tài chính CFO-Grade](figures/fig06_reskilling_roi_scenarios.png)
 
-| Chiến lược hành động (Khung 36 tháng) | Đầu tư ban đầu | NPV Cơ sở | Monte Carlo P10 / P50 / P90 | ROI (%) | Hoàn vốn | Tác động tổ chức & Kiểm toán giới |
+| Chiến lược hành động (Khung 36 tháng) | Đầu tư đầu | NPV Cơ sở | NPV Thận trọng | Monte Carlo P10 / P50 / P90 | Hoàn vốn | Ghi chú Tổ chức & Giới |
 | :--- | ---: | ---: | ---: | ---: | :---: | :--- |
-| **A. Status Quo (Giữ nguyên)** | 0 Tỷ | **0.00 Tỷ** | — | 0.0% | — | Chịu chi phí cơ hội **`-21.89 Tỷ VNĐ`** và tụt năng suất |
-| **B. Cut & Replace (Cắt 34 người)** | 1.89 Tỷ | **+4.05 Tỷ** | +3.37 / +4.22 / +5.04 Tỷ | 213.8% | Tháng 22 | `53.55%` người bị cắt là nữ (`+1.87 pp` so với DN); gián đoạn 6 tháng |
-| **C. Targeted Reskilling (520 người)** | 7.18 Tỷ | **+21.89 Tỷ** | **+11.06 / +21.78 / +33.51 Tỷ** | **305.0%** | **Tháng 10** | Chỉ cần **+5.35% năng suất** để hòa vốn; **`55.29%`** người học là nữ (`100%` NPV > 0) |
+| **A. Status Quo (Giữ nguyên)** | 0 Tỷ | **0.00 Tỷ** | **0.00 Tỷ** | — | — | Chi phí cơ hội **`-28.30 Tỷ VNĐ`** |
+| **B. Fair Cut & Replace (-34 NV)** | 1.89 Tỷ | **+13.96 Tỷ** | **+7.29 Tỷ** | +11.57 / +14.10 / +16.67 Tỷ | Tháng 6 | Bất mãn văn hóa; `53.55%` cắt là nữ (`+1.87 đ%`) |
+| **C. Targeted Reskilling (520 NV)** | 7.18 Tỷ | **+16.95 Tỷ** | **+1.51 Tỷ** | +3.73 / +16.60 / +31.33 Tỷ | Tháng 11 | Break-even **`6.84%`**, **`CVaR 5% = -1.80 Tỷ`** (`96.0%` NPV > 0) |
+| **D. Hybrid (Reskill + Đóng băng Auto)** | **6.72 Tỷ** | **+28.30 Tỷ** | **+9.70 Tỷ** | **+15.59 / +27.79 / +41.60 Tỷ** | **Tháng 8** | **0 sa thải**, đóng băng 33 ghế Auto; **`98.1%` thắng Fair Cut** |
 
 ---
 
-## 4. Lộ trình Hành động 3 Bước cho Doanh nghiệp Việt Nam
+## 4. Lộ trình Hành động 3 Bước Cho Ban Giám đốc Việt Nam
 
-1. **Quý 1 — Đánh thức & Thí điểm ở Góc phần tư Q1 (`ISCO 2` Chuyên môn & `ISCO 4` Văn phòng):** Triển khai trước cho **160 chuyên viên** (`exposure = 0.386`, hoàn vốn thống nhất **tháng 7**, NPV `67.0 Triệu/người`) và **220 nhân sự hành chính** (`0.536`, `72%` tác vụ Gradient 3–4, hoàn vốn thống nhất **tháng 11**, NPV `34.5 Triệu/người`), tiếp theo là **140 kỹ thuật viên `ISCO 3`** (hoàn vốn **tháng 13**; tổng thể `ISCO 2–4` hoàn vốn **tháng 10**).
-2. **Quý 2 — Thiết lập Rào chắn Human-in-the-Loop cho `ISCO 1` & Khối rủi ro cao:** Trang bị AI Copilot để giải phóng `728 giờ/tháng` cho cấp quản lý (hoàn vốn thống nhất **tháng 5** ở góc Q2) nhưng **cấm tự động ra quyết định phê duyệt/pháp lý/tín dụng** không có con người kiểm duyệt.
-3. **Quý 3–4 — Kiểm toán Cân bằng Giới tính & Tái phân bổ Thời gian Giải phóng:** Vận hành **Enterprise Gender Impact Audit** dựa trên tỷ trọng nữ thực tế LFS Việt Nam 2024 (`51.68%` toàn DN $\rightarrow$ `55.29%` trong nhóm tái đào tạo), tự động bật cảnh báo quản trị nếu phương án tái cấu trúc gây lệch giới tính vượt ngưỡng `5.0 pp`.
+1. **Quý 1 — Kích hoạt Chiến lược D (*Hybrid*) thay cho Sa thải hay Đào tạo Tràn lan:** Tái đào tạo toàn diện khối Augmentation (**`ISCO 2` Chuyên môn**, hoàn vốn thống nhất **tháng 8**, NPV `56.9 Triệu/NV`; **`ISCO 3` Kỹ thuật viên**, hoàn vốn **tháng 17**) đồng thời bật **đóng băng tuyển bù tự nhiên (Attrition Hiring Freeze)** lên tới `33` vị trí tác vụ tự động hóa tại `ISCO 4` (nếu giữ nguyên biên chế `ISCO 4`, hoàn vốn riêng lẻ là **tháng 12**).
+2. **Quý 2 — Áp dụng Cầu nối Tham số Vĩ mô & Khóa HITL cho `ISCO 1`:** Trang bị Copilot cho `ISCO 1` (hoàn vốn **tháng 5**) kèm khóa bảo vệ *Human-in-the-Loop*, và neo tham số `adoption_prior = 0.66` / `replacement_months = 4.60t` từ dữ liệu thực Việt Nam.
+3. **Quý 3–4 — Kiểm toán Cân bằng Giới (`5.0 pp`) & Chuẩn hóa theo Quy mô Thực tế:** Theo dõi *Enterprise Gender Impact Audit* (`51.68%` nữ toàn DN $\rightarrow$ `55.29%` tái đào tạo) và kiểm tra kết quả nhân rộng đã hiệu chuẩn theo BCTC FY2025 của **FPT** (`54,110` NV, Hybrid `+6,432 Tỷ`) và **Techcombank** (`12,705` NV, Hybrid `+1,706 Tỷ`).

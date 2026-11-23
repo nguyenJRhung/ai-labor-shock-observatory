@@ -69,9 +69,11 @@ Trong khung thời gian đánh giá $M = 36$ tháng với tỷ lệ chiết kh�
 4. **Điểm hòa vốn nâng suất ($\text{Break-even Productivity Lift}$):**
    - Tỷ lệ tăng năng suất tối thiểu (%) mà một nhân sự sau đào tạo phải đạt được để $\text{NPV}_{\text{Reskill}} = 0$. Giúp CFO kiểm tra tính khả thi thực tế (*"Chỉ cần tăng 4.2% năng suất là hòa vốn đào tạo + bản quyền AI"*).
 
-5. **So sánh 3 kịch bản hành động (Decision Matrix), Monte Carlo & Gender Audit:**
-   - **Kịch bản A — Giữ nguyên (Status Quo):** Chi phí trực tiếp bằng 0, nhưng chịu chi phí cơ hội mất năng suất so với đối thủ.
-   - **Kịch bản B — Cắt giảm & Tuyển thay thế (Cut & Replace):** Cộng dồn chi phí đền bù, tuyển mới và mất năng suất bàn giao (`replacement_cost_months_salary` $\times$ lương tháng), kèm rủi ro gián đoạn vận hành.
-   - **Kịch bản C — Tái đào tạo có trọng điểm (Targeted Reskilling):** Ưu tiên nhóm nằm trong góc phần tư **[Phơi nhiễm AI cao × Chi phí tái đào tạo hợp lý]** và bảo vệ nhóm bắt buộc **Human-in-the-Loop**.
-   - **Kiểm định Rủi ro Monte Carlo 1.000 lần (`seed = 42`):** Mô phỏng đồng thời độ bất định của `realization_rate`, tốc độ hấp thụ và chi phí đào tạo/bản quyền để xuất phân vị **`P10 / P50 / P90`**, xác suất `Prob(NPV > 0)` và `Prob(Reskilling > Cut & Replace)`.
+5. **So sánh 4 kịch bản hành động (Decision Matrix), Cầu nối Vĩ mô, Copula Monte Carlo & Gender Audit:**
+   - **Kịch bản A — Giữ nguyên (Status Quo):** Chi phí trực tiếp bằng 0, nhưng chịu chi phí cơ hội mất năng suất so với phương án tốt nhất (`-28.30 Tỷ` ở DN mẫu).
+   - **Kịch bản B — Fair Cut & Replace:** Cắt giảm tại nhóm tự động hóa, chỉ tính gián đoạn bàn giao tỷ lệ theo quỹ lương bị cắt (`1.5` tháng lương) và cho phép nhóm ở lại khai thác AI tự học ở mức `35%`.
+   - **Kịch bản C — Targeted Reskilling:** Đã tính đầy đủ **tỷ lệ nghỉ việc tự nhiên `18%/năm`** (đào tạo bù `75%`, cập nhật kỹ năng `15%/năm`), thống nhất một hàm dòng tiền chiết khấu giữa bảng tổng hợp và ma trận 2×2.
+   - **Kịch bản D — Hybrid (Reskill Augmentation + Attrition Freeze):** Tái đào tạo nhóm bổ trợ (`ISCO 2–3`) và đóng băng tuyển bù tự nhiên ở nhóm tự động hóa (`ISCO 4`) với **`0` chi phí đền bù**.
+   - **Cầu nối Layer 2 $\rightarrow$ Layer 3 (`derive_macro_priors_for_country`):** Ánh xạ phân vị công nghệ (`aui_global` & GitHub/10k WAP) và hệ số vĩ mô hậu 2022 thành `adoption_multiplier_prior` (`0.66` tại VN) và `replacement_cost_months_prior` (`4.60` tháng).
+   - **4×4 Cholesky Gaussian Copula Monte Carlo (`rho=+0.65/-0.35`, `1.000` lần):** Mô phỏng đồng thời tương quan đuôi của áp dụng, hiện thực hóa, nghỉ việc và chi phí để xuất **`P10 / P50 / P90`**, **`CVaR 5%`** và xác suất thắng từng đối thủ.
    - **Enterprise Gender Impact Audit (`5.0 pp` Guardrail):** Đối chiếu tỷ trọng nữ chịu tác động từ LFS Việt Nam 2024 giữa phương án tái đào tạo và cắt giảm so với tỷ trọng nữ toàn doanh nghiệp.

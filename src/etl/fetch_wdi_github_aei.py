@@ -15,7 +15,6 @@ from src.etl.common import (
     load_pipeline_config,
 )
 
-
 WDI_COLUMN_MAP = {
     "SL.UEM.TOTL.ZS": "unemployment",
     "NY.GDP.MKTP.KD.ZG": "gdp_growth",

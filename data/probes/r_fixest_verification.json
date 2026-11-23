@@ -1,5 +1,5 @@
 {
-  "verified_at_utc": "2026-11-23 12:09:33 UTC",
+  "verified_at_utc": "2026-11-23 12:36:07 UTC",
   "r_version": "R version 4.5.2 (2025-10-31 ucrt)",
   "fixest_version": "0.14.2",
   "n_obs": 3987,
@@ -58,7 +58,7 @@
       "estimate": -0.04480914085202,
       "se_unit": 0.05404474692475,
       "pvalue_unit": 0.4074906617786,
-      "se_iso": 0.05173478632668
+      "se_iso": 0.05173478632667
     },
     {
       "year": 2023,
@@ -90,10 +90,12 @@
     "se_unit_cluster": 0.071517892471,
     "pvalue_unit_cluster": 0.03623172802708,
     "se_country_cluster": 0.06749655045638,
-    "pvalue_country_cluster": 0.03075082674602
+    "pvalue_country_cluster": 0.03075082674602,
+    "se_twoway_iso3_isco1": 0.1419075930696,
+    "pvalue_twoway_iso3_isco1": 0.3206427426128
   },
   "occ_linear_trends": {
-    "estimate": 0.07691704619145,
+    "estimate": 0.07691704619146,
     "se_unit_cluster": 0.07171098803938,
     "pvalue_unit_cluster": 0.2840395446626
   },
@@ -110,37 +112,48 @@
     "female_diff_estimate": 0.08502036050979,
     "female_diff_se": 0.1217705115658
   },
+  "youth_triple_diff": {
+    "n_obs": 7734,
+    "prime_estimate": 0.2586542643069,
+    "prime_se": 0.0732035117571,
+    "youth_diff_estimate": 0.05493796654096,
+    "youth_diff_se": 0.1355578591174
+  },
   "python_vs_r_comparison": {
     "available": true,
-    "models_verified_count": 5,
+    "models_verified_count": 6,
     "n_obs_r": 3987,
     "n_obs_python": 3987,
     "per_model_diffs": {
       "event_study": {
-        "max_coef_diff": 2.123301534596e-15,
-        "max_se_diff": 3.191891195797e-15
+        "max_coef_diff": 2.109423746788e-15,
+        "max_se_diff": 3.663735981263e-15
       },
       "pooled_did": {
-        "max_coef_diff": 1.110223024625e-16,
-        "max_se_diff": 1.387778780781e-17
+        "max_coef_diff": 2.775557561563e-17,
+        "max_se_diff": 9.71445146547e-17
       },
       "occ_linear_trends": {
-        "max_coef_diff": 1.026956297778e-15,
-        "max_se_diff": 1.026956297778e-15
+        "max_coef_diff": 5.453970608471e-15,
+        "max_se_diff": 3.74700270811e-15
       },
       "binary_clerical_vs_manual": {
-        "max_coef_diff": 4.336808689942e-17,
-        "max_se_diff": 1.734723475977e-17
+        "max_coef_diff": 2.862293735362e-17,
+        "max_se_diff": 5.20417042793e-17
       },
       "triple_diff_gender": {
-        "max_coef_diff": 2.164934898019e-15,
-        "max_se_diff": 3.83476167487e-11
+        "max_coef_diff": 2.942091015257e-15,
+        "max_se_diff": 3.834767225985e-11
+      },
+      "youth_triple_diff": {
+        "max_coef_diff": 6.106226635438e-15,
+        "max_se_diff": 6.183881184896e-11
       }
     },
-    "max_abs_coef_diff": 2.164934898019e-15,
-    "max_abs_se_diff": 3.83476167487e-11,
-    "did_coef_diff": 1.110223024625e-16,
-    "did_se_diff": 1.387778780781e-17,
+    "max_abs_coef_diff": 6.106226635438e-15,
+    "max_abs_se_diff": 6.183881184896e-11,
+    "did_coef_diff": 2.775557561563e-17,
+    "did_se_diff": 9.71445146547e-17,
     "exact_match_pass": true
   }
 }

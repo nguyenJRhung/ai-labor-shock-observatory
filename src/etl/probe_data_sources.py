@@ -20,7 +20,6 @@ import pandas as pd
 import requests
 import yaml
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CONFIG_PATH = PROJECT_ROOT / "config" / "pipeline.yaml"
 USER_AGENT = "ai-labor-shock-observatory/0.1 (academic-research)"

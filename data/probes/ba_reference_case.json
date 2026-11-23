@@ -2,6 +2,7 @@
   "reference_profile": {
     "total_headcount": 1000,
     "scenario": "base",
+    "annual_attrition_rate": 0.18,
     "locked_hitl_isco1": [
       "1"
     ],
@@ -40,7 +41,7 @@
       "realizable_hours_per_month": 727.776,
       "monthly_value_gain_vnd": 194940000.0,
       "payback_months_est": 5.0,
-      "npv_36m_per_person_vnd": 116212457.45138057,
+      "npv_36m_per_person_vnd": 104889030.03503096,
       "quadrant": "Q2: Strategic Copilot (HITL Locked)"
     },
     {
@@ -59,8 +60,8 @@
       "effective_time_saved_share": 0.1158913043478261,
       "realizable_hours_per_month": 3115.1582608695658,
       "monthly_value_gain_vnd": 519193043.47826093,
-      "payback_months_est": 7.0,
-      "npv_36m_per_person_vnd": 67035353.39813639,
+      "payback_months_est": 8.0,
+      "npv_36m_per_person_vnd": 56921799.52642675,
       "quadrant": "Q1: Quick Wins (Reskill First)"
     },
     {
@@ -79,8 +80,8 @@
       "effective_time_saved_share": 0.10379268292682928,
       "realizable_hours_per_month": 2441.2039024390247,
       "monthly_value_gain_vnd": 261557560.97560978,
-      "payback_months_est": 13.0,
-      "npv_36m_per_person_vnd": 25463518.692518227,
+      "payback_months_est": 17.0,
+      "npv_36m_per_person_vnd": 16372730.678635744,
       "quadrant": "Q1: Quick Wins (Reskill First)"
     },
     {
@@ -99,8 +100,8 @@
       "effective_time_saved_share": 0.1606551724137931,
       "realizable_hours_per_month": 5937.815172413792,
       "monthly_value_gain_vnd": 477145862.0689655,
-      "payback_months_est": 11.0,
-      "npv_36m_per_person_vnd": 34540024.00552796,
+      "payback_months_est": 12.0,
+      "npv_36m_per_person_vnd": 25225932.406218722,
       "quadrant": "Q1: Quick Wins (Reskill First)"
     },
     {
@@ -120,7 +121,7 @@
       "realizable_hours_per_month": 2576.861538461538,
       "monthly_value_gain_vnd": 176392307.69230768,
       "payback_months_est": NaN,
-      "npv_36m_per_person_vnd": -4319972.2171381395,
+      "npv_36m_per_person_vnd": -12678015.625327636,
       "quadrant": "Q3: Selective Task Pilot"
     },
     {
@@ -140,7 +141,7 @@
       "realizable_hours_per_month": 82.6,
       "monthly_value_gain_vnd": 4179166.6666666665,
       "payback_months_est": NaN,
-      "npv_36m_per_person_vnd": -18332728.554476317,
+      "npv_36m_per_person_vnd": -26346024.879517622,
       "quadrant": "Q4: Shielded / Low AI Priority"
     },
     {
@@ -160,7 +161,7 @@
       "realizable_hours_per_month": 668.6916923076923,
       "monthly_value_gain_vnd": 47763692.30769231,
       "payback_months_est": NaN,
-      "npv_36m_per_person_vnd": -12923557.99954759,
+      "npv_36m_per_person_vnd": -21069932.76584415,
       "quadrant": "Q4: Shielded / Low AI Priority"
     },
     {
@@ -180,7 +181,7 @@
       "realizable_hours_per_month": 798.1292307692306,
       "monthly_value_gain_vnd": 52258461.53846153,
       "payback_months_est": NaN,
-      "npv_36m_per_person_vnd": -11226951.974689508,
+      "npv_36m_per_person_vnd": -19415067.278268017,
       "quadrant": "Q4: Shielded / Low AI Priority"
     },
     {
@@ -200,7 +201,7 @@
       "realizable_hours_per_month": 525.9927272727272,
       "monthly_value_gain_vnd": 25047272.727272723,
       "payback_months_est": NaN,
-      "npv_36m_per_person_vnd": -20147521.639394395,
+      "npv_36m_per_person_vnd": -28116169.744807705,
       "quadrant": "Q4: Shielded / Low AI Priority"
     }
   ],
@@ -213,336 +214,410 @@
     "n_trained": 520,
     "targeted_monthly_payroll_vnd": 9970000000.0,
     "upfront_investment_vnd": 7175999999.999999,
-    "pv_operating_net_vnd": 29065354441.87053,
-    "npv_reskill_vnd": 21889354441.87053,
-    "roi_pct": 305.035597016033,
-    "payback_months": 10,
-    "breakeven_productivity_lift_pct": 5.346148974451188,
-    "expected_effective_lift_pct": 12.616815110560042,
+    "pv_operating_net_vnd": 24125375348.605396,
+    "npv_reskill_vnd": 16949375348.605396,
+    "roi_pct": 236.19530864834726,
+    "payback_months": 11,
+    "breakeven_productivity_lift_pct": 6.844988814204543,
+    "expected_effective_lift_pct": 12.3064114966475,
+    "pv_attrition_backfill_vnd": 2393854128.8590584,
+    "pv_refresh_cost_vnd": 1611611592.7598386,
     "monthly_schedule": [
       {
         "month": 1,
         "ramp_factor": 0.3333,
-        "gross_benefit_vnd": 419298822.17,
+        "gross_benefit_vnd": 408983075.41,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 133298822.17,
-        "discounted_cashflow_vnd": 132244287.65,
-        "cumulative_discounted_cf_vnd": -7043755712.35
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 46223666.08,
+        "discounted_cashflow_vnd": 45857988.05,
+        "cumulative_discounted_cf_vnd": -7130142011.95
       },
       {
         "month": 2,
         "ramp_factor": 0.6667,
-        "gross_benefit_vnd": 838597644.35,
+        "gross_benefit_vnd": 817966150.81,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 552597644.35,
-        "discounted_cashflow_vnd": 543888966.14,
-        "cumulative_discounted_cf_vnd": -6499866746.21
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 455206741.49,
+        "discounted_cashflow_vnd": 448032897.97,
+        "cumulative_discounted_cf_vnd": -6682109113.98
       },
       {
         "month": 3,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 949012279.48,
-        "cumulative_discounted_cf_vnd": -5550854466.73
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 843841680.96,
+        "cumulative_discounted_cf_vnd": -5838267433.02
       },
       {
         "month": 4,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 941504589.67,
-        "cumulative_discounted_cf_vnd": -4609349877.06
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 837166001.7,
+        "cumulative_discounted_cf_vnd": -5001101431.32
       },
       {
         "month": 5,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 934056293.61,
-        "cumulative_discounted_cf_vnd": -3675293583.45
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 830543134.12,
+        "cumulative_discounted_cf_vnd": -4170558297.2
       },
       {
         "month": 6,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 926666921.45,
-        "cumulative_discounted_cf_vnd": -2748626662.0
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 823972660.42,
+        "cumulative_discounted_cf_vnd": -3346585636.78
       },
       {
         "month": 7,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 919336007.03,
-        "cumulative_discounted_cf_vnd": -1829290654.97
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 817454166.1,
+        "cumulative_discounted_cf_vnd": -2529131470.68
       },
       {
         "month": 8,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 912063087.89,
-        "cumulative_discounted_cf_vnd": -917227567.09
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 810987239.96,
+        "cumulative_discounted_cf_vnd": -1718144230.72
       },
       {
         "month": 9,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 904847705.22,
-        "cumulative_discounted_cf_vnd": -12379861.87
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 804571474.04,
+        "cumulative_discounted_cf_vnd": -913572756.68
       },
       {
         "month": 10,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 897689403.85,
-        "cumulative_discounted_cf_vnd": 885309541.98
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 798206463.61,
+        "cumulative_discounted_cf_vnd": -115366293.06
       },
       {
         "month": 11,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 890587732.21,
-        "cumulative_discounted_cf_vnd": 1775897274.19
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 791891807.14,
+        "cumulative_discounted_cf_vnd": 676525514.07
       },
       {
         "month": 12,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 883542242.29,
-        "cumulative_discounted_cf_vnd": 2659439516.48
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 785627106.27,
+        "cumulative_discounted_cf_vnd": 1462152620.34
       },
       {
         "month": 13,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 876552489.65,
-        "cumulative_discounted_cf_vnd": 3535992006.13
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 936000000.0,
+        "net_cashflow_vnd": -71810183.11,
+        "discounted_cashflow_vnd": -64765535.17,
+        "cumulative_discounted_cf_vnd": 1397387085.17
       },
       {
         "month": 14,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 869618033.33,
-        "cumulative_discounted_cf_vnd": 4405610039.46
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 773245993.66,
+        "cumulative_discounted_cf_vnd": 2170633078.83
       },
       {
         "month": 15,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 862738435.89,
-        "cumulative_discounted_cf_vnd": 5268348475.35
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 767128800.88,
+        "cumulative_discounted_cf_vnd": 2937761879.71
       },
       {
         "month": 16,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 855913263.33,
-        "cumulative_discounted_cf_vnd": 6124261738.68
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 761060001.55,
+        "cumulative_discounted_cf_vnd": 3698821881.26
       },
       {
         "month": 17,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 849142085.1,
-        "cumulative_discounted_cf_vnd": 6973403823.78
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 755039212.84,
+        "cumulative_discounted_cf_vnd": 4453861094.09
       },
       {
         "month": 18,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 842424474.05,
-        "cumulative_discounted_cf_vnd": 7815828297.83
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 749066054.92,
+        "cumulative_discounted_cf_vnd": 5202927149.02
       },
       {
         "month": 19,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 835760006.39,
-        "cumulative_discounted_cf_vnd": 8651588304.22
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 743140151.0,
+        "cumulative_discounted_cf_vnd": 5946067300.02
       },
       {
         "month": 20,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 829148261.71,
-        "cumulative_discounted_cf_vnd": 9480736565.93
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 737261127.24,
+        "cumulative_discounted_cf_vnd": 6683328427.26
       },
       {
         "month": 21,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 822588822.92,
-        "cumulative_discounted_cf_vnd": 10303325388.85
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 731428612.77,
+        "cumulative_discounted_cf_vnd": 7414757040.02
       },
       {
         "month": 22,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 816081276.23,
-        "cumulative_discounted_cf_vnd": 11119406665.08
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 725642239.65,
+        "cumulative_discounted_cf_vnd": 8140399279.67
       },
       {
         "month": 23,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 809625211.1,
-        "cumulative_discounted_cf_vnd": 11929031876.18
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 719901642.85,
+        "cumulative_discounted_cf_vnd": 8860300922.52
       },
       {
         "month": 24,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 803220220.27,
-        "cumulative_discounted_cf_vnd": 12732252096.45
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 714206460.24,
+        "cumulative_discounted_cf_vnd": 9574507382.77
       },
       {
         "month": 25,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 796865899.68,
-        "cumulative_discounted_cf_vnd": 13529117996.13
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 936000000.0,
+        "net_cashflow_vnd": -71810183.11,
+        "discounted_cashflow_vnd": -58877759.24,
+        "cumulative_discounted_cf_vnd": 9515629623.52
       },
       {
         "month": 26,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 790561848.48,
-        "cumulative_discounted_cf_vnd": 14319679844.61
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 702950903.33,
+        "cumulative_discounted_cf_vnd": 10218580526.85
       },
       {
         "month": 27,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 784307668.99,
-        "cumulative_discounted_cf_vnd": 15103987513.6
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 697389818.98,
+        "cumulative_discounted_cf_vnd": 10915970345.83
       },
       {
         "month": 28,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 778102966.67,
-        "cumulative_discounted_cf_vnd": 15882090480.26
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 691872728.68,
+        "cumulative_discounted_cf_vnd": 11607843074.51
       },
       {
         "month": 29,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 771947350.09,
-        "cumulative_discounted_cf_vnd": 16654037830.36
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 686399284.4,
+        "cumulative_discounted_cf_vnd": 12294242358.9
       },
       {
         "month": 30,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 765840430.95,
-        "cumulative_discounted_cf_vnd": 17419878261.31
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 680969140.84,
+        "cumulative_discounted_cf_vnd": 12975211499.74
       },
       {
         "month": 31,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 759781823.99,
-        "cumulative_discounted_cf_vnd": 18179660085.3
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 675581955.46,
+        "cumulative_discounted_cf_vnd": 13650793455.2
       },
       {
         "month": 32,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 753771147.01,
-        "cumulative_discounted_cf_vnd": 18933431232.31
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 670237388.4,
+        "cumulative_discounted_cf_vnd": 14321030843.6
       },
       {
         "month": 33,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 747808020.84,
-        "cumulative_discounted_cf_vnd": 19681239253.15
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 664935102.52,
+        "cumulative_discounted_cf_vnd": 14985965946.11
       },
       {
         "month": 34,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 741892069.3,
-        "cumulative_discounted_cf_vnd": 20423131322.45
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 659674763.32,
+        "cumulative_discounted_cf_vnd": 15645640709.43
       },
       {
         "month": 35,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 736022919.18,
-        "cumulative_discounted_cf_vnd": 21159154241.63
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 654456038.96,
+        "cumulative_discounted_cf_vnd": 16300096748.38
       },
       {
         "month": 36,
         "ramp_factor": 1.0,
-        "gross_benefit_vnd": 1257896466.52,
+        "gross_benefit_vnd": 1226949226.22,
         "ai_license_cost_vnd": 286000000.0,
-        "net_cashflow_vnd": 971896466.52,
-        "discounted_cashflow_vnd": 730200200.24,
-        "cumulative_discounted_cf_vnd": 21889354441.87
+        "backfill_retrain_cost_vnd": 76759409.32,
+        "refresh_cost_vnd": 0.0,
+        "net_cashflow_vnd": 864189816.89,
+        "discounted_cashflow_vnd": 649278600.22,
+        "cumulative_discounted_cf_vnd": 16949375348.61
       }
     ]
   },
@@ -550,46 +625,47 @@
     "cut_headcount": 34,
     "upfront_severance_friction_vnd": 1894000000.0,
     "monthly_payroll_saved_vnd": 473500000.0,
-    "npv_vnd": 4049891572.824888,
-    "roi_pct": 213.82743256731197,
-    "payback_months": 22,
+    "survivor_monthly_ai_gain_full_vnd": 207038935.37088162,
+    "npv_vnd": 13962569529.641825,
+    "roi_pct": 737.200080762504,
+    "payback_months": 6,
     "cumulative_discounted_cf": [
-      -2348128713.86,
-      -2798664789.79,
-      -3245636649.34,
-      -3689072489.23,
-      -4129000283.11,
-      -4565447783.34,
-      -4243976975.75,
-      -3925049341.89,
-      -3608644762.59,
-      -3294743277.81,
-      -2983325085.42,
-      -2674370539.97,
-      -2367860151.39,
-      -2063774583.84,
-      -1762094654.4,
-      -1462801331.95,
-      -1165875735.9,
-      -871299135.03,
-      -579052946.31,
-      -289118733.72,
-      -1478207.08,
-      283886779.09,
-      566994226.71,
-      847861995.31,
-      1126507803.1,
-      1402949228.15,
-      1677203709.45,
-      1949288548.04,
-      2219220908.09,
-      2487017817.97,
-      2752696171.35,
-      3016272728.25,
-      3277764116.11,
-      3537186830.81,
-      3794557237.74,
-      4049891572.82
+      -1640043594.81,
+      -1354133569.87,
+      -1036791392.77,
+      -688532280.22,
+      -309865264.26,
+      98706742.08,
+      616019755.82,
+      1129240277.04,
+      1638400681.7,
+      2143533089.6,
+      2644669366.45,
+      3141841125.88,
+      3635079731.4,
+      4124416298.42,
+      4609881696.19,
+      5091506549.74,
+      5569321241.83,
+      6043355914.88,
+      6513640472.81,
+      6980204583.02,
+      7443077678.16,
+      7902288958.07,
+      8357867391.57,
+      8809841718.33,
+      9258240450.62,
+      9703091875.18,
+      10144424054.97,
+      10582264830.92,
+      11016641823.74,
+      11447582435.6,
+      11875113851.9,
+      12299263043.0,
+      12720056765.85,
+      13137521565.77,
+      13551683778.05,
+      13962569529.64
     ],
     "cut_by_isco1": [
       {
@@ -657,6 +733,53 @@
       }
     ]
   },
+  "hybrid": {
+    "upfront_investment_vnd": 6720600000.0,
+    "n_initially_reskilled": 487,
+    "frozen_attrition_seats": 33,
+    "severance_cost_vnd": 0.0,
+    "npv_vnd": 28295607904.28331,
+    "roi_pct": 421.02800202784437,
+    "payback_months": 8,
+    "cumulative_discounted_cf": [
+      -6622527029.08,
+      -6081377006.35,
+      -5109682338.65,
+      -4106284475.69,
+      -3072381567.32,
+      -2009139500.97,
+      -917692704.83,
+      200855068.48,
+      1345429977.34,
+      2511904008.74,
+      3669149998.1,
+      4817240949.0,
+      5165644589.44,
+      6295642168.52,
+      7416700272.84,
+      8528889623.11,
+      9632280380.52,
+      10726942151.26,
+      11812943990.82,
+      12890354408.41,
+      13959241371.25,
+      15019672308.89,
+      16071714117.4,
+      17115433163.67,
+      17432163745.89,
+      18459434272.32,
+      19478578003.53,
+      20489659231.04,
+      21492741737.78,
+      22487888802.09,
+      23475163201.69,
+      24454627217.68,
+      25426342638.45,
+      26390370763.57,
+      27346772407.67,
+      28295607904.28
+    ]
+  },
   "status_quo_curve": [
     0.0,
     0.0,
@@ -700,42 +823,61 @@
       "strategy": "A. Status Quo (Giữ nguyên hiện trạng)",
       "upfront_cost_vnd": 0.0,
       "npv_36m_vnd": 0.0,
-      "opportunity_cost_vnd": -21889354441.87053,
+      "opportunity_cost_vnd": -28295607904.28331,
       "roi_pct": 0.0,
       "payback_months": null,
-      "headcount_impact": "0 nhân sự cắt giảm; rủi ro tụt năng suất"
+      "headcount_impact": "0 cắt giảm; mất cơ hội năng suất"
     },
     {
-      "strategy": "B. Cut & Replace (Cắt giảm theo tự động hóa)",
+      "strategy": "B. Fair Cut & Replace (Cắt giảm + Survivor AI)",
       "upfront_cost_vnd": 1894000000.0,
-      "npv_36m_vnd": 4049891572.824888,
+      "npv_36m_vnd": 13962569529.641825,
       "opportunity_cost_vnd": 0.0,
-      "roi_pct": 213.82743256731197,
-      "payback_months": 22,
-      "headcount_impact": "-34 nhân sự (khóa HITL được bảo vệ)"
+      "roi_pct": 737.200080762504,
+      "payback_months": 6,
+      "headcount_impact": "-34 NV (tổn thất bàn giao tỷ lệ; survivor dùng AI)"
     },
     {
-      "strategy": "C. Targeted Reskilling + AI (Khuyến nghị BA)",
+      "strategy": "C. Targeted Reskilling + AI (Bao gồm Attrition & Refresh)",
       "upfront_cost_vnd": 7175999999.999999,
-      "npv_36m_vnd": 21889354441.87053,
+      "npv_36m_vnd": 16949375348.605396,
       "opportunity_cost_vnd": 0.0,
-      "roi_pct": 305.035597016033,
-      "payback_months": 10,
-      "headcount_impact": "Đào tạo lại 520 nhân sự; giữ tri thức vận hành"
+      "roi_pct": 236.19530864834726,
+      "payback_months": 11,
+      "headcount_impact": "Đào tạo 520 NV + bù nghỉ việc 18%/năm"
+    },
+    {
+      "strategy": "D. Hybrid (Reskill Aug. + Đóng băng tuyển bù Tự động hóa)",
+      "upfront_cost_vnd": 6720600000.0,
+      "npv_36m_vnd": 28295607904.28331,
+      "opportunity_cost_vnd": 0.0,
+      "roi_pct": 421.02800202784437,
+      "payback_months": 8,
+      "headcount_impact": "Không sa thải (0 đền bù); đóng băng bù tự nhiên tối đa 33 ghế Auto"
     }
   ],
   "monte_carlo": {
     "n_sims": 1000,
     "seed": 42,
-    "p10_npv_vnd": 11059913844.76695,
-    "p50_npv_vnd": 21775302466.332615,
-    "p90_npv_vnd": 33505909166.07053,
-    "mean_npv_vnd": 21952800542.264282,
-    "prob_npv_positive_pct": 100.0,
-    "prob_reskill_beats_cut_pct": 99.0,
-    "p10_cut_npv_vnd": 3371586059.3605714,
-    "p50_cut_npv_vnd": 4217706855.028552,
-    "p90_cut_npv_vnd": 5044117005.42704
+    "correlations": {
+      "adoption_realization": 0.65,
+      "realization_attrition": -0.35
+    },
+    "p10_npv_vnd": 3727482823.2590594,
+    "p50_npv_vnd": 16603115057.721506,
+    "p90_npv_vnd": 31326771847.211437,
+    "cvar_5pct_vnd": -1801110947.2033477,
+    "uncorrelated_p10_npv_vnd": 5625881954.248481,
+    "mean_npv_vnd": 17215951725.80227,
+    "prob_npv_positive_pct": 96.0,
+    "prob_reskill_beats_cut_pct": 62.2,
+    "prob_hybrid_beats_cut_pct": 98.1,
+    "p10_cut_npv_vnd": 11570702527.631258,
+    "p50_cut_npv_vnd": 14099847178.924421,
+    "p90_cut_npv_vnd": 16671916854.311537,
+    "p10_hybrid_npv_vnd": 15590892017.551367,
+    "p50_hybrid_npv_vnd": 27789485997.14987,
+    "p90_hybrid_npv_vnd": 41604743157.1316
   },
   "gender_audit": {
     "vnm_lfs_reference_year": 2024,
@@ -757,30 +899,120 @@
       "9": 48.75
     }
   },
+  "macro_priors": {
+    "VNM": {
+      "iso3": "VNM",
+      "country_name": "Viet Nam",
+      "aui_global": 0.8604789993877846,
+      "devs_per_10k_wap": 401.65650815102777,
+      "lmic_tech_composite_pct": 77.1,
+      "adoption_multiplier_prior": 0.66,
+      "macro_beta_post2022": 0.15024090289134376,
+      "replacement_cost_months_prior": 4.6
+    },
+    "PHL": {
+      "iso3": "PHL",
+      "country_name": "Philippines",
+      "aui_global": 0.6426744526728776,
+      "devs_per_10k_wap": 326.50341833728027,
+      "lmic_tech_composite_pct": 68.7,
+      "adoption_multiplier_prior": 0.62,
+      "macro_beta_post2022": 0.15024090289134376,
+      "replacement_cost_months_prior": 4.6
+    },
+    "IDN": {
+      "iso3": "IDN",
+      "country_name": "Indonesia",
+      "aui_global": 0.5136967725675057,
+      "devs_per_10k_wap": 251.24500873950183,
+      "lmic_tech_composite_pct": 56.6,
+      "adoption_multiplier_prior": 0.58,
+      "macro_beta_post2022": 0.15024090289134376,
+      "replacement_cost_months_prior": 4.6
+    },
+    "THA": {
+      "iso3": "THA",
+      "country_name": "Thailand",
+      "aui_global": 1.3617323948699818,
+      "devs_per_10k_wap": 288.53048584031075,
+      "lmic_tech_composite_pct": 75.9,
+      "adoption_multiplier_prior": 0.65,
+      "macro_beta_post2022": 0.15024090289134376,
+      "replacement_cost_months_prior": 4.6
+    },
+    "IND": {
+      "iso3": "IND",
+      "country_name": "India",
+      "aui_global": 0.3822856025965304,
+      "devs_per_10k_wap": 245.346186868946,
+      "lmic_tech_composite_pct": 50.6,
+      "adoption_multiplier_prior": 0.55,
+      "macro_beta_post2022": 0.15024090289134376,
+      "replacement_cost_months_prior": 4.6
+    }
+  },
+  "presets_summary": {
+    "reference_bpo_1000": {
+      "label": "Doanh nghiệp Mẫu Dịch vụ / BPO VN (1.000 NV)",
+      "source_note": "Hồ sơ chuẩn tham chiếu BA (lương thị trường VN 2025 theo ISCO-08; ISCO distribution giả lập 1.000 NV).",
+      "total_headcount": 1000,
+      "high_exposure_payroll_pct": 71.09634551495017,
+      "npv_cut_vnd": 13962569529.641825,
+      "npv_reskill_vnd": 16949375348.605396,
+      "npv_hybrid_vnd": 28295607904.28331,
+      "reskill_payback_months": 11,
+      "hybrid_payback_months": 8
+    },
+    "fpt_tech_services_2025": {
+      "label": "FPT-Calibrated Tech & Services (54.110 NV, FY2025)",
+      "source_note": "Tổng biên chế 54.110 NV & chi phí nhân sự bình quân ~571,6 triệu VNĐ/năm (~47,6 triệu/tháng) theo Báo cáo thường niên FPT FY2025; phân bổ chi tiết theo 9 mã ISCO-1 được hiệu chuẩn theo cơ cấu ngành CNTT-Viễn thông.",
+      "total_headcount": 54110,
+      "high_exposure_payroll_pct": 92.67574451451934,
+      "npv_cut_vnd": 1811163328441.1885,
+      "npv_reskill_vnd": 5837292382642.176,
+      "npv_hybrid_vnd": 6432312464289.435,
+      "reskill_payback_months": 4,
+      "hybrid_payback_months": 4
+    },
+    "techcombank_banking_2025": {
+      "label": "Techcombank-Calibrated Banking (12.705 NV, FY2025)",
+      "source_note": "Tổng biên chế hợp nhất cuối năm 2025 (12.705 NV) & thu nhập bình quân tổng gói ~47,5 triệu VNĐ/tháng theo BCTC Kiểm toán Techcombank FY2025; phân bổ 9 mã ISCO-1 hiệu chuẩn theo cơ cấu ngân hàng.",
+      "total_headcount": 12705,
+      "high_exposure_payroll_pct": 91.98937182170759,
+      "npv_cut_vnd": 642627173271.223,
+      "npv_reskill_vnd": 1342244812503.838,
+      "npv_hybrid_vnd": 1706410240302.979,
+      "reskill_payback_months": 4,
+      "hybrid_payback_months": 4
+    }
+  },
   "scenario_sensitivity": {
     "conservative": {
       "adoption_multiplier": 0.35,
-      "npv_reskill_vnd": 6062403793.393418,
-      "roi_pct": 84.48165821339771,
-      "payback_months": 20,
-      "breakeven_lift_pct": 5.346148974451188,
-      "npv_cut_vnd": -457230007.67385364
+      "npv_reskill_vnd": 1511805271.6475554,
+      "roi_pct": 21.06752050790908,
+      "payback_months": 31,
+      "breakeven_lift_pct": 6.844988814204543,
+      "npv_cut_vnd": 7289522359.894944,
+      "npv_hybrid_vnd": 9697846367.965864
     },
     "base": {
       "adoption_multiplier": 0.6,
-      "npv_reskill_vnd": 21889354441.87053,
-      "roi_pct": 305.035597016033,
-      "payback_months": 10,
-      "breakeven_lift_pct": 5.346148974451188,
-      "npv_cut_vnd": 4049891572.824888
+      "npv_reskill_vnd": 16949375348.605396,
+      "roi_pct": 236.19530864834726,
+      "payback_months": 11,
+      "breakeven_lift_pct": 6.844988814204543,
+      "npv_cut_vnd": 13962569529.641825,
+      "npv_hybrid_vnd": 28295607904.28331
     },
     "accelerated": {
       "adoption_multiplier": 0.85,
-      "npv_reskill_vnd": 37716305090.347626,
-      "roi_pct": 525.5895358186682,
+      "npv_reskill_vnd": 32386945425.56324,
+      "roi_pct": 451.32309678878545,
       "payback_months": 7,
-      "breakeven_lift_pct": 5.346148974451188,
-      "npv_cut_vnd": 4547824100.856435
+      "breakeven_lift_pct": 6.844988814204543,
+      "npv_cut_vnd": 16899553898.059563,
+      "npv_hybrid_vnd": 42952456458.03009
     }
   }
 }

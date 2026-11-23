@@ -7,10 +7,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import duckdb
-import pandas as pd
 
 from src.etl.common import PROJECT_ROOT, get_lmics_metadata, load_pipeline_config
-
 
 SQL_FILES = [
     "sql/01_staging_harmonize.sql",
@@ -45,6 +43,8 @@ def run() -> dict:
         _register_parquet_table(con, "raw_ilo_exposure_isco4", processed_dir / "ilo_exposure_isco4.parquet")
         _register_parquet_table(con, "raw_ilostat_lfs", processed_dir / "ilostat_lfs_lmics.parquet")
         _register_parquet_table(con, "raw_ilostat_modeled", processed_dir / "ilostat_modeled_lmics.parquet")
+        _register_parquet_table(con, "raw_ilostat_age_ocu", processed_dir / "ilostat_age_ocu_lmics.parquet")
+        _register_parquet_table(con, "raw_ilostat_hours_ocu", processed_dir / "ilostat_hours_ocu_lmics.parquet")
         _register_parquet_table(con, "raw_wdi_macro", processed_dir / "wdi_lmics_macro.parquet")
         _register_parquet_table(con, "raw_wdi_world_wap", processed_dir / "wdi_world_wap.parquet")
         _register_parquet_table(con, "raw_github_annual", processed_dir / "github_annual_lmics.parquet")
@@ -63,6 +63,12 @@ def run() -> dict:
         )
         con.execute(
             f"COPY mart_panel_causal_modeled TO '{str(processed_dir / 'mart_panel_causal_modeled.csv').replace(chr(39), chr(39)*2)}' (HEADER, DELIMITER ',');"
+        )
+        con.execute(
+            f"COPY mart_panel_youth_ocu TO '{str(processed_dir / 'mart_panel_youth_ocu.csv').replace(chr(39), chr(39)*2)}' (HEADER, DELIMITER ',');"
+        )
+        con.execute(
+            f"COPY mart_panel_hours_ocu TO '{str(processed_dir / 'mart_panel_hours_ocu.csv').replace(chr(39), chr(39)*2)}' (HEADER, DELIMITER ',');"
         )
 
         # Export lightweight CSV snapshots (<200 KB) for GitHub & Streamlit Community Cloud
@@ -151,10 +157,40 @@ def run() -> dict:
             ORDER BY e.iso3
         """).df().to_dict(orient="records")
 
+        dup_youth = con.execute("""
+            SELECT COUNT(*) FROM (
+                SELECT iso3, age_group, isco1, sex, year, COUNT(*) AS c
+                FROM mart_panel_youth_ocu
+                GROUP BY 1,2,3,4,5
+                HAVING COUNT(*) > 1
+            )
+        """).fetchone()[0]
+
+        dup_hours = con.execute("""
+            SELECT COUNT(*) FROM (
+                SELECT iso3, isco1, sex, year, COUNT(*) AS c
+                FROM mart_panel_hours_ocu
+                GROUP BY 1,2,3,4
+                HAVING COUNT(*) > 1
+            )
+        """).fetchone()[0]
+
+        youth_stats = con.execute("""
+            SELECT COUNT(*), COUNT(DISTINCT iso3), MIN(year), MAX(year)
+            FROM mart_panel_youth_ocu
+        """).fetchone()
+
+        hours_stats = con.execute("""
+            SELECT COUNT(*), COUNT(DISTINCT iso3), MIN(year), MAX(year)
+            FROM mart_panel_hours_ocu
+        """).fetchone()
+
         summary = {
             "built_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
             "duckdb_path": str(db_path.relative_to(PROJECT_ROOT)),
             "duplicate_primary_keys_lfs": int(dup_check),
+            "duplicate_primary_keys_youth": int(dup_youth),
+            "duplicate_primary_keys_hours": int(dup_hours),
             "mart_panel_causal_lfs": {
                 "total_rows": int(lfs_stats[0]),
                 "rows_sex_total": int(lfs_stats[1]),
@@ -167,6 +203,18 @@ def run() -> dict:
                 "rows_sex_total": int(mod_stats[1]),
                 "total_countries_count": int(mod_stats[2]),
                 "rows_sex_total_matched_lfs": int(mod_stats[3]),
+            },
+            "mart_panel_youth_ocu": {
+                "total_rows": int(youth_stats[0]),
+                "eligible_countries_count": int(youth_stats[1]),
+                "min_year": int(youth_stats[2]) if youth_stats[2] is not None else None,
+                "max_year": int(youth_stats[3]) if youth_stats[3] is not None else None,
+            },
+            "mart_panel_hours_ocu": {
+                "total_rows": int(hours_stats[0]),
+                "eligible_countries_count": int(hours_stats[1]),
+                "min_year": int(hours_stats[2]) if hours_stats[2] is not None else None,
+                "max_year": int(hours_stats[3]) if hours_stats[3] is not None else None,
             },
             "eligible_lfs_countries": eligible_list,
             "vietnam_gender_exposure": vnm_gender[0] if vnm_gender else None,

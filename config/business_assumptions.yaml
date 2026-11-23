@@ -56,6 +56,14 @@ financial_assumptions:
   replacement_cost_months_salary: 4.0    # Chi phí đền bù nghỉ việc + tuyển mới + thời gian làm quen (tính theo tháng lương)
   realization_rate: 0.50                 # Tỷ lệ giờ tiết kiệm thực tế chuyển hóa thành giá trị kinh doanh (thận trọng 50%)
   productivity_ramp_months: 3            # Số tháng làm quen công cụ trước khi đạt năng suất ổn định
+  annual_attrition_rate: 0.18            # Tỷ lệ nghỉ việc tự nhiên hàng năm (18%/năm - thực tế ngành BPO/Tech VN)
+  backfill_retrain_cost_ratio: 0.75      # Chi phí đào tạo lại cho nhân sự tuyển bù người nghỉ việc (tỷ lệ trên reskilling_cost)
+  annual_refresh_cost_pct: 0.15          # Chi phí cập nhật kỹ năng & công cụ AI hàng năm (% trên chi phí đào tạo năm đầu)
+  handover_disruption_months_per_cut: 1.5 # Tổn thất bàn giao quy trình tương ứng với quỹ lương bị cắt giảm (tháng lương bị cắt)
+  untrained_ai_realization_ratio: 0.35   # Hiệu suất khai thác AI tự học của nhân sự ở lại khi KHÔNG tái đào tạo bài bản (35%)
+  survivor_ai_seat_coverage: 0.50        # Tỷ trọng nhân sự ở lại trong phương án Cut & Replace được cấp license AI (50%)
+  monte_carlo_corr_adoption_realization: 0.65 # Tương quan đồng biến (Gaussian Copula) giữa tốc độ áp dụng & hiện thực hóa
+  monte_carlo_corr_realization_attrition: -0.35 # Tương quan nghịch giữa hiện thực hóa năng suất & tỷ lệ nghỉ việc
 
 adoption_scenarios:
   conservative:
@@ -70,6 +78,80 @@ adoption_scenarios:
     label: "Tăng tốc (Accelerated)"
     adoption_multiplier: 0.85
     description: "Triển khai đồng bộ AI Agents + tái thiết kế quy trình liên phòng ban."
+
+enterprise_presets:
+  reference_bpo_1000:
+    label: "Doanh nghiệp Mẫu Dịch vụ / BPO VN (1.000 NV)"
+    source_note: "Hồ sơ chuẩn tham chiếu BA (lương thị trường VN 2025 theo ISCO-08; ISCO distribution giả lập 1.000 NV)."
+    total_headcount: 1000
+    isco1_weights:
+      "1": 0.04
+      "2": 0.16
+      "3": 0.14
+      "4": 0.22
+      "5": 0.20
+      "6": 0.01
+      "7": 0.08
+      "8": 0.08
+      "9": 0.07
+    monthly_salary_vnd:
+      "1": 45000000
+      "2": 28000000
+      "3": 18000000
+      "4": 13500000
+      "5": 11500000
+      "6": 8500000
+      "7": 12000000
+      "8": 11000000
+      "9": 8000000
+  fpt_tech_services_2025:
+    label: "FPT-Calibrated Tech & Services (54.110 NV, FY2025)"
+    source_note: "Tổng biên chế 54.110 NV & chi phí nhân sự bình quân ~571,6 triệu VNĐ/năm (~47,6 triệu/tháng) theo Báo cáo thường niên FPT FY2025; phân bổ chi tiết theo 9 mã ISCO-1 được hiệu chuẩn theo cơ cấu ngành CNTT-Viễn thông."
+    total_headcount: 54110
+    isco1_weights:
+      "1": 0.04
+      "2": 0.48
+      "3": 0.22
+      "4": 0.11
+      "5": 0.08
+      "6": 0.00
+      "7": 0.03
+      "8": 0.02
+      "9": 0.02
+    monthly_salary_vnd:
+      "1": 90400000
+      "2": 59570000
+      "3": 40420000
+      "4": 27660000
+      "5": 25530000
+      "6": 16000000
+      "7": 23400000
+      "8": 21270000
+      "9": 15960000
+  techcombank_banking_2025:
+    label: "Techcombank-Calibrated Banking (12.705 NV, FY2025)"
+    source_note: "Tổng biên chế hợp nhất cuối năm 2025 (12.705 NV) & thu nhập bình quân tổng gói ~47,5 triệu VNĐ/tháng theo BCTC Kiểm toán Techcombank FY2025; phân bổ 9 mã ISCO-1 hiệu chuẩn theo cơ cấu ngân hàng."
+    total_headcount: 12705
+    isco1_weights:
+      "1": 0.06
+      "2": 0.34
+      "3": 0.20
+      "4": 0.26
+      "5": 0.10
+      "6": 0.00
+      "7": 0.01
+      "8": 0.01
+      "9": 0.02
+    monthly_salary_vnd:
+      "1": 97210000
+      "2": 61400000
+      "3": 45020000
+      "4": 30700000
+      "5": 30700000
+      "6": 15350000
+      "7": 22510000
+      "8": 20470000
+      "9": 15350000
 
 governance_guardrails:
   human_in_the_loop_mandatory_isco2: ["11", "12", "22", "24", "26"]

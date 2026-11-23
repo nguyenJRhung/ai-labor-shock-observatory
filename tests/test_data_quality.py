@@ -70,8 +70,12 @@ def test_aui_matched_denominators_and_audit_notes() -> None:
 
     summary = json.loads((PROBES_DIR / "warehouse_summary.json").read_text(encoding="utf-8"))
     assert summary["duplicate_primary_keys_lfs"] == 0
+    assert summary["duplicate_primary_keys_youth"] == 0
+    assert summary["duplicate_primary_keys_hours"] == 0
     assert summary["mart_panel_causal_lfs"]["eligible_countries_count"] >= 45
     assert summary["mart_panel_causal_lfs"]["rows_sex_total"] > 0
+    assert summary["mart_panel_youth_ocu"]["eligible_countries_count"] >= 35
+    assert summary["mart_panel_hours_ocu"]["eligible_countries_count"] >= 35
     audit = summary["data_audit_notes"]
     assert audit["ind_eligibility"]["iso3"] == "IND"
     assert audit["ind_eligibility"]["is_eligible"] == 0

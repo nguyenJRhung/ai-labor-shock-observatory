@@ -26,10 +26,10 @@ Giai đoạn 2023–2026 chứng kiến làn sóng ứng dụng Generative AI v�
 ## 3. Phạm vi MVP 12 tuần (Scope Definition)
 
 ### Trong phạm vi (In-Scope)
-- **Dữ liệu mở 100% (0 đồng):** Tích hợp tự động 4 nguồn dữ liệu thực tế chuẩn quốc tế: ILO 2025 Refined GenAI Exposure (ISCO-08), ILOSTAT Actual LFS (kèm ILO Modeled để kiểm tra độ nhạy), Anthropic Economic Index (AEI), GitHub Innovation Graph và World Bank WDI.
-- **Kho dữ liệu cục bộ tái lập:** DuckDB + SQL staging/mart (`sql/`) chuẩn hóa bảng `Quốc gia × Nghề ISCO-08 × Giới tính × Năm`.
-- **Lõi Kinh tế lượng nhân quả (Model/Measure-Agnostic):** Continuous-Treatment Event Study (Saturated TWFE), Triple-Diff theo giới tính & mức độ sẵn sàng công nghệ, bộ 9 kiểm định phản bác & độ bền vững (*Placebo Date*, *Exposure Swap*, *Leave-One-Occupation-Out*, *No-COVID*, *Occupation Linear Trends*, *WLS & Alternative Outcomes*, *Balanced 2017–2024*, *Binary Clerical vs. Manual DiD*, *FWL Randomization Inference*), đối chiếu chéo `5/5` mô hình giữa Python (`pyfixest`) và R (`fixest`).
-- **Lớp nghiệp vụ BA & Delivery:** Tài liệu BRD, Cây KPI 3 tầng, mô hình tài chính `Reskilling ROI` (NPV, ROI, Payback, Break-even), cơ chế **Human-in-the-Loop** trên ứng dụng Streamlit deploy miễn phí.
+- **Dữ liệu mở 100% (0 đồng):** Tích hợp tự động 7 tập dữ liệu thực tế chuẩn quốc tế: ILO 2025 (Mean, IQR P25–P75, Task-Weighted, GPT-4o & Gemini), ILOSTAT Actual LFS + Youth `15–24` + Weekly Hours + ILO Modeled, Anthropic Economic Index (AEI), GitHub Innovation Graph và World Bank WDI (`WLD WAP`).
+- **Kho dữ liệu cục bộ tái lập:** DuckDB + SQL staging/mart (`sql/`) kèm `validators.py` chuẩn hóa bảng `Quốc gia × Nghề ISCO-08 × Giới tính/Độ tuổi × Năm`.
+- **Lõi Kinh tế lượng nhân quả (Model/Measure-Agnostic):** Continuous-Treatment Event Study (Saturated TWFE), Triple-Diff giới tính & tuổi trẻ, **14 kiểm định phản bác & độ bền vững** (bao gồm *Two-Way CRV1*, *Webb 6-point Wild Cluster Bootstrap (G=9)*, *Dose-Response*, *Youth 15–24 Margin* và *Weekly Hours Intensive Margin*), đối chiếu chéo **6/6 mô hình** giữa Python (`pyfixest`) và R (`fixest`).
+- **Lớp nghiệp vụ CFO-Grade BA & Delivery:** BRD, Cây KPI 3 tầng + Cầu nối Layer 2 $\rightarrow$ Layer 3, mô hình **Fair Cut vs. Reskilling (attrition `18%/năm`) vs. Hybrid Freeze**, **4×4 Gaussian Copula Monte Carlo (`CVaR 5%`)**, hồ sơ chuẩn **FPT / Techcombank FY2025**, và ứng dụng Streamlit 1-click deploy miễn phí.
 
 ### Ngoài phạm vi (Out-of-Scope)
 - Thu thập dữ liệu tin tuyển dụng thời gian thực bằng crawler trả phí hoặc vi phạm điều khoản nền tảng.
@@ -48,7 +48,7 @@ Giai đoạn 2023–2026 chứng kiến làn sóng ứng dụng Generative AI v�
 | **2. Kiến trúc linh hoạt** | **Model-Agnostic** | Tách 3 lớp Data (DuckDB/SQL) – Causal (`exposure_adapter.py`) – Business (`reskilling_roi.py`). | Giao diện adapter tập trung vào 3 bộ thước đo phơi nhiễm chính (ILO25, ILO23, AEI). |
 | | **End-to-End Reproducibility** | Chạy toàn bộ từ tải dữ liệu đến kiểm thử bằng `Makefile` & GitHub Actions CI. | Giới hạn cập nhật định kỳ theo lịch batch thay vì streaming thời gian thực. |
 | | **Unit Economics & Scalability** | Chi phí vận hành 0 đồng (DuckDB nhúng, dữ liệu Parquet nén, Streamlit Community Cloud). | Đánh giá chi phí mở rộng giả định khi tăng từ 1.000 lên 50.000 nhân sự trong Governance Card. |
-| **3. Độ tin cậy & Quản trị** | **Explainability & Auditability** | Phân rã đóng góp tới từng nhóm nghề ISCO, xuất đủ khoảng tin cậy 95% & 9 kiểm định phản bác / độ bền vững. | Bảng kiểm định trình bày cả dạng thống kê học thuật và tóm tắt dễ hiểu cho BA. |
+| **3. Độ tin cậy & Quản trị** | **Explainability & Auditability** | Phân rã đóng góp tới từng nhóm nghề ISCO, xuất đủ khoảng tin cậy 95% & 14 kiểm định phản bác / độ bền vững. | Bảng kiểm định trình bày cả dạng thống kê học thuật và tóm tắt dễ hiểu cho BA. |
 | | **Human-in-the-Loop** | Thanh trượt giả định (*Realization Rate*, tốc độ AI, lương) + nút khóa vai trò nhạy cảm pháp lý. | Lưu cấu hình kịch bản dạng JSON/YAML xuất báo cáo thay vì lưu DB người dùng đa tài khoản. |
 | | **Governance & Ethics** | Kiểm toán tác động bất cân xứng theo giới tính (*Gender Exposure Gap*); 100% dữ liệu tổng hợp không PII. | Kiểm soát thiên kiến ở cấp nhóm nghề/giới tính vĩ mô thay vì dữ liệu hồ sơ cá nhân. |
 | **4. Triển khai thực tế** | **Actionable Delivery** | Ứng dụng Streamlit 3 tab + Executive Policy Memo 2 trang cho lãnh đạo. | Deploy bản MVP công khai để nhà tuyển dụng và chuyên gia kiểm chứng trực tiếp. |

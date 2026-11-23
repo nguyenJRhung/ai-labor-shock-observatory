@@ -27,7 +27,7 @@ def test_causal_results_complete_and_finite() -> None:
     assert len(ref_rows) == 1
     assert ref_rows[0]["estimate"] == 0.0
 
-    # All 9 robustness blocks must exist and be finite
+    # All 14 robustness blocks must exist and be finite
     rob = res["robustness_checks"]
     expected_checks = {
         "1_placebo_2019",
@@ -39,6 +39,11 @@ def test_causal_results_complete_and_finite() -> None:
         "7_balanced_panel_2017_2024",
         "8_binary_clerical_vs_manual",
         "9_randomization_inference",
+        "10_aggregation_bounds_and_llm_raters",
+        "11_wild_cluster_bootstrap_and_twoway",
+        "12_dose_response_by_occupation",
+        "13_youth_vs_prime_age_margin",
+        "14_weekly_hours_intensive_margin",
     }
     assert expected_checks.issubset(set(rob.keys()))
     assert math.isfinite(rob["1_placebo_2019"]["estimate"])
@@ -55,18 +60,33 @@ def test_causal_results_complete_and_finite() -> None:
     assert 0.0 <= ri["continuous_ilo2025_9_groups"]["ri_two_sided_pvalue"] <= 1.0
     assert 0.0 <= ri["binary_clerical_vs_manual_4_groups"]["exact_ri_two_sided_pvalue"] <= 1.0
 
+    assert len(rob["10_aggregation_bounds_and_llm_raters"]) == 7
+    wcb = rob["11_wild_cluster_bootstrap_and_twoway"]
+    assert math.isfinite(wcb["twoway_iso3_isco1_cluster"]["se"])
+    assert 0.0 <= wcb["webb_wild_cluster_bootstrap"]["webb_wcb_two_sided_pvalue"] <= 1.0
+    dose = rob["12_dose_response_by_occupation"]
+    assert len(dose["by_occupation"]) == 9
+    assert math.isfinite(dose["spearman_exposure_vs_shift_rho"])
+    ym = rob["13_youth_vs_prime_age_margin"]
+    assert ym["youth_15_24_did"]["n_countries"] >= 35
+    assert math.isfinite(ym["triple_diff_youth_vs_prime"]["youth_differential"]["estimate"])
+    hm = rob["14_weekly_hours_intensive_margin"]
+    assert hm["ln_hours_did"]["n_countries"] >= 35
+    assert math.isfinite(hm["ln_hours_did"]["estimate"])
+
 
 def test_python_pyfixest_matches_r_fixest() -> None:
     r_ver = json.loads((PROBES_DIR / "r_fixest_verification.json").read_text(encoding="utf-8"))
     cmp = r_ver["python_vs_r_comparison"]
     assert cmp["available"] is True
-    assert cmp["models_verified_count"] == 5
+    assert cmp["models_verified_count"] == 6
     expected_models = {
         "event_study",
         "pooled_did",
         "occ_linear_trends",
         "binary_clerical_vs_manual",
         "triple_diff_gender",
+        "youth_triple_diff",
     }
     assert set(cmp["per_model_diffs"].keys()) == expected_models
     for m_name in expected_models:

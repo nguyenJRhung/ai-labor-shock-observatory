@@ -23,7 +23,12 @@ SELECT
     CAST(task_count AS INTEGER) AS task_count,
     CAST(exposure_2025 AS DOUBLE) AS exposure_2025,
     CAST(exposure_2025_median AS DOUBLE) AS exposure_2025_median,
+    CAST(exposure_2025_p25 AS DOUBLE) AS exposure_2025_p25,
+    CAST(exposure_2025_p75 AS DOUBLE) AS exposure_2025_p75,
     CAST(exposure_2025_sd AS DOUBLE) AS exposure_2025_sd,
+    CAST(task_score_2025_mean AS DOUBLE) AS task_score_2025_mean,
+    CAST(exposure_2025_gpt4o AS DOUBLE) AS exposure_2025_gpt4o,
+    CAST(exposure_2025_gemini AS DOUBLE) AS exposure_2025_gemini,
     CAST(exposure_2023 AS DOUBLE) AS exposure_2023,
     CAST(share_exposed_grad34 AS DOUBLE) AS share_exposed_grad34,
     CAST(share_exposed_grad12 AS DOUBLE) AS share_exposed_grad12,
@@ -262,3 +267,75 @@ SELECT
     END AS high_tech_readiness
 FROM combined cb
 CROSS JOIN med m;
+
+-- Khử trùng tất định bảng Nhóm tuổi x Nghề ISCO-08 (Youth 15-24 vs Prime-Age 25-54)
+CREATE OR REPLACE TABLE stg_ilostat_age_ocu AS
+WITH parsed AS (
+    SELECT
+        UPPER(TRIM(iso3)) AS iso3,
+        TRIM(age_group) AS age_group,
+        REPLACE(TRIM(classif1), 'OCU_ISCO08_', '') AS isco1,
+        UPPER(TRIM(sex)) AS sex,
+        CAST(year AS INTEGER) AS year,
+        TRIM(source) AS source,
+        CAST(obs_value AS DOUBLE) AS emp_thousands
+    FROM raw_ilostat_age_ocu
+    WHERE regexp_matches(TRIM(classif1), '^OCU_ISCO08_[1-9]$')
+      AND UPPER(TRIM(sex)) = 'SEX_T'
+      AND TRIM(age_group) IN ('AGE_AGGREGATE_Y15-24', 'AGE_AGGREGATE_Y25-54', 'AGE_AGGREGATE_Y55-64')
+      AND year BETWEEN 2015 AND 2025
+      AND obs_value > 0
+),
+source_span AS (
+    SELECT iso3, source, COUNT(DISTINCT year) AS span_years
+    FROM parsed
+    GROUP BY iso3, source
+),
+ranked AS (
+    SELECT
+        p.*,
+        ROW_NUMBER() OVER (
+            PARTITION BY p.iso3, p.age_group, p.isco1, p.year
+            ORDER BY COALESCE(s.span_years, 0) DESC, p.source ASC
+        ) AS rn
+    FROM parsed p
+    LEFT JOIN source_span s ON p.iso3 = s.iso3 AND p.source = s.source
+)
+SELECT iso3, age_group, isco1, sex, year, source, emp_thousands
+FROM ranked
+WHERE rn = 1;
+
+-- Khử trùng tất định bảng Giờ làm việc trung bình / tuần theo Nghề ISCO-08
+CREATE OR REPLACE TABLE stg_ilostat_hours_ocu AS
+WITH parsed AS (
+    SELECT
+        UPPER(TRIM(iso3)) AS iso3,
+        REPLACE(TRIM(classif1), 'OCU_ISCO08_', '') AS isco1,
+        UPPER(TRIM(sex)) AS sex,
+        CAST(year AS INTEGER) AS year,
+        TRIM(source) AS source,
+        CAST(obs_value AS DOUBLE) AS weekly_hours
+    FROM raw_ilostat_hours_ocu
+    WHERE regexp_matches(TRIM(classif1), '^OCU_ISCO08_[1-9]$')
+      AND UPPER(TRIM(sex)) = 'SEX_T'
+      AND year BETWEEN 2015 AND 2025
+      AND obs_value > 0
+),
+source_span AS (
+    SELECT iso3, source, COUNT(DISTINCT year) AS span_years
+    FROM parsed
+    GROUP BY iso3, source
+),
+ranked AS (
+    SELECT
+        p.*,
+        ROW_NUMBER() OVER (
+            PARTITION BY p.iso3, p.isco1, p.year
+            ORDER BY COALESCE(s.span_years, 0) DESC, p.source ASC
+        ) AS rn
+    FROM parsed p
+    LEFT JOIN source_span s ON p.iso3 = s.iso3 AND p.source = s.source
+)
+SELECT iso3, isco1, sex, year, source, weekly_hours
+FROM ranked
+WHERE rn = 1;

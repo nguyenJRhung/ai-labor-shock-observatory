@@ -1,0 +1,9 @@
+-r requirements.txt
+pyfixest>=0.25
+scipy>=1.12
+matplotlib>=3.8
+seaborn>=0.13
+openpyxl>=3.1
+pyarrow>=16.0
+pytest>=8.0
+ruff>=0.8

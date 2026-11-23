@@ -11,7 +11,6 @@ import pandas as pd
 import requests
 import yaml
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CONFIG_PATH = PROJECT_ROOT / "config" / "pipeline.yaml"
 ASSUMPTIONS_PATH = PROJECT_ROOT / "config" / "business_assumptions.yaml"

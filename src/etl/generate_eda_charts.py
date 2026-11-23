@@ -7,10 +7,8 @@ from pathlib import Path
 import duckdb
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
 from src.etl.common import PROJECT_ROOT, load_pipeline_config
-
 
 plt.rcParams["font.sans-serif"] = ["DejaVu Sans", "Arial", "Segoe UI"]
 plt.rcParams["axes.unicode_minus"] = False

@@ -1,48 +1,46 @@
-# Model Governance, Ethics & Unit Economics Card
+# Model Governance, Ethics, Financial Fairness & Unit Economics Card
 
-Tài liệu này đáp ứng chuẩn **Nhóm tiêu chí 2 & 3 (Scalability & Unit Economics, Explainability, Human-in-the-Loop, Governance & Ethics)** của hệ thống *AI Labor Shock & Skills Exposure Observatory*.
+Tài liệu này đáp ứng chuẩn **Nhóm tiêu chí 2 & 3 (Data Quality & Econometric Rigor, CFO Financial Fairness, Explainability, HITL, Ethics)** sau đợt kiểm toán khắt khe toàn hệ thống.
 
 ---
 
-## 1. Giới hạn Dữ liệu & Minh bạch Phương pháp (Data Limits & Auditability)
+## 1. Giới hạn Dữ liệu & Minh bạch Kinh tế lượng (Data & Identification Audit)
 
-| Hạng mục | Thực tế quan sát được | Rủi ro sai lệch nếu không xử lý | Biện pháp kiểm soát đã cài đặt |
+| Hạng mục | Thực tế quan sát được | Rủi ro sai lệch nếu bỏ qua | Biện pháp kiểm soát & Bằng chứng đã cài đặt |
 | :--- | :--- | :--- | :--- |
-| **Actual LFS vs. ILO Modeled** | Actual LFS (`49` LMICs) đạt kiểm định xu hướng song song ($p = 0.274$). ILO Modeled (`124` LMICs) vi phạm pre-trend ($p = 0.00051$) với cú nhảy giả năm 2020 (`+0.224, p = 0.0018`). | Dùng dữ liệu nội suy tạo kết luận sai hoàn toàn (`-0.0459` vs `+0.1502`). | Khóa cứng `mart_panel_causal_lfs` làm lõi ước lượng chính; tách bảng Modeled chỉ phục vụ đối chiếu độ nhạy. |
-| **Độ nhạy theo từng nhóm nghề & Xu hướng (`Checks 3, 5, 8`)** | Khi bỏ `ISCO-6` (LOOO), hệ số giảm xuống `+0.0196 (p = 0.785)`; khi thêm xu hướng tuyến tính theo nghề xuống `+0.0769 (p = 0.284)`; Binary DiD `ISCO-4` vs. `ISCO 7–9` bằng `+0.0047 (p = 0.848)`. | Khẳng định quá mức rằng toàn bộ mức tăng là do GenAI hoặc có sa thải ròng. | Báo cáo trung thực vai trò chuyển dịch cơ cấu và kết luận chưa có bằng chứng thu hẹp ròng sau 500 lần hoán vị FWL RI (`p = 0.428`). |
-| **Độ phủ hậu 2022 & Mẫu LFS** | Trong `49` LMICs đủ chuẩn, `PHL 2025` chỉ có `OCU_ISCO08_0`/`TOTAL` nên dừng ở `2024`; `IND` chỉ có `pre_2022_years = 1` nên bị loại; `GRD` & `KIR` có LFS nhưng không nằm trong ILO Modeled (`47/49`). | Mẫu năm `2025` nhỏ hơn `2024` làm $SE$ năm `2025` phình rộng; so sánh lệch mẫu LFS vs. Modeled. | Báo cáo đầy đủ KTC 95%, kiểm định Balanced Panel `2017–2024` (`30` nước, `+0.1718, p = 0.025`), và tách riêng đối chiếu khớp mẫu `47` nước. |
-| **Phân giải mã nghề** | ILOSTAT LFS khối LMICs công bố phổ biến ở cấp **1 chữ số ISCO-08** (`0/16` nước mẫu có 2 chữ số), trong khi điểm ILO 2025 ở cấp **4 chữ số** (`427` nghề). | Sai số gộp nhóm (*aggregation bias*) bên trong từng nhóm 1 chữ số. | Thiết kế Adapter chuẩn hóa cho phép thay bằng bảng 2/4 chữ số ngay khi GSO/ILOSTAT mở rộng dữ liệu. |
+| **Gộp nhóm `ISCO-4 -> ISCO-1` & `G = 9` cụm** | `427` nghề ISCO-4 gộp thành `9` nhóm ISCO-1 tạo đúng 9 giá trị `exposure` duy nhất; CRV1 thông thường cho $p=0.036$, nhưng Two-way CRV1 cho $p=0.321$ và **Webb 6-point WCB cho $p=0.362$**. | Phóng đại độ ý nghĩa thống kê do sai số chuẩn quá lạc quan khi số cụm phơi nhiễm nhỏ ($G=9$). | Công bố trung thực p-value Webb WCB (`0.3624`), kiểm tra trọn dải **P25 / Median / Task-Wtd / P75 / GPT-4o / Gemini**, và **Dose-Response (`Spearman rho = +0.40, p = 0.286`)**. |
+| **Biên Ngắn hạn (Youth & Weekly Hours)** | Đo tổng việc làm cấp 1 chữ số có thể bỏ sót đóng băng tuyển dụng hoặc giảm giờ làm. | Nguy cơ âm tính giả (*false negative*) nếu GenAI đánh vào nhân sự trẻ mới ra trường trước. | Bổ sung ETL + SQL marts cho **Youth 15–24 (`48` LMICs, `+0.3136, p=0.006`)** & **Weekly Hours (`45` LMICs, `+0.0047, p=0.713`)**. |
+| **Độ nhạy Chuyển dịch Cơ cấu (`Checks 3, 5, 8`)** | Bỏ `ISCO-6` (Nông nghiệp) đưa hệ số về `+0.0196 (p=0.785)`; thêm trend tuyến tính nghề đưa về `+0.0769 (p=0.284)`; Binary `ISCO-4` vs `7–9` bằng `+0.0047 (p=0.848)`. | Kết luận sai rằng GenAI đang "tạo việc làm ròng" hoặc đang "sa thải hàng loạt". | Kết luận trung thực: **chưa có sa thải ròng hậu 2022**, mức tăng baseline gắn với chuyển dịch cơ cấu rời nông nghiệp. |
+| **Actual LFS vs. ILO Modeled & Độ phủ** | Actual LFS (`49` LMICs) đạt pre-trend ($p=0.274$); Modeled (`124` LMICs) vi phạm ($p=0.00051$). `PHL 2025` chỉ có `TOTAL`/`OCU_0`; `IND` thiếu tiền 2022 (`pre=1`); `GRD`/`KIR` thiếu trong Modeled. | Lệch mẫu và suy diễn sai dấu khi dùng dữ liệu nội suy. | Khóa cứng `mart_panel_causal_lfs` làm lõi chính; kiểm toán tự động `phl_2025_raw_codes`, `ind_eligibility`, `missing_from_modeled` trong `warehouse_summary.json`. |
 
 ---
 
-## 2. Kiểm toán Công bằng Giới tính (Gender Equity & Bias Audit)
+## 2. Tính Công bằng Tài chính & Giả định Kinh doanh (CFO-Grade Fairness Audit)
 
-- **Phát hiện từ dữ liệu thực tế (`mart_gender_exposure_gap` trên 98 LMICs):**
-  - Tại **Việt Nam (2024)**: điểm phơi nhiễm GenAI gia quyền của lao động nữ là **`0.2245`**, của nam giới là **`0.2071`** $\rightarrow$ **Gender Exposure Gap = `+0.0174`** (tỷ trọng việc làm ở nhóm Gradient 3–4 của nữ là `4.79%` so với `3.42%` ở nam; tỷ trọng nhân viên văn phòng ISCO-4 của nữ là `2.71%` vs `2.15%`).
-  - Tại nhiều nền kinh tế ASEAN & Mỹ Latinh khác, khoảng cách này còn lớn hơn: **Philippines (`+0.054`)**, **Brazil (`+0.049`)**, **Colombia (`+0.040`)**, **Thái Lan (`+0.037`)**, **Indonesia (`+0.025`)**.
-  - Ngược lại ở Nam Á (**Bangladesh `-0.034`**, **Pakistan `-0.020`**, **Ấn Độ `-0.014`**), khoảng cách âm do tỷ trọng lao động nữ tham gia khu vực văn phòng/dịch vụ chính thức còn thấp.
-- **Kiểm định nhân quả Triple-Diff theo Giới tính (`7,916` quan sát, 49 LMICs):**
-  - Hệ số chênh lệch bổ sung cho nữ hậu 2022: **`+0.0850` ($SE_{\text{unit}} = 0.1218, p = 0.485$; $SE_{\text{country}} = 0.0888, p = 0.343$)** — hiện chưa có bằng chứng lao động nữ bị thu hẹp việc làm ròng nhanh hơn nam giới ở cấp vĩ mô.
-- **Kiểm toán Giới tính Cấp Doanh nghiệp (`Enterprise Gender Impact Audit`):** Sử dụng tỷ trọng lao động nữ thực tế năm `2024` tại Việt Nam (theo từng mã ISCO 1 chữ số, ví dụ `ISCO-4`: `53.43%`, `ISCO-2`: `57.38%`, `ISCO-5`: `61.03%`). Ở doanh nghiệp mẫu `1.000` nhân sự (`51.68%` nữ), chiến lược *Targeted Reskilling* phân bổ **`55.29%` suất học cho lao động nữ**, còn *Cut & Replace* tác động tới **`53.55%` nữ** (chênh lệch **`+1.87 pp`**, thấp hơn ngưỡng cảnh báo `5.0 pp`). Bộ test đơn vị xác nhận cảnh báo quản trị (`governance_alert = True`) sẽ tự động kích hoạt khi chênh lệch $\ge 5.0\text{ pp}$.
-
----
-
-## 3. Kinh tế Đơn vị & Khả năng Mở rộng (Unit Economics & Scalability)
-
-Hệ thống được thiết kế **Model-Agnostic** (tách hoàn toàn lớp dữ liệu, lớp ước lượng nhân quả và lớp tối ưu tài chính) để chi phí biên gần bằng `0` khi mở rộng quy mô dữ liệu và số doanh nghiệp sử dụng:
-
-| Quy mô triển khai | Kiến trúc hạ tầng | Chi phí cố định / tháng | Chi phí biến đổi / 1.000 nhân sự | Thời gian chạy xử lý | Ghi chú kỹ thuật |
-| :--- | :--- | ---: | ---: | ---: | :--- |
-| **MVP Cá nhân / NCKH** *(Hiện tại)* | DuckDB nhúng + Parquet + Streamlit Community Cloud + GitHub Actions Free | **0 VNĐ** | **0 VNĐ** | ~45s ETL, <3s ước lượng | Chạy hoàn toàn trên laptop & hạ tầng miễn phí |
-| **1 Doanh nghiệp (1.000 nhân sự)** | Docker + Postgres/DuckDB nội bộ + SSO nội bộ | ~500k–1M VNĐ *(VM nhỏ)* | ~0 VNĐ *(tính theo bảng tổng hợp)* | <1s mô phỏng kịch bản | Không gọi LLM API theo từng nhân viên |
-| **Đa doanh nghiệp (50.000 nhân sự / 50 phòng ban)** | DuckDB / Cloud Run serverless + Vector/Parquet cache | ~2–3M VNĐ | ~50k VNĐ *(lưu trữ & log kiểm toán)* | <3s tính toàn bộ ma trận | Chi phí biên tăng chậm hơn rất nhiều so với giá trị NPV tạo ra |
-
-*Lưu ý thiết kế bảo mật (Privacy-by-Design):* Hệ thống **không thu thập, không lưu trữ PII (họ tên, CMND/CCCD, hồ sơ lương cá nhân)**; toàn bộ tính toán vận hành trên bảng tổng hợp ẩn danh theo mã nhóm nghề ISCO-08.
+1. **Loại bỏ hoàn toàn thiên vị chống lại *Cut & Replace*:**
+   - Phiên bản mới chấm dứt việc phạt chi phí gián đoạn trên toàn bộ 520 nhân sự và chấm dứt việc giả định người ở lại đóng góp `0%` năng suất. *Fair Cut & Replace* chỉ chịu tổn thất bàn giao tỷ lệ theo quỹ lương *bị cắt* (`1.5 tháng` lương của `34` người) và nhận `35%` năng suất AI tự học trên `50%` người ở lại được cấp license.
+   - Bộ kiểm thử **No-Rigging Fairness Test** (`pytest`) chứng minh khi chi phí đào tạo đắt (`45M`) + nghỉ việc cao (`35%/năm`) + `realization = 0.30`, *Fair Cut & Replace* thắng pure *Reskilling*.
+2. **Đưa Thực tế Nghỉ việc (`18%/năm`) & Tương quan Đuôi (*Copula*) vào NPV:**
+   - Pure *Reskilling* gánh đầy đủ sụt giảm do nghỉ việc khi đang làm quen, chi phí đào tạo bù `75%` và cập nhật hàng năm `15%`.
+   - **4×4 Cholesky Gaussian Copula (`rho = +0.65 / -0.35`, `1,000` lần)** phản ánh rủi ro cộng hưởng khi thất bại chuyển đổi số: *Uncorrelated P10* (`+5.63 Tỷ`) tụt xuống **`+3.73 Tỷ`**, xuất hiện **`CVaR 5% = -1.80 Tỷ`**. Giải pháp **Hybrid** khắc chế triệt để rủi ro đuôi này (`P50 = +27.79 Tỷ`, **`98.1%` thắng Fair Cut**).
+3. **Minh bạch Hiệu chuẩn Doanh nghiệp Việt Nam:**
+   - Các hồ sơ `FPT FY2025` (`54,110` NV, ~571.6M/năm) và `Techcombank FY2025` (`12,705` NV, ~47.5M/tháng) neo tổng biên chế & quỹ lương thực tế từ BCTC công khai FY2025; tỷ trọng 9 mã ISCO-1 được chuẩn hóa theo đặc thù ngành và gắn nhãn giải trình trực tiếp trên UI.
 
 ---
 
-## 4. Rào chắn Human-in-the-Loop (HITL Guardrails)
+## 3. Kiểm toán Công bằng Giới tính (Gender Equity & Bias Audit)
 
-1. **Khóa bảo vệ vai trò nhạy cảm:** Nhóm `ISCO-1` (Nhà quản lý) được khóa mặc định trên Streamlit UI (`locked_hitl = True`), và người dùng có thể khóa thêm bất kỳ nhóm chuyên môn nào mang trách nhiệm pháp lý/y tế/phê duyệt tín dụng (`ISCO 11, 12, 22, 24, 26`) để thuật toán tối ưu **không bao giờ đề xuất cắt giảm biên chế** tại các vị trí này.
-2. **Kiểm soát giả định lạc quan quá mức:** Thanh trượt `realization_rate` bị chặn tối đa ở `0.90` và đặt mặc định thận trọng tại `0.50` — ngăn mô hình tài chính tạo ra con số NPV ảo do nhầm lẫn giữa *giờ tiết kiệm lý thuyết* và *giá trị kinh doanh thu về thực tế*.
-3. **Tái lập kiểm toán 5/5 mô hình bằng 1 lệnh:** Toàn bộ **5 mô hình kinh tế lượng chính** (`Event Study`, `Pooled DiD`, `Occupation Linear Trends`, `Binary Clerical vs. Manual`, `Triple-Diff Gender`) đều có script đối chiếu chéo độc lập trong R (`src/causal/verify_in_r.R`), đạt **`max |Δβ| = 2.16e-15`** và **`max |ΔSE| = 3.83e-11`** trước khi xuất báo cáo cho lãnh đạo.
+- **Vĩ mô LMICs (`mart_gender_exposure_gap`):** Tại Việt Nam (2024), phơi nhiễm gia quyền của nữ **`0.2245`** vs. nam **`0.2071`** (`+0.0174`), cùng mức chênh lớn hơn ở Philippines (`+0.054`), Brazil (`+0.049`), Thái Lan (`+0.037`). Triple-Diff giới tính (`7,916` obs) cho hệ số bổ sung `+0.0850` ($p = 0.485$).
+- **Enterprise Gender Impact Audit (`5.0 pp` Guardrail):** Theo LFS 2024 Việt Nam, ở mẫu `1,000` NV (`51.68%` nữ), *Targeted Reskilling* phân bổ **`55.29%`** suất học cho nữ còn *Fair Cut & Replace* cắt **`53.55%`** nữ (`+1.87 pp < 5.0 pp`). Nếu cấu trúc văn phòng thiên lệch nữ nặng làm mức chênh $\ge 5.0\text{ pp}$, hệ thống tự động bật cảnh báo quản trị (đã xác minh bằng stress-test trong `pytest`).
+
+---
+
+## 4. Kinh tế Đơn vị, Rào chắn HITL & Kiểm thử CI
+
+| Quy mô triển khai | Kiến trúc hạ tầng | Chi phí cố định / tháng | Chi phí biến đổi / 1.000 NV | Thời gian xử lý |
+| :--- | :--- | ---: | ---: | ---: |
+| **MVP Cá nhân / Live Demo** | DuckDB + Parquet + CSV Snapshot + Streamlit Community Cloud (`requirements.txt` 7 gói) + GitHub Actions CI | **0 VNĐ** | **0 VNĐ** | ~1s UI render |
+| **Doanh nghiệp vừa & lớn (`1k–55k NV`)** | Docker + Postgres/DuckDB nội bộ (tổng hợp ẩn danh không PII) | ~500k–3M VNĐ | ~0–50k VNĐ | <3s tính toàn bộ Copula MC & Preset |
+
+1. **Khóa HITL:** Nhóm `ISCO-1` bị khóa mặc định (`assert cut_n == 0`); mọi thay đổi lương, nhân sự, tỷ lệ nghỉ việc và giả định *Fair Cut* đều tương tác trực tiếp trên UI.
+2. **Độ tin cậy Kỹ thuật:** Đạt `0` lỗi lint **Ruff**, `19/19` bài kiểm thử `pytest` (bao gồm chạy thật `sql/01`–`03` trên DuckDB fixture trong CI + `AppTest` đổi preset 54,110 NV), và đối chiếu R `fixest` **6/6 mô hình** đạt **`6.11e-15`**.
