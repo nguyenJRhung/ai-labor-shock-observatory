@@ -1,0 +1,31 @@
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# Raw & processed data (downloaded via ETL scripts)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/*.duckdb
+data/*.duckdb.wal
+data/*.duckdb.tmp
+
+# Caches & byte-compiled Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+
+# R artifacts
+.Rhistory
+.RData
+.Ruserdata
+
+# OS & environment
+.DS_Store
+Thumbs.db
+.env
+.env.*

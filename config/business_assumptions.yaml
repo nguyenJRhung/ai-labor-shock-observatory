@@ -1,0 +1,77 @@
+# Tham số giả định nghiệp vụ mặc định cho Lớp 3 (BA Reskilling ROI Simulator)
+# Người dùng (CHRO / CFO / Business Analyst) có thể hiệu chỉnh trực tiếp qua cơ chế Human-in-the-Loop trên Streamlit.
+
+enterprise_profile:
+  company_name_template: "Doanh nghiệp Mẫu Việt Nam (Dịch vụ / Tài chính / BPO)"
+  headcount_default: 1000
+  working_hours_per_month: 168
+  currency: "VND"
+
+# Mức lương gộp bình quân tháng (VNĐ) tham khảo theo nhóm nghề chính ISCO-08 (1 chữ số)
+# Lưu ý: Đây là tham số mặc định có thể điều chỉnh theo thang lương thực tế từng doanh nghiệp.
+monthly_salary_vnd_by_isco1:
+  "1":
+    label_vi: "Nhà quản lý"
+    label_en: "Managers"
+    monthly_gross_vnd: 45000000
+  "2":
+    label_vi: "Chuyên môn bậc cao"
+    label_en: "Professionals"
+    monthly_gross_vnd: 28000000
+  "3":
+    label_vi: "Kỹ thuật viên & Chuyên môn trung cấp"
+    label_en: "Technicians and associate professionals"
+    monthly_gross_vnd: 18000000
+  "4":
+    label_vi: "Nhân viên văn phòng / Hỗ trợ hành chính"
+    label_en: "Clerical support workers"
+    monthly_gross_vnd: 13500000
+  "5":
+    label_vi: "Nhân viên dịch vụ & Bán hàng"
+    label_en: "Service and sales workers"
+    monthly_gross_vnd: 11500000
+  "6":
+    label_vi: "Lao động nông, lâm, ngư nghiệp có kỹ năng"
+    label_en: "Skilled agricultural, forestry and fishery workers"
+    monthly_gross_vnd: 8500000
+  "7":
+    label_vi: "Thợ thủ công & Các nghề liên quan"
+    label_en: "Craft and related trades workers"
+    monthly_gross_vnd: 12000000
+  "8":
+    label_vi: "Thợ vận hành máy móc & Lắp ráp"
+    label_en: "Plant and machine operators and assemblers"
+    monthly_gross_vnd: 11000000
+  "9":
+    label_vi: "Lao động giản đơn"
+    label_en: "Elementary occupations"
+    monthly_gross_vnd: 8000000
+
+financial_assumptions:
+  horizon_months: 36                     # Khung thời gian đánh giá dòng tiền (3 năm)
+  discount_rate_annual: 0.10             # Chi phí sử dụng vốn / tỷ lệ chiết khấu năm (10%/năm)
+  reskilling_cost_vnd: 12000000          # Chi phí tái đào tạo bình quân một nhân sự (VNĐ)
+  ai_seat_cost_vnd: 550000               # Chi phí bản quyền công cụ AI / nhân sự / tháng (VNĐ)
+  change_management_overhead_pct: 0.15   # Chi phí quản trị thay đổi & tích hợp quy trình (% trên tổng chi phí đào tạo)
+  replacement_cost_months_salary: 4.0    # Chi phí đền bù nghỉ việc + tuyển mới + thời gian làm quen (tính theo tháng lương)
+  realization_rate: 0.50                 # Tỷ lệ giờ tiết kiệm thực tế chuyển hóa thành giá trị kinh doanh (thận trọng 50%)
+  productivity_ramp_months: 3            # Số tháng làm quen công cụ trước khi đạt năng suất ổn định
+
+adoption_scenarios:
+  conservative:
+    label: "Thận trọng (Conservative)"
+    adoption_multiplier: 0.35
+    description: "Áp dụng AI thí điểm tại các tác vụ văn bản/báo cáo chuẩn hóa, kiểm duyệt chặt."
+  base:
+    label: "Cơ sở (Base Case)"
+    adoption_multiplier: 0.60
+    description: "Tích hợp AI vào quy trình làm việc chuẩn kèm đào tạo lại có trọng điểm."
+  accelerated:
+    label: "Tăng tốc (Accelerated)"
+    adoption_multiplier: 0.85
+    description: "Triển khai đồng bộ AI Agents + tái thiết kế quy trình liên phòng ban."
+
+governance_guardrails:
+  human_in_the_loop_mandatory_isco2: ["11", "12", "22", "24", "26"]
+  max_annual_headcount_reduction_cap_pct: 0.15
+  gender_impact_audit_threshold_pct: 5.0

@@ -1,0 +1,86 @@
+# Cấu hình đường ống dữ liệu và tham số nghiên cứu (Data Pipeline Configuration)
+project:
+  name: "AI Labor Shock & Skills Exposure Observatory"
+  version: "0.1.0"
+  scope: "LMICs & Vietnam"
+  budget_tier: "zero-cost-open-data"
+
+study_window:
+  start_year: 2015
+  end_year: 2026
+  reference_year: 2022   # Năm nền ngay trước bước ngoặt thương mại hóa GenAI (cuối 2022)
+  covid_years: [2020, 2021]
+
+# 16 quốc gia LMICs tiêu biểu (châu Á, Mỹ Latinh, châu Phi/MENA) dùng để kiểm chứng độ phủ nhanh
+sample_lmics_iso3:
+  - VNM  # Việt Nam (Lower-middle income)
+  - IDN  # Indonesia
+  - PHL  # Philippines
+  - THA  # Thái Lan
+  - MYS  # Malaysia
+  - IND  # Ấn Độ
+  - BGD  # Bangladesh
+  - PAK  # Pakistan
+  - MEX  # Mexico
+  - BRA  # Brazil
+  - COL  # Colombia
+  - PER  # Peru
+  - ZAF  # Nam Phi
+  - EGY  # Ai Cập
+  - MAR  # Ma-rốc
+  - TUR  # Thổ Nhĩ Kỳ
+
+paths:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  probes_dir: "data/probes"
+  duckdb_path: "data/observatory.duckdb"
+  audit_report_path: "docs/00_Data_Coverage_Audit.md"
+
+sources:
+  ilo_genai_2025:
+    description: "ILO Working Paper 140 (Gmyrek et al., 2025) - Refined GenAI Exposure Index (ISCO-08)"
+    url: "https://raw.githubusercontent.com/pgmyrek/2025_GenAI_scores_ISCO08/main/Final_Scores_ISCO08_Gmyrek_et_al_2025.xlsx"
+    local_file: "data/raw/ilo_2025_genai_isco08.xlsx"
+
+  ilostat:
+    description: "ILOSTAT rplumber CSV endpoint (ưu tiên khảo sát thực tế LFS trước, dùng Modeled để kiểm tra độ nhạy)"
+    base_url: "https://rplumber.ilo.org/data/indicator/"
+    indicator_lfs: "EMP_TEMP_SEX_OCU_NB_A"       # Employment by sex and occupation (Actual LFS)
+    indicator_modeled: "EMP_2EMP_SEX_OCU_NB_A"   # ILO Modeled Estimates (chỉ dùng robustness/coverage check)
+    request_delay_sec: 0.3
+    timeout_sec: 45
+
+  github_innovation_graph:
+    description: "GitHub Innovation Graph - Chỉ báo mật độ lập trình viên & hoạt động mã nguồn theo quý"
+    developers_url: "https://raw.githubusercontent.com/github/innovationgraph/main/data/developers.csv"
+    git_pushes_url: "https://raw.githubusercontent.com/github/innovationgraph/main/data/git_pushes.csv"
+    local_developers_file: "data/raw/github_developers.csv"
+    local_git_pushes_file: "data/raw/github_git_pushes.csv"
+
+  anthropic_aei:
+    description: "Anthropic Economic Index (Hugging Face) - Dữ liệu sử dụng AI thực tế theo quốc gia & O*NET"
+    repo_id: "Anthropic/EconomicIndex"
+    job_exposure_url: "https://huggingface.co/datasets/Anthropic/EconomicIndex/resolve/main/labor_market_impacts/job_exposure.csv"
+    local_job_exposure_file: "data/raw/anthropic_job_exposure.csv"
+    latest_release_tree_api: "https://huggingface.co/api/datasets/Anthropic/EconomicIndex/tree/main/release_2026_06_26/data"
+    fallback_release_tree_apis:
+      - "https://huggingface.co/api/datasets/Anthropic/EconomicIndex/tree/main/release_2026_03_24/data"
+      - "https://huggingface.co/api/datasets/Anthropic/EconomicIndex/tree/main/release_2026_01_15/data"
+      - "https://huggingface.co/api/datasets/Anthropic/EconomicIndex/tree/main/release_2025_09_15/data"
+    max_probe_file_mb: 20
+
+  world_bank_wdi:
+    description: "World Bank WDI v2 API - Danh mục LMICs và 8 chỉ báo kinh tế vĩ mô đồng bộ với NCKH"
+    countries_lmics_url: "https://api.worldbank.org/v2/country?incomeLevel=LIC;LMC;UMC&format=json&per_page=300"
+    indicator_base_url: "https://api.worldbank.org/v2/country/{country}/indicator/{indicator}?format=json&per_page=100"
+    local_countries_file: "data/raw/wb_lmics_countries.json"
+    indicators:
+      - SL.UEM.TOTL.ZS       # Tỷ lệ thất nghiệp (% lực lượng lao động)
+      - NY.GDP.MKTP.KD.ZG    # Tăng trưởng GDP thực (%)
+      - FP.CPI.TOTL.ZG       # Lạm phát CPI (%)
+      - BX.KLT.DINV.WD.GD.ZS # Dòng vốn FDI ròng (% GDP)
+      - NE.TRD.GNFS.ZS       # Độ mở thương mại (% GDP)
+      - SL.TLF.CACT.FE.ZS    # Tỷ lệ tham gia LLLĐ nữ (%)
+      - FS.AST.PRVT.GD.ZS    # Tín dụng khu vực tư nhân (% GDP)
+      - NY.GDP.PCAP.KD       # GDP bình quân đầu người (USD cố định)
