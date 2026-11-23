@@ -83,3 +83,4 @@ pip install -r requirements.txt
 - [ ] **Tuần 7–8:** Lõi Suy luận Nhân quả (`pyfixest` + đối chiếu chéo R `fixest`), Triple-Diff & bộ 4 kiểm định phản bác.
 - [ ] **Tuần 9–10:** Mô hình tài chính `Reskilling ROI` + ứng dụng Streamlit 3 tab tích hợp cơ chế *Human-in-the-Loop*.
 - [ ] **Tuần 11–12:** Tự động hóa `Makefile`, GitHub Actions CI, `pytest`, hoàn thiện *Executive Policy Memo* và *Model Governance Card*.
+"# ai-labor-shock-observatory" 
